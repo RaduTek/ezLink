@@ -1,0 +1,13 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# Test and packaging artifacts
+TestResults/
+packages/
+*.nupkg

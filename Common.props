@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings shared by every ezLink project. Same old-style csproj format as
+  ..\EasyMusicSync\EasyMusicSync.csproj (built with Visual Studio's MSBuild),
+  targeting .NET Framework 2.0 and AnyCPU.
+-->
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <!-- C# 2.0 only: the compiler rejects var, lambdas, auto-properties, LINQ syntax, ... -->
+    <LangVersion>ISO-2</LangVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+</Project>
+

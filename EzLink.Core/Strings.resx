@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve">
+    <value>ezLink</value>
+  </data>
+  <data name="ExplorerTitle" xml:space="preserve">
+    <value>ezExplorer</value>
+  </data>
+  <data name="SetupTitle" xml:space="preserve">
+    <value>ezLink Setup</value>
+  </data>
+  <data name="UnexpectedError" xml:space="preserve">
+    <value>An unexpected error occurred:
+
+{0}
+
+Details were written to the log folder:
+{1}</value>
+  </data>
+  <data name="MainPlaceholder" xml:space="preserve">
+    <value>ezLink is running.
+
+The connection status area arrives in a later milestone.</value>
+  </data>
+  <data name="ExplorerPlaceholder" xml:space="preserve">
+    <value>ezExplorer is running.
+
+The remote file pane arrives in a later milestone.</value>
+  </data>
+  <data name="SetupPlaceholder" xml:space="preserve">
+    <value>ezLinkSetup is running.
+
+The setup verbs (/install, /uuid, /firewall, /datadir, /uninstall) arrive in a later milestone.</value>
+  </data>
+</root>

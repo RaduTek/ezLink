@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzLink.Protocol", "EzLink.Protocol\EzLink.Protocol.csproj", "{E08F289C-68CA-4BE3-9875-9557A595B9E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzLink.Core", "EzLink.Core\EzLink.Core.csproj", "{CEEA545C-7D5A-4B76-852E-871E7E875D67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezLink", "ezLink\ezLink.csproj", "{00984FE4-D7A1-4340-BD9B-4A672AEDB92B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezExplorer", "ezExplorer\ezExplorer.csproj", "{D10C3454-9E9C-42CC-9251-4745A6C2C09E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezLinkSetup", "ezLinkSetup\ezLinkSetup.csproj", "{FE65D3BA-1D7E-42A7-9F7E-487A50626F9D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E08F289C-68CA-4BE3-9875-9557A595B9E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E08F289C-68CA-4BE3-9875-9557A595B9E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E08F289C-68CA-4BE3-9875-9557A595B9E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E08F289C-68CA-4BE3-9875-9557A595B9E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEEA545C-7D5A-4B76-852E-871E7E875D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEEA545C-7D5A-4B76-852E-871E7E875D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEEA545C-7D5A-4B76-852E-871E7E875D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEEA545C-7D5A-4B76-852E-871E7E875D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00984FE4-D7A1-4340-BD9B-4A672AEDB92B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00984FE4-D7A1-4340-BD9B-4A672AEDB92B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00984FE4-D7A1-4340-BD9B-4A672AEDB92B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00984FE4-D7A1-4340-BD9B-4A672AEDB92B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D10C3454-9E9C-42CC-9251-4745A6C2C09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D10C3454-9E9C-42CC-9251-4745A6C2C09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D10C3454-9E9C-42CC-9251-4745A6C2C09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D10C3454-9E9C-42CC-9251-4745A6C2C09E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE65D3BA-1D7E-42A7-9F7E-487A50626F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE65D3BA-1D7E-42A7-9F7E-487A50626F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE65D3BA-1D7E-42A7-9F7E-487A50626F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE65D3BA-1D7E-42A7-9F7E-487A50626F9D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A0E8C1DC-3D26-4B03-9D6F-668FBAC9A0D0}
+	EndGlobalSection
+EndGlobal
+
