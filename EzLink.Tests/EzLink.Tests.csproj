@@ -35,17 +35,25 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AdapterLocatorTests.cs" />
     <Compile Include="BeaconTests.cs" />
     <Compile Include="CommandNumberTests.cs" />
+    <Compile Include="DiscoveryServiceTests.cs" />
     <Compile Include="FrameTests.cs" />
+    <Compile Include="IpMathTests.cs" />
     <Compile Include="MessageTests.cs" />
     <Compile Include="PayloadTests.cs" />
+    <Compile Include="PeerTableTests.cs" />
     <Compile Include="Samples.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">
+      <Project>{CEEA545C-7D5A-4B76-852E-871E7E875D67}</Project>
+      <Name>EzLink.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EzLink.Protocol\EzLink.Protocol.csproj">
       <Project>{E08F289C-68CA-4BE3-9875-9557A595B9E0}</Project>
       <Name>EzLink.Protocol</Name>

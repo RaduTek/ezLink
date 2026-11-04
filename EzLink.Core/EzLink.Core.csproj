@@ -33,10 +33,19 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AdapterInfo.cs" />
+    <Compile Include="AdapterLocator.cs" />
     <Compile Include="AppBootstrap.cs" />
+    <Compile Include="BeaconChannel.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="DiscoveryService.cs" />
+    <Compile Include="IAdapterSource.cs" />
+    <Compile Include="IpMath.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="MachineIdentity.cs" />
+    <Compile Include="PeerTable.cs" />
     <Compile Include="Strings.cs" />
+    <Compile Include="SystemAdapterSource.cs" />
     <EmbeddedResource Include="Strings.resx" />
   </ItemGroup>
   <ItemGroup>
