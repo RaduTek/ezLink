@@ -252,6 +252,7 @@ Reuse the main window design of the existing EasyMusicSync app ([RaduTek/EasyMus
 - Status area: large icon for the state, the status text, the peer's computer name, and the two trust lines.
 - Closing the window hides it to the tray; Exit is in the tray menu.
 - Copy the reused files into the ezLink project with their namespaces changed; do not reference the EasyMusicSync project. Both are MIT-licensed by the same author, so keep the license header where present.
+- Necessary icons are to be sourced from `oxygen-icons` repo checked out at `../oxygen-icons`
 
 ### Tray and startup
 
