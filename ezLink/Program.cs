@@ -37,12 +37,14 @@ namespace ezLink
                 }
 
                 bool startHidden = Array.IndexOf(args, "/minimized") >= 0;
-                LinkManager link = CreateLink(args);
+                WinFormsApprovalPrompt prompt = new WinFormsApprovalPrompt();
+                LinkManager link = CreateLink(args, suffix, prompt);
                 try
                 {
                     using (IpcWindow ipc = new IpcWindow(MainWindowTitle + suffix))
                     using (MainForm form = new MainForm(link, ipc, startHidden))
                     {
+                        prompt.Attach(form);
                         link.Start();
                         Application.Run(form);
                     }
@@ -75,7 +77,7 @@ namespace ezLink
             }
         }
 
-        private static LinkManager CreateLink(string[] args)
+        private static LinkManager CreateLink(string[] args, string suffix, WinFormsApprovalPrompt prompt)
         {
             IAdapterSource source = new SystemAdapterSource();
             Guid machineId = MachineIdentity.GetOrCreate();
@@ -98,7 +100,8 @@ namespace ezLink
 #endif
 
             string appVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
-            return new LinkManager(source, machineId, computerName, appVersion, options);
+            TrustManager trust = new TrustManager(new TrustStore(TrustStore.DefaultPath(suffix)), prompt);
+            return new LinkManager(source, machineId, computerName, appVersion, options, trust);
         }
     }
 }

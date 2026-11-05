@@ -27,6 +27,7 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -54,6 +55,8 @@
     <Compile Include="SessionListener.cs" />
     <Compile Include="Strings.cs" />
     <Compile Include="SystemAdapterSource.cs" />
+    <Compile Include="TrustManager.cs" />
+    <Compile Include="TrustStore.cs" />
     <EmbeddedResource Include="Strings.resx" />
   </ItemGroup>
   <ItemGroup>

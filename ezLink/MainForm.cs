@@ -26,6 +26,7 @@ namespace ezLink
         private readonly Label peerLabel = new Label();
         private readonly Label weAllowLabel = new Label();
         private readonly Label peerAllowsLabel = new Label();
+        private readonly Button fixButton = new Button();
 
         private readonly NotifyIcon notifyIcon = new NotifyIcon();
         private readonly ContextMenuStrip trayMenu = new ContextMenuStrip();
@@ -126,6 +127,13 @@ namespace ezLink
             peerAllowsLabel.AutoEllipsis = true;
             peerAllowsLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
+            fixButton.Text = Strings.Get("ErrorFixButton");
+            fixButton.Location = new Point(82, 56);
+            fixButton.Size = new Size(90, 26);
+            fixButton.Visible = false;
+            fixButton.Click += OnFixClick;
+
+            mainPanel.Controls.Add(fixButton);
             mainPanel.Controls.Add(statusIcon);
             mainPanel.Controls.Add(statusLabel);
             mainPanel.Controls.Add(peerLabel);
@@ -317,10 +325,42 @@ namespace ezLink
 
         private void OnOptionsClick(object sender, EventArgs e)
         {
-            using (OptionsForm options = new OptionsForm(link.MachineId, link.ComputerName))
+            using (OptionsForm options = new OptionsForm(link.MachineId, link.ComputerName, link.Trust))
             {
                 options.ShowDialog(this);
             }
+        }
+
+        /// <summary>
+        /// The fix for a duplicate machine ID (a cloned Windows image): the setup helper, elevated, gives this
+        /// computer a new one. The ID is read once at startup, so ezLink exits afterwards.
+        /// </summary>
+        private void OnFixClick(object sender, EventArgs e)
+        {
+            if (link.State.Status.ErrorKind != LinkErrorKind.DuplicateUuid)
+            {
+                return;
+            }
+            if (MessageBox.Show(this, Strings.Get("FixUuidPrompt"), Strings.Get("AppName"),
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
+            {
+                return;
+            }
+
+            int exitCode;
+            if (!SetupLauncher.Run("/regenerate-uuid", this, out exitCode))
+            {
+                return;
+            }
+            if (exitCode != 0)
+            {
+                MessageBox.Show(this, string.Format(Strings.Get("FixUuidFailed"), exitCode), Strings.Get("AppName"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            MessageBox.Show(this, Strings.Get("FixUuidDone"), Strings.Get("AppName"),
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ExitApplication();
         }
 
         // ---- rendering the state ----
@@ -332,6 +372,7 @@ namespace ezLink
 
             statusIcon.Image = Images.Status(status.State);
             statusLabel.Text = status.Text;
+            fixButton.Visible = status.State == LinkState.Error && status.ErrorKind == LinkErrorKind.DuplicateUuid;
 
             bool showPeer = status.State == LinkState.Connected || status.State == LinkState.Connecting;
             peerLabel.Text = showPeer ? status.PeerName : string.Empty;

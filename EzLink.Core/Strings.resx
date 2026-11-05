@@ -151,4 +151,84 @@ The remote file pane arrives in a later milestone.</value>
 
 The setup verbs (/install, /uuid, /firewall, /datadir, /uninstall) arrive in a later milestone.</value>
   </data>
+  <data name="AccessBlocked" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="AccessBrowse" xml:space="preserve">
+    <value>browse</value>
+  </data>
+  <data name="AccessRead" xml:space="preserve">
+    <value>copy from</value>
+  </data>
+  <data name="AccessWrite" xml:space="preserve">
+    <value>copy to</value>
+  </data>
+  <data name="AccessNone" xml:space="preserve">
+    <value>Nothing</value>
+  </data>
+  <data name="ApprovalHeadline" xml:space="preserve">
+    <value>{0} wants to access files on this computer.</value>
+  </data>
+  <data name="ApprovalBrowseCopy" xml:space="preserve">
+    <value>Browse and copy files from this computer</value>
+  </data>
+  <data name="ApprovalWrite" xml:space="preserve">
+    <value>Copy files to this computer</value>
+  </data>
+  <data name="ApprovalAllowOnce" xml:space="preserve">
+    <value>Allow once</value>
+  </data>
+  <data name="ApprovalAlwaysAllow" xml:space="preserve">
+    <value>Always allow</value>
+  </data>
+  <data name="ApprovalDeny" xml:space="preserve">
+    <value>Deny</value>
+  </data>
+  <data name="ApprovalNote" xml:space="preserve">
+    <value>Allow once lasts until the connection ends. Deny is remembered; you can change it later in Options.</value>
+  </data>
+  <data name="OptionsTrusted" xml:space="preserve">
+    <value>Trusted computers</value>
+  </data>
+  <data name="OptionsColName" xml:space="preserve">
+    <value>Computer</value>
+  </data>
+  <data name="OptionsColAccess" xml:space="preserve">
+    <value>This computer allows it to</value>
+  </data>
+  <data name="OptionsColLastSeen" xml:space="preserve">
+    <value>Last seen</value>
+  </data>
+  <data name="OptionsEdit" xml:space="preserve">
+    <value>Edit...</value>
+  </data>
+  <data name="OptionsRemove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="OptionsUnblock" xml:space="preserve">
+    <value>Unblock</value>
+  </data>
+  <data name="TrustEditTitle" xml:space="preserve">
+    <value>Access for {0}</value>
+  </data>
+  <data name="TrustEditBlock" xml:space="preserve">
+    <value>Block this computer (deny without asking)</value>
+  </data>
+  <data name="ErrorFixButton" xml:space="preserve">
+    <value>Fix...</value>
+  </data>
+  <data name="FixUuidPrompt" xml:space="preserve">
+    <value>Another computer reports the same ID as this one, which usually means this Windows installation was cloned.
+
+Give this computer a new ID now? Windows will ask for administrator permission, and ezLink will close afterwards.</value>
+  </data>
+  <data name="FixUuidDone" xml:space="preserve">
+    <value>This computer has a new ID. Start ezLink again to use it.</value>
+  </data>
+  <data name="FixUuidFailed" xml:space="preserve">
+    <value>The ID could not be changed (setup helper exit code {0}). Details are in the setup log.</value>
+  </data>
+  <data name="SetupMissing" xml:space="preserve">
+    <value>ezLinkSetup.exe was not found next to ezLink.exe.</value>
+  </data>
 </root>

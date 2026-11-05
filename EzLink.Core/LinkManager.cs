@@ -39,6 +39,7 @@ namespace EzLink
         private readonly LinkOptions options;
         private readonly DiscoveryService discovery;
         private readonly LinkStateMachine state = new LinkStateMachine();
+        private readonly TrustManager trust;
 
         private readonly object sync = new object();
         private readonly object listenerSync = new object(); // serializes EnsureListener
@@ -55,9 +56,17 @@ namespace EzLink
         /// <summary>Raised when the control session closes.</summary>
         public event EventHandler<PeerEventArgs> ControlClosed;
 
+        /// <summary>A link without a trust manager: the control session works, every other session is denied.</summary>
         public LinkManager(IAdapterSource source, Guid machineId, string computerName, string appVersion,
             LinkOptions options)
+            : this(source, machineId, computerName, appVersion, options, null)
         {
+        }
+
+        public LinkManager(IAdapterSource source, Guid machineId, string computerName, string appVersion,
+            LinkOptions options, TrustManager trust)
+        {
+            this.trust = trust;
             this.source = source;
             this.machineId = machineId;
             this.computerName = computerName;
@@ -73,6 +82,10 @@ namespace EzLink
             discovery.DuplicateMachineId += OnDuplicateMachineId;
             discovery.ChannelError += OnChannelError;
             discovery.ChannelErrorsCleared += OnChannelErrorsCleared;
+            if (trust != null)
+            {
+                trust.PermissionsChanged += OnPermissionsChanged;
+            }
         }
 
         public LinkStateMachine State
@@ -88,6 +101,12 @@ namespace EzLink
         public Guid MachineId
         {
             get { return machineId; }
+        }
+
+        /// <summary>The trust manager, or null if this link has none.</summary>
+        public TrustManager Trust
+        {
+            get { return trust; }
         }
 
         public string ComputerName
@@ -169,6 +188,10 @@ namespace EzLink
             Stop();
             discovery.Dispose();
             stopEvent.Close();
+            if (trust != null)
+            {
+                trust.PermissionsChanged -= OnPermissionsChanged;
+            }
         }
 
         // ---- ISessionHost: the listening side ----
@@ -195,12 +218,51 @@ namespace EzLink
                 // The control session is always accepted so both sides can show the peer's name and trust state.
                 reply.Status = HelloStatus.Accepted;
             }
-            else
+            else if (hello.SessionType != SessionTypes.Files || trust == null)
             {
-                Log.Info("Refusing {0} session from {1}: not available yet", hello.SessionType, hello.ComputerName);
+                Log.Info("Refusing {0} session from {1}: not available", hello.SessionType, hello.ComputerName);
                 reply.Status = HelloStatus.Denied;
             }
+            else
+            {
+                AuthorizeSession(hello, remote, connection, reply);
+            }
             return reply;
+        }
+
+        /// <summary>
+        /// Applies the trust decision to a files session. If the user has to be asked, the peer is told to wait
+        /// (PendingApproval) first; the prompt is abandoned if the connection drops meanwhile.
+        /// </summary>
+        private void AuthorizeSession(HelloMessage hello, IPEndPoint remote, SessionConnection connection,
+            HelloReplyMessage reply)
+        {
+            ManualResetEvent gone = new ManualResetEvent(false);
+            EventHandler<ConnectionClosedEventArgs> onClosed = delegate { gone.Set(); };
+            connection.Closed += onClosed;
+            try
+            {
+                Permissions granted;
+                reply.Status = trust.Authorize(hello.MachineId, hello.ComputerName, hello.SessionType,
+                    delegate
+                    {
+                        HelloReplyMessage pending = new HelloReplyMessage();
+                        pending.MachineId = reply.MachineId;
+                        pending.ComputerName = reply.ComputerName;
+                        pending.AppVersion = reply.AppVersion;
+                        pending.Status = HelloStatus.PendingApproval;
+                        connection.Send(pending.ToFrame(1));
+                    },
+                    gone, out granted);
+                reply.GrantedPermissions = granted;
+                Log.Info("Session {0} from {1} ({2}): {3} {4}", hello.SessionType, hello.ComputerName, remote,
+                    reply.Status, granted);
+            }
+            finally
+            {
+                connection.Closed -= onClosed;
+                gone.Close();
+            }
         }
 
         public bool SessionEstablished(PeerSession session)
@@ -270,6 +332,10 @@ namespace EzLink
                 }
             }
             state.SetPeer(null);
+            if (trust != null)
+            {
+                trust.ClearOnce(e.Peer.MachineId); // Allow once ends when the cable is unplugged
+            }
             if (listener != null)
             {
                 listener.Stop();
@@ -532,6 +598,7 @@ namespace EzLink
             discovery.SetSessionOpen(session.PeerId, true);
             state.SetControl(true, session.PeerName);
             state.SetPeerAllows(session.PeerGrantsUs);
+            AnnounceWhatWeAllow(session);
             Log.Info("Control session open: {0}", session);
 
             EventHandler<PeerEventArgs> opened = ControlOpened;
@@ -540,6 +607,29 @@ namespace EzLink
                 opened(this, new PeerEventArgs(PeerFromSession(session)));
             }
             return true;
+        }
+
+        /// <summary>Tells the peer (and the UI) what this machine currently lets the peer do.</summary>
+        private void AnnounceWhatWeAllow(PeerSession session)
+        {
+            Permissions allowed = trust != null ? trust.GetEffective(session.PeerId) : Permissions.None;
+            state.SetWeAllow(allowed);
+            TrustChangedMessage message = new TrustChangedMessage();
+            message.Granted = allowed;
+            session.Send(message, 0);
+        }
+
+        private void OnPermissionsChanged(object sender, TrustEventArgs e)
+        {
+            PeerSession session;
+            lock (sync)
+            {
+                session = control;
+            }
+            if (session != null && session.PeerId == e.PeerId && !session.IsClosed)
+            {
+                AnnounceWhatWeAllow(session);
+            }
         }
 
         private void OnTrustChanged(object sender, EventArgs e)
@@ -576,6 +666,11 @@ namespace EzLink
             Log.Info("Control session closed: {0} ({1})", session, e.Reason);
             discovery.SetSessionOpen(session.PeerId, false);
             state.SetControl(false, null);
+            state.SetWeAllow(Permissions.None);
+            if (trust != null)
+            {
+                trust.ClearOnce(session.PeerId); // Allow once lasts for the lifetime of the control session
+            }
 
             EventHandler<PeerEventArgs> closed = ControlClosed;
             if (closed != null)

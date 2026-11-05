@@ -51,6 +51,9 @@
     <Compile Include="PeerTableTests.cs" />
     <Compile Include="Samples.cs" />
     <Compile Include="SessionTests.cs" />
+    <Compile Include="TrustLinkTests.cs" />
+    <Compile Include="TrustManagerTests.cs" />
+    <Compile Include="TrustStoreTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
