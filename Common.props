@@ -9,6 +9,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <!-- Every project builds into this one folder, so the executables sit next to each other and their DLLs. -->
+    <EzLinkBin>$(MSBuildThisFileDirectory)bin\</EzLinkBin>
     <!-- C# 2.0 only: the compiler rejects var, lambdas, auto-properties, LINQ syntax, ... -->
     <LangVersion>ISO-2</LangVersion>
     <FileAlignment>512</FileAlignment>
