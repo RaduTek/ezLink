@@ -14,6 +14,7 @@ namespace ezLink
     {
         private readonly LinkManager link;
         private readonly IpcWindow ipc;
+        private readonly ExplorerLauncher explorers;
         private readonly bool startHidden;
 
         private readonly NativeToolStrip.NativeToolStrip toolStrip = new NativeToolStrip.NativeToolStrip();
@@ -43,6 +44,7 @@ namespace ezLink
         {
             this.link = link;
             this.ipc = ipc;
+            explorers = new ExplorerLauncher(ipc);
             this.startHidden = startHidden;
             allowVisible = !startHidden;
 
@@ -67,6 +69,8 @@ namespace ezLink
 
             link.State.StateChanged += OnStateChanged;
             ipc.MessageReceived += OnIpcMessage;
+            link.ControlOpened += OnControlOpened;
+            link.ControlClosed += OnControlClosed;
             UpdateStatus();
         }
 
@@ -315,12 +319,41 @@ namespace ezLink
             {
                 ShowMain();
             }
-            // The explorer notifications (ExplorerHello / ExplorerClosed) are handled once ezExplorer exists.
+            else
+            {
+                explorers.OnMessage(e); // ExplorerHello / ExplorerClosed
+            }
+        }
+
+        // The control session events come from session threads; the explorers are told on the UI thread.
+        private void OnControlOpened(object sender, PeerEventArgs e)
+        {
+            RunOnUi(delegate { explorers.PeerBack(e.Peer); });
+        }
+
+        private void OnControlClosed(object sender, PeerEventArgs e)
+        {
+            RunOnUi(delegate { explorers.PeerLost(e.Peer.MachineId); });
+        }
+
+        private void RunOnUi(MethodInvoker action)
+        {
+            if (IsHandleCreated && !IsDisposed)
+            {
+                try
+                {
+                    BeginInvoke(action);
+                }
+                catch (InvalidOperationException)
+                {
+                    // The window is being torn down.
+                }
+            }
         }
 
         private void OnExploreClick(object sender, EventArgs e)
         {
-            ExplorerLauncher.Launch(link, ipc.Handle, Visible ? (IWin32Window)this : null);
+            explorers.Launch(link, Visible ? (IWin32Window)this : null);
         }
 
         private void OnOptionsClick(object sender, EventArgs e)

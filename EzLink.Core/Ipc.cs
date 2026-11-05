@@ -21,6 +21,18 @@ namespace EzLink
         public const int ExplorerClosed = 5;
         /// <summary>ezExplorer.exe to ezLink.exe right after start; payload: peer UUID.</summary>
         public const int ExplorerHello = 6;
+
+        /// <summary>The title of an explorer's message window; ezLink.exe finds it by the peer it browses.</summary>
+        public static string ExplorerWindowTitle(Guid peerId)
+        {
+            return "ezLink.Explorer.Ipc." + peerId.ToString("D");
+        }
+
+        /// <summary>The name of the mutex that keeps it to one explorer per peer.</summary>
+        public static string ExplorerMutexName(Guid peerId)
+        {
+            return @"Local\ezLink.Explorer." + peerId.ToString("D");
+        }
     }
 
     public sealed class IpcMessageEventArgs : EventArgs

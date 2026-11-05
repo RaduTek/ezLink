@@ -50,6 +50,13 @@
     <Compile Include="MessageTests.cs" />
     <Compile Include="PayloadTests.cs" />
     <Compile Include="PeerTableTests.cs" />
+    <Compile Include="RemotePathsTests.cs" />
+    <Compile Include="..\ezExplorer\RemotePaths.cs">
+      <Link>Linked\RemotePaths.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\ShellNative.cs">
+      <Link>Linked\ShellNative.cs</Link>
+    </Compile>
     <Compile Include="Samples.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="TrustLinkTests.cs" />

@@ -34,14 +34,44 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ExplorerArgs.cs" />
     <Compile Include="ExplorerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ExplorerSettings.cs" />
+    <Compile Include="NativeToolStrip\NativeToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NativeToolStrip\NativeToolStripRenderer.cs" />
+    <Compile Include="NavigationController.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="RemoteBrowser.cs" />
+    <Compile Include="RemoteItem.cs" />
+    <Compile Include="RemoteListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RemotePaths.cs" />
+    <Compile Include="RemoteTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ShellIcons.cs" />
+    <Compile Include="ShellNative.cs" />
+    <Compile Include="ToolImages.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\nav-back.png"><LogicalName>ezExplorer.Resources.nav-back.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-forward.png"><LogicalName>ezExplorer.Resources.nav-forward.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-up.png"><LogicalName>ezExplorer.Resources.nav-up.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-refresh.png"><LogicalName>ezExplorer.Resources.nav-refresh.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\view-details.png"><LogicalName>ezExplorer.Resources.view-details.png</LogicalName></EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <None Include="..\ezLink\licenses\oxygen-icons-LGPL-3.0-or-later.txt">
+      <Link>licenses\oxygen-icons-LGPL-3.0-or-later.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">

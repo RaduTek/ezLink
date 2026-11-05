@@ -22,10 +22,21 @@ Riccardo Iaconelli.
 | `tool-sync` | `actions/folder-sync` |
 | `tool-options` | `actions/configure` |
 
+The toolbar images of `ezExplorer.exe` (`ezExplorer/Resources/*.png`, 22 px) are likewise unmodified Oxygen icons;
+the license text is copied next to `ezExplorer.exe` at build time as well.
+
+| ezExplorer image | Oxygen icon |
+| --- | --- |
+| `nav-back` | `actions/go-previous` |
+| `nav-forward` | `actions/go-next` |
+| `nav-up` | `actions/go-up` |
+| `nav-refresh` | `actions/view-refresh` |
+| `view-details` | `actions/view-list-details` |
+
 In the Oxygen repository `places/folder-open` (32 px) is a link to `status/folder-open`, and `places/network-workgroup`
 (16 px) is a link to `mimetypes/application-x-smb-workgroup`; the linked images are what is embedded.
 
 ## EasyMusicSync
 
-`ezLink/NativeToolStrip/` is adapted from the `NativeToolStrip` classes of EasyMusicSync (MIT licensed, same
+`ezLink/NativeToolStrip/` and `ezExplorer/NativeToolStrip/` are adapted from the `NativeToolStrip` classes of EasyMusicSync (MIT licensed, same
 author). The namespace was changed; the sources carry no license header.

@@ -282,4 +282,154 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="ErrorFilesNotOffered" xml:space="preserve">
     <value>The other computer does not offer file access.</value>
   </data>
+  <data name="ExplorerWindowTitle" xml:space="preserve">
+    <value>{0} - ezExplorer</value>
+  </data>
+  <data name="ExplorerConnecting" xml:space="preserve">
+    <value>Connecting to {0}…</value>
+  </data>
+  <data name="ExplorerDenied" xml:space="preserve">
+    <value>{0} did not allow access to its files.</value>
+  </data>
+  <data name="ExplorerVersionMismatch" xml:space="preserve">
+    <value>{0} runs a version of ezLink that is not compatible with this one.</value>
+  </data>
+  <data name="ExplorerConnectFailed" xml:space="preserve">
+    <value>Could not connect to {0}.
+
+{1}</value>
+  </data>
+  <data name="ExplorerNoArguments" xml:space="preserve">
+    <value>ezExplorer is started by ezLink. Open ezLink and click Explore.</value>
+  </data>
+  <data name="ExplorerDisconnected" xml:space="preserve">
+    <value>Disconnected from {0}</value>
+  </data>
+  <data name="ExplorerReconnecting" xml:space="preserve">
+    <value>Reconnecting to {0}…</value>
+  </data>
+  <data name="ExplorerLoadFailed" xml:space="preserve">
+    <value>Cannot open '{0}'.
+
+{1}</value>
+  </data>
+  <data name="ExplorerNotConnected" xml:space="preserve">
+    <value>Not connected.</value>
+  </data>
+  <data name="ToolBack" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ToolForward" xml:space="preserve">
+    <value>Forward</value>
+  </data>
+  <data name="ToolUp" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="ToolRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="ToolViews" xml:space="preserve">
+    <value>Views</value>
+  </data>
+  <data name="ViewDetails" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ViewLargeIcons" xml:space="preserve">
+    <value>Large icons</value>
+  </data>
+  <data name="ViewList" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="ColName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ColSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="ColType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ColModified" xml:space="preserve">
+    <value>Date modified</value>
+  </data>
+  <data name="MenuOpenItem" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="MenuCopy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="MenuPaste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="MenuRename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="MenuDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MenuNewFolder" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="MenuRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="NewFolderName" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="ConfirmDeleteOne" xml:space="preserve">
+    <value>Are you sure you want to permanently delete '{0}' on {1}?</value>
+  </data>
+  <data name="ConfirmDeleteMany" xml:space="preserve">
+    <value>Are you sure you want to permanently delete these {0} items on {1}?</value>
+  </data>
+  <data name="ConfirmDeleteTitle" xml:space="preserve">
+    <value>Confirm delete</value>
+  </data>
+  <data name="StatusOneItem" xml:space="preserve">
+    <value>1 item selected</value>
+  </data>
+  <data name="StatusManyItems" xml:space="preserve">
+    <value>{0} items selected</value>
+  </data>
+  <data name="StatusSize" xml:space="preserve">
+    <value>{0}   {1}</value>
+  </data>
+  <data name="TypeFolder" xml:space="preserve">
+    <value>File folder</value>
+  </data>
+  <data name="TypeFile" xml:space="preserve">
+    <value>{0} File</value>
+  </data>
+  <data name="TypeFileNoExtension" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="DriveFixed" xml:space="preserve">
+    <value>Local Disk</value>
+  </data>
+  <data name="DriveRemovable" xml:space="preserve">
+    <value>Removable Disk</value>
+  </data>
+  <data name="DriveName" xml:space="preserve">
+    <value>{0} ({1}:)</value>
+  </data>
+  <data name="OperationFailed" xml:space="preserve">
+    <value>The operation failed.
+
+{0}</value>
+  </data>
+  <data name="RenameFailed" xml:space="preserve">
+    <value>Cannot rename '{0}'.
+
+{1}</value>
+  </data>
+  <data name="InvalidFileName" xml:space="preserve">
+    <value>A file name cannot contain any of the following characters:
+\ / : * ? " &lt; &gt; |</value>
+  </data>
+  <data name="ExplorerNoAdapter" xml:space="preserve">
+    <value>No network adapter connected to {0} was found.</value>
+  </data>
+  <data name="ExplorerRefreshHint" xml:space="preserve">
+    <value>Press Refresh to try again.</value>
+  </data>
 </root>
