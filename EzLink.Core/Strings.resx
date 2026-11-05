@@ -92,6 +92,11 @@ Details were written to the log folder:
   <data name="MenuExit" xml:space="preserve">
     <value>Exit</value>
   </data>
+  <data name="ConfirmExit" xml:space="preserve">
+    <value>ezLink is connected to {0}. Exiting will end the connection.
+
+Exit ezLink?</value>
+  </data>
   <data name="ToolExplore" xml:space="preserve">
     <value>Explore</value>
   </data>

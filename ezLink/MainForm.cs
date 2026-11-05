@@ -8,7 +8,7 @@ namespace ezLink
 {
     /// <summary>
     /// The ActiveSync-style status window (layout and toolbar rendering follow EasyMusicSync's main window) plus
-    /// the tray icon. Closing the window hides it to the tray; Exit is in the tray menu.
+    /// the tray icon. Minimising hides the window to the tray; closing it exits (after a confirmation while connected).
     /// </summary>
     internal sealed class MainForm : Form
     {
@@ -178,6 +178,7 @@ namespace ezLink
             allowVisible = true;
             if (!Visible)
             {
+                AnimateToTray(Bounds, false);
                 Show();
             }
             if (WindowState == FormWindowState.Minimized)
@@ -188,15 +189,84 @@ namespace ezLink
             BringToFront();
         }
 
+        /// <summary>The close button exits the program, asking first while a connection is active.</summary>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!exiting && e.CloseReason == CloseReason.UserClosing)
             {
-                e.Cancel = true;
+                LinkStatus status = link.State.Status;
+                if (status.State == LinkState.Connected &&
+                    MessageBox.Show(this, string.Format(Strings.Get("ConfirmExit"), status.PeerName),
+                        Strings.Get("AppName"), MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                exiting = true;
+            }
+            base.OnFormClosing(e);
+        }
+
+        /// <summary>The minimise button hides the window to the tray, animating the caption toward the tray icons.</summary>
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_SYSCOMMAND && ((int)m.WParam & 0xFFF0) == SC_MINIMIZE)
+            {
+                AnimateToTray(Bounds, true);
                 Hide();
                 return;
             }
-            base.OnFormClosing(e);
+            base.WndProc(ref m);
+        }
+
+        private const int WM_SYSCOMMAND = 0x0112;
+        private const int SC_MINIMIZE = 0xF020;
+        private const int IDANI_CAPTION = 3;
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left, Top, Right, Bottom;
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool DrawAnimatedRects(IntPtr hwnd, int idAni, ref RECT from, ref RECT to);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern IntPtr FindWindow(string className, string windowName);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern IntPtr FindWindowEx(IntPtr parent, IntPtr after, string className, string windowName);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool GetWindowRect(IntPtr hwnd, out RECT rect);
+
+        /// <summary>Plays the caption animation between the window and the taskbar notification area.</summary>
+        private void AnimateToTray(Rectangle window, bool toTray)
+        {
+            RECT tray;
+            IntPtr taskbar = FindWindow("Shell_TrayWnd", null);
+            IntPtr notify = taskbar == IntPtr.Zero ? IntPtr.Zero : FindWindowEx(taskbar, IntPtr.Zero, "TrayNotifyWnd", null);
+            if (notify == IntPtr.Zero || !GetWindowRect(notify, out tray))
+            {
+                return; // no tray found: skip the animation
+            }
+            RECT win = new RECT();
+            win.Left = window.Left;
+            win.Top = window.Top;
+            win.Right = window.Right;
+            win.Bottom = window.Bottom;
+            if (toTray)
+            {
+                DrawAnimatedRects(Handle, IDANI_CAPTION, ref win, ref tray);
+            }
+            else
+            {
+                DrawAnimatedRects(Handle, IDANI_CAPTION, ref tray, ref win);
+            }
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)

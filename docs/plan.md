@@ -250,7 +250,7 @@ Reuse the main window design of the existing EasyMusicSync app ([RaduTek/EasyMus
 
 - Toolbar, using the same `NativeToolStrip` approach: **Explore** (enabled when Connected), **Sync** (always disabled in v1, tooltip "Coming soon"), **Options**.
 - Status area: large icon for the state, the status text, the peer's computer name, and the two trust lines.
-- Closing the window hides it to the tray; Exit is in the tray menu.
+- Minimising hides the window to the tray (caption animates toward the notification area); closing it exits, with a confirmation while connected. Exit is also in the tray menu.
 - Copy the reused files into the ezLink project with their namespaces changed; do not reference the EasyMusicSync project. Both are MIT-licensed by the same author, so keep the license header where present.
 - Necessary icons are to be sourced from `oxygen-icons` repo checked out at `../oxygen-icons`
 
