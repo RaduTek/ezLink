@@ -42,6 +42,9 @@ namespace EzLink
         private bool closed;
         private string closedReason = string.Empty;
 
+        /// <summary>Reply frames held back from the network while the consumer is busy (64 KiB each when downloading).</summary>
+        private const int MaxQueuedReplies = 128;
+
         /// <summary>How long to wait for the next reply frame before giving up.</summary>
         public TimeSpan ReplyTimeout = TimeSpan.FromSeconds(30);
 
@@ -135,6 +138,19 @@ namespace EzLink
                 {
                     return; // a late frame of a request that is already over
                 }
+
+                // Backpressure: a consumer slower than the cable (a download whose reader is Explorer writing to
+                // disk) must not let the queue grow without bound. Holding back this (the session's reader) thread
+                // makes the socket fill up and the peer's send slow down. It resumes as the consumer dequeues, or
+                // when the request ends or the session closes.
+                while (replies.Count >= MaxQueuedReplies && !closed && requestId == currentId)
+                {
+                    Monitor.Wait(sync);
+                }
+                if (closed || requestId != currentId)
+                {
+                    return;
+                }
                 replies.Enqueue(message);
                 Monitor.PulseAll(sync);
             }
@@ -169,7 +185,9 @@ namespace EzLink
                     }
                     Monitor.Wait(sync, left);
                 }
-                return replies.Dequeue();
+                Message next = replies.Dequeue();
+                Monitor.PulseAll(sync); // a delivery may be waiting for room
+                return next;
             }
         }
 
@@ -178,7 +196,13 @@ namespace EzLink
         {
             lock (sync)
             {
-                return replies.Count > 0 ? replies.Dequeue() : null;
+                if (replies.Count == 0)
+                {
+                    return null;
+                }
+                Message next = replies.Dequeue();
+                Monitor.PulseAll(sync);
+                return next;
             }
         }
 
@@ -203,6 +227,7 @@ namespace EzLink
                 }
                 replies.Clear();
                 currentId = id;
+                Monitor.PulseAll(sync);
             }
             return id;
         }
@@ -213,6 +238,7 @@ namespace EzLink
             {
                 currentId = 0;
                 replies.Clear();
+                Monitor.PulseAll(sync); // releases a delivery that was waiting for room
             }
         }
 

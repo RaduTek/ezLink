@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Windows.Forms;
 using EzLink;
@@ -54,6 +56,11 @@ namespace ezExplorer
         private MenuSet treeMenu;
         private string treeContextPath = string.Empty;
 
+        private VirtualFileDataObject clipboardData;       // what we put on the clipboard, to take back on exit
+        private bool downloadBusy;                          // a drag or copy is being prepared
+        private int downloadDialogs;                        // download dialogs open right now
+        private readonly List<string> tempRoots = new List<string>();
+
         private bool firstConnect = true;
         private string pendingSelectName;       // select (and maybe rename) this item once the next listing shows
         private bool pendingRename;
@@ -82,10 +89,10 @@ namespace ezExplorer
             BuildPathBar();
             BuildPanes();
             BuildStatusBar();
-            listMenu = BuildMenu(OnListOpen, OnListPaste, OnListRename, OnListDelete, OnListNewFolder,
+            listMenu = BuildMenu(OnListOpen, OnListCopy, OnListPaste, OnListRename, OnListDelete, OnListNewFolder,
                 OnRefreshClick);
-            treeMenu = BuildMenu(OnTreeOpen, OnTreePaste, OnTreeMenuRename, OnTreeDelete, OnTreeNewFolder,
-                OnRefreshClick);
+            treeMenu = BuildMenu(OnTreeOpen, OnTreeCopy, OnTreePaste, OnTreeMenuRename, OnTreeDelete,
+                OnTreeNewFolder, OnRefreshClick);
             list.ContextMenuStrip = listMenu.Strip;
             listMenu.Strip.Opening += OnListMenuOpening;
 
@@ -113,6 +120,8 @@ namespace ezExplorer
             list.FilesDropped += OnFilesDropped;
             tree.DropQuery += OnDropQuery;
             tree.FilesDropped += OnFilesDropped;
+            list.DragRequested += OnListDragRequested;
+            tree.DragRequested += OnTreeDragRequested;
 
             ipc.MessageReceived += OnIpcMessage;
             SetView(settings.View);
@@ -191,15 +200,13 @@ namespace ezExplorer
             statusStrip.Items.AddRange(new ToolStripItem[] { selectionLabel, connectionLabel });
         }
 
-        private MenuSet BuildMenu(EventHandler open, EventHandler paste, EventHandler rename, EventHandler delete,
+        private MenuSet BuildMenu(EventHandler open, EventHandler copy, EventHandler paste, EventHandler rename, EventHandler delete,
             EventHandler newFolder, EventHandler refresh)
         {
             MenuSet set = new MenuSet();
             set.Open = new ToolStripMenuItem(Strings.Get("MenuOpenItem"), null, open);
             set.Open.Font = new Font(set.Open.Font, FontStyle.Bold);
-            // Copy arrives with the download milestone.
-            set.Copy = new ToolStripMenuItem(Strings.Get("MenuCopy"));
-            set.Copy.Enabled = false;
+            set.Copy = new ToolStripMenuItem(Strings.Get("MenuCopy"), null, copy);
             set.Paste = new ToolStripMenuItem(Strings.Get("MenuPaste"), null, paste);
             set.Rename = new ToolStripMenuItem(Strings.Get("MenuRename"), null, rename);
             set.Delete = new ToolStripMenuItem(Strings.Get("MenuDelete"), null, delete);
@@ -248,6 +255,28 @@ namespace ezExplorer
             settings.WindowSize = ClientSizeFor(bounds);
             settings.SplitterDistance = split.SplitterDistance;
             settings.Save();
+
+            if (clipboardData != null)
+            {
+                // Data that is still on the clipboard would call into this process after it is gone.
+                clipboardData.CancelAll();
+                DragSource.ClearClipboardIf(clipboardData);
+                clipboardData = null;
+            }
+            foreach (string root in tempRoots)
+            {
+                try
+                {
+                    Directory.Delete(root, true);
+                }
+                catch (IOException)
+                {
+                    // A program still has the opened file: leave it for the temp folder cleanup.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
+            }
 
             if (args.MainWindow != IntPtr.Zero)
             {
@@ -465,7 +494,10 @@ namespace ezExplorer
             {
                 nav.NavigateTo(selected[0].Path);
             }
-            // Opening a file downloads it first, which needs the transfer dialog of a later milestone.
+            else if (selected.Count == 1)
+            {
+                OpenRemoteFile(selected[0]);
+            }
         }
 
         private void OnSelectionChanged(object sender, EventArgs e)
@@ -517,7 +549,8 @@ namespace ezExplorer
             bool anyDrive = selected.Exists(delegate(RemoteItem item) { return item.IsDrive; });
             bool inFolder = nav.Current != null && !RemotePaths.IsRoot(nav.Current);
 
-            listMenu.Open.Enabled = single && selected[0].IsFolder;
+            listMenu.Open.Enabled = single && (selected[0].IsFolder || browser.CanRead);
+            listMenu.Copy.Enabled = selected.Count > 0 && !anyDrive && browser.CanRead;
             listMenu.Rename.Enabled = single && !anyDrive && browser.CanWrite;
             listMenu.Delete.Enabled = selected.Count > 0 && !anyDrive && browser.CanWrite;
             listMenu.NewFolder.Enabled = inFolder && browser.CanWrite;
@@ -530,6 +563,7 @@ namespace ezExplorer
             treeContextPath = e.Path;
             treeMenu.Open.Enabled = true;
             bool plainFolder = !e.IsDrive;
+            treeMenu.Copy.Enabled = plainFolder && browser.CanRead;
             treeMenu.Rename.Enabled = plainFolder && browser.CanWrite;
             treeMenu.Delete.Enabled = plainFolder && browser.CanWrite;
             treeMenu.NewFolder.Enabled = !RemotePaths.IsRoot(e.Path) && browser.CanWrite;
@@ -555,6 +589,16 @@ namespace ezExplorer
         private void OnListNewFolder(object sender, EventArgs e)
         {
             NewFolder(nav.Current);
+        }
+
+        private void OnListCopy(object sender, EventArgs e)
+        {
+            CopySelection(true);
+        }
+
+        private void OnTreeCopy(object sender, EventArgs e)
+        {
+            CopyToClipboard(new RemoteItem[] { FolderItem(treeContextPath) });
         }
 
         private void OnListPaste(object sender, EventArgs e)
@@ -640,6 +684,9 @@ namespace ezExplorer
                                 paths.Add(tree.SelectedPath);
                                 DeletePaths(paths);
                             }
+                            return true;
+                        case Keys.Control | Keys.C:
+                            CopySelection(list.Focused);
                             return true;
                         case Keys.Control | Keys.V:
                             PasteInto(list.Focused ? ListPasteTarget() : tree.SelectedPath);
@@ -758,6 +805,351 @@ namespace ezExplorer
             }
             UpdateEnabled();
             FinishChange(folder); // show what arrived, even after a cancel
+        }
+
+        // ---- downloading: files to Explorer ----
+
+        /// <summary>A tree folder as an item, for the same code that handles the list's selection.</summary>
+        private static RemoteItem FolderItem(string path)
+        {
+            RemoteItem item = new RemoteItem();
+            item.Name = RemotePaths.GetName(path);
+            item.DisplayName = item.Name;
+            item.Path = path;
+            item.IsFolder = true;
+            item.Attributes = ShellNative.FILE_ATTRIBUTE_DIRECTORY;
+            item.IconIndex = ShellIcons.FolderIndex;
+            return item;
+        }
+
+        private List<RemoteItem> DownloadableSelection(bool fromList)
+        {
+            List<RemoteItem> items = new List<RemoteItem>();
+            if (fromList)
+            {
+                foreach (RemoteItem item in list.SelectedRemoteItems)
+                {
+                    if (!item.IsDrive)
+                    {
+                        items.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                string path = tree.SelectedPath;
+                if (path != null && !RemotePaths.IsRoot(path) && !RemotePaths.IsDriveRoot(path))
+                {
+                    items.Add(FolderItem(path));
+                }
+            }
+            return items;
+        }
+
+        private void OnListDragRequested(object sender, DragRequestEventArgs e)
+        {
+            DragOut(DownloadableSelection(true), e.Button);
+        }
+
+        private void OnTreeDragRequested(object sender, DragRequestEventArgs e)
+        {
+            List<RemoteItem> items = new List<RemoteItem>();
+            items.Add(FolderItem(e.Path));
+            DragOut(items, e.Button);
+        }
+
+        private bool CheckCanRead()
+        {
+            if (!browser.Connected)
+            {
+                return false;
+            }
+            if (!browser.CanRead)
+            {
+                MessageBox.Show(this, string.Format(Strings.Get("TransferNoRead"), args.PeerName),
+                    Strings.Get("ExplorerTitle"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+            return true;
+        }
+
+        private VirtualFileDataObject NewDataObject(DownloadPlan plan)
+        {
+            VirtualFileDataObject data = new VirtualFileDataObject(plan, browser);
+            data.OperationStarted += OnDownloadOperation;
+            return data;
+        }
+
+        /// <summary>Drags the items into whatever window is under the cursor (normally Explorer).</summary>
+        private void DragOut(List<RemoteItem> items, MouseButtons button)
+        {
+            if (items.Count == 0 || downloadBusy || !CheckCanRead())
+            {
+                return;
+            }
+            downloadBusy = true;
+            try
+            {
+                bool slow;
+                DownloadPlan plan = PrepareDownload(items, button, out slow);
+                if (plan != null && (Control.MouseButtons & button) == 0)
+                {
+                    slow = true; // preparing took so long that the user let go: a drag can no longer start
+                }
+                if (slow)
+                {
+                    OfferCopyToFolder(items, plan);
+                    return;
+                }
+                if (plan == null || plan.Entries.Count == 0)
+                {
+                    return;
+                }
+                DragSource.Drag(NewDataObject(plan), button, items);
+            }
+            finally
+            {
+                downloadBusy = false;
+            }
+        }
+
+        /// <summary>Ctrl+C or Copy: puts the files on the clipboard without reading any of them yet.</summary>
+        private void CopySelection(bool fromList)
+        {
+            CopyToClipboard(DownloadableSelection(fromList));
+        }
+
+        private void CopyToClipboard(IList<RemoteItem> chosen)
+        {
+            if (chosen.Count == 0 || downloadBusy || !CheckCanRead())
+            {
+                return;
+            }
+            List<RemoteItem> items = new List<RemoteItem>(chosen);
+            downloadBusy = true;
+            try
+            {
+                bool slow;
+                DownloadPlan plan = PrepareDownload(items, MouseButtons.None, out slow);
+                if (slow)
+                {
+                    OfferCopyToFolder(items, null);
+                    return;
+                }
+                if (plan == null || plan.Entries.Count == 0)
+                {
+                    return;
+                }
+
+                VirtualFileDataObject data = NewDataObject(plan);
+                if (DragSource.Copy(data))
+                {
+                    clipboardData = data;
+                }
+                else
+                {
+                    MessageBox.Show(this, Strings.Get("ClipboardBusy"), Strings.Get("ExplorerTitle"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            finally
+            {
+                downloadBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Lists what is to be copied on the peer. A quick selection is ready before a dialog would be worth
+        /// showing; otherwise the transfer dialog opens in its Preparing state. Returns null if there is no plan:
+        /// cancelled, failed, or (<paramref name="slow"/>) not ready within the ten seconds a drag can wait.
+        /// </summary>
+        private DownloadPlan PrepareDownload(List<RemoteItem> items, MouseButtons held, out bool slow)
+        {
+            slow = false;
+            PrepareDownloadJob job = new PrepareDownloadJob(browser, items);
+            job.Start();
+
+            DateTime started = DateTime.UtcNow;
+            while (!job.WaitDone(15) && (DateTime.UtcNow - started).TotalMilliseconds < 400
+                && (held == MouseButtons.None || (Control.MouseButtons & held) != 0))
+            {
+                Application.DoEvents(); // the button is still down: this must not turn into a dialog yet
+            }
+
+            bool dialogShown = false;
+            if (!job.WaitDone(0))
+            {
+                dialogShown = true;
+                using (TransferDialog dialog = new TransferDialog(string.Format(Strings.Get("TransferFrom"),
+                    args.PeerName), job))
+                {
+                    dialog.ShowDialog(this);
+                }
+            }
+
+            switch (job.Outcome)
+            {
+                case TransferOutcome.Completed:
+                    return job.Plan;
+
+                case TransferOutcome.TimedOut:
+                    slow = true;
+                    return null;
+
+                case TransferOutcome.ConnectionLost:
+                    browser.CheckLink();
+                    UpdateEnabled();
+                    if (!dialogShown) // the dialog says so itself
+                    {
+                        MessageBox.Show(this, Strings.Get("TransferConnectionLost"), Strings.Get("ExplorerTitle"),
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    return null;
+
+                case TransferOutcome.Failed:
+                    browser.CheckLink();
+                    if (!dialogShown)
+                    {
+                        MessageBox.Show(this, string.Format(Strings.Get("TransferFailed"), job.FailureMessage),
+                            Strings.Get("ExplorerTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    return null;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>A drag that could not start (too slow to prepare): copy to a folder chosen in a dialog instead.</summary>
+        private void OfferCopyToFolder(List<RemoteItem> items, DownloadPlan plan)
+        {
+            if (MessageBox.Show(this, Strings.Get("TransferPrepSlow"), Strings.Get("ExplorerTitle"),
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+            using (FolderBrowserDialog picker = new FolderBrowserDialog())
+            {
+                picker.Description = string.Format(Strings.Get("CopyToFolderPrompt"), args.PeerName);
+                if (picker.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                DownloadToFolderJob job = plan != null
+                    ? new DownloadToFolderJob(browser, plan, picker.SelectedPath)
+                    : new DownloadToFolderJob(browser, items, picker.SelectedPath);
+                RunTransfer(string.Format(Strings.Get("TransferFrom"), args.PeerName), job);
+            }
+        }
+
+        private TransferOutcome RunTransfer(string title, TransferJob job)
+        {
+            TransferOutcome outcome;
+            using (TransferDialog dialog = new TransferDialog(title, job))
+            {
+                dialog.ShowDialog(this);
+                outcome = dialog.Outcome;
+            }
+            if (outcome == TransferOutcome.ConnectionLost || outcome == TransferOutcome.Failed)
+            {
+                browser.CheckLink();
+            }
+            UpdateEnabled();
+            return outcome;
+        }
+
+        /// <summary>Open: downloads the file to a temporary folder, then starts it with its associated program.</summary>
+        private void OpenRemoteFile(RemoteItem item)
+        {
+            if (downloadBusy || !CheckCanRead())
+            {
+                return;
+            }
+            downloadBusy = true;
+            try
+            {
+                string root = Path.Combine(Path.Combine(Path.GetTempPath(), "ezLink"), Path.GetRandomFileName());
+                tempRoots.Add(root);
+                DownloadToFolderJob job = new DownloadToFolderJob(browser, DownloadPlan.ForFile(item), root);
+                if (RunTransfer(string.Format(Strings.Get("TransferFrom"), args.PeerName), job)
+                    != TransferOutcome.Completed || job.FirstFilePath.Length == 0)
+                {
+                    return;
+                }
+
+                try
+                {
+                    ProcessStartInfo start = new ProcessStartInfo(job.FirstFilePath);
+                    start.UseShellExecute = true;
+                    Process.Start(start);
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    MessageBox.Show(this, string.Format(Strings.Get("OpenFailed"), item.Name, ex.Message),
+                        Strings.Get("ExplorerTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            finally
+            {
+                downloadBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// The drop target started pulling data (on any thread). The transfer dialog opens from the UI thread's
+        /// own message loop, never from inside a stream read.
+        /// </summary>
+        private void OnDownloadOperation(DownloadOperation operation)
+        {
+            try
+            {
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    BeginInvoke(new MethodInvoker(delegate { ShowDownloadDialog(operation); }));
+                    return;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            operation.Cancel();
+        }
+
+        private void ShowDownloadDialog(DownloadOperation operation)
+        {
+            if (operation.IsEnded || IsDisposed)
+            {
+                return;
+            }
+            if (PumpGuard.Active || downloadDialogs > 0)
+            {
+                // Inside a stream read (which is waiting for this very call to return), or another copy's dialog
+                // is up: try again a moment later, from outside.
+                System.Threading.Timer retry = null;
+                retry = new System.Threading.Timer(delegate(object unused)
+                {
+                    retry.Dispose();
+                    try
+                    {
+                        BeginInvoke(new MethodInvoker(delegate { ShowDownloadDialog(operation); }));
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        operation.Cancel();
+                    }
+                }, null, 100, System.Threading.Timeout.Infinite);
+                return;
+            }
+
+            downloadDialogs++;
+            try
+            {
+                RunTransfer(string.Format(Strings.Get("TransferFrom"), args.PeerName), operation);
+            }
+            finally
+            {
+                downloadDialogs--;
+            }
         }
 
         // ---- file operations ----

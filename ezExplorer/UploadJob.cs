@@ -12,7 +12,7 @@ namespace ezExplorer
     /// transfer session. Folders are recreated with their contents, files keep their times and attributes, and
     /// each folder gets its own times last, after its contents stopped changing it.
     /// </summary>
-    internal sealed class UploadJob : TransferJob
+    internal sealed class UploadJob : ClientJob
     {
         private sealed class Item
         {
@@ -29,20 +29,9 @@ namespace ezExplorer
             public bool CreatedHere;        // a folder that did not exist on the peer before
         }
 
-        private sealed class Abort : Exception
-        {
-            public readonly TransferOutcome Outcome;
-
-            public Abort(TransferOutcome outcome)
-            {
-                Outcome = outcome;
-            }
-        }
-
         private readonly ITransferClientSource browser;
         private readonly string[] sources;
         private readonly string targetFolder;
-        private volatile FileClient client;
 
         public UploadJob(ITransferClientSource browser, string[] sources, string targetFolder)
         {
@@ -56,20 +45,11 @@ namespace ezExplorer
             get { return targetFolder; }
         }
 
-        public override void Cancel()
-        {
-            FileClient current = client;
-            if (current != null)
-            {
-                current.Cancel();
-            }
-        }
-
         public override TransferOutcome Run(TransferState state, ITransferHost host)
         {
             try
             {
-                client = browser.GetTransferClient();
+                Client = browser.GetTransferClient();
 
                 List<Item> items = Prepare(state, host);
                 long total = 0;
@@ -107,73 +87,7 @@ namespace ezExplorer
             }
             catch (Exception ex)
             {
-                if (host.Cancelled)
-                {
-                    return TransferOutcome.Cancelled;
-                }
-                if (IsLost())
-                {
-                    return TransferOutcome.ConnectionLost;
-                }
-                Log.Warn("Upload failed: {0}", ex.Message);
-                FailureMessage = ex.Message;
-                return TransferOutcome.Failed;
-            }
-        }
-
-        private bool IsLost()
-        {
-            FileClient current = client;
-            return current == null || current.Session.IsClosed;
-        }
-
-        private void CheckCancel(ITransferHost host)
-        {
-            if (host.Cancelled)
-            {
-                throw new Abort(TransferOutcome.Cancelled);
-            }
-        }
-
-        /// <summary>
-        /// Runs one step, offering Retry / Skip / Cancel if it fails. Returns false if the user chose Skip.
-        /// A lost connection or a cancel ends the whole job instead.
-        /// </summary>
-        private bool Attempt(ITransferHost host, string name, MethodInvoker step)
-        {
-            while (true)
-            {
-                CheckCancel(host);
-                try
-                {
-                    step();
-                    return true;
-                }
-                catch (Abort)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    if (host.Cancelled)
-                    {
-                        throw new Abort(TransferOutcome.Cancelled);
-                    }
-                    if (IsLost())
-                    {
-                        throw new Abort(TransferOutcome.ConnectionLost);
-                    }
-                    Log.Warn("Copying '{0}' failed: {1}", name, ex.Message);
-                    ErrorChoice choice = host.AskError(name, ex.Message);
-                    if (choice == ErrorChoice.Skip)
-                    {
-                        return false;
-                    }
-                    if (choice == ErrorChoice.Cancel)
-                    {
-                        throw new Abort(TransferOutcome.Cancelled);
-                    }
-                }
+                return Unhandled(ex, host, "Upload");
             }
         }
 
@@ -276,7 +190,7 @@ namespace ezExplorer
 
             bool done = Attempt(host, item.Name, delegate
             {
-                StatResultReply stat = client.Stat(remote);
+                StatResultReply stat = Client.Stat(remote);
                 if (stat.Exists)
                 {
                     if (!RemotePaths.IsFolder(stat.Attributes))
@@ -285,7 +199,7 @@ namespace ezExplorer
                     }
                     return; // merge into the folder that is already there
                 }
-                client.CreateDir(remote);
+                Client.CreateDir(remote);
                 item.CreatedHere = true;
             });
             if (!done)
@@ -305,7 +219,7 @@ namespace ezExplorer
 
             bool checkedOk = Attempt(host, item.Name, delegate
             {
-                StatResultReply stat = client.Stat(remote);
+                StatResultReply stat = Client.Stat(remote);
                 if (!stat.Exists)
                 {
                     return;
@@ -346,7 +260,7 @@ namespace ezExplorer
                             state.BeginItem(item.Name, RemotePaths.GetParent(remote), size);
                         }
                         state.SetFileDone(0);
-                        client.WriteFile(remote, source, size, item.Created, item.Modified, item.Attributes, mode,
+                        Client.WriteFile(remote, source, size, item.Created, item.Modified, item.Attributes, mode,
                             delegate(long bytes) { state.SetFileDone(bytes); });
                     }
                 });
@@ -364,7 +278,7 @@ namespace ezExplorer
             for (int n = 2; ; n++)
             {
                 string candidate = RemotePaths.Combine(folder, stem + " (" + n + ")" + extension);
-                if (!client.Stat(candidate).Exists)
+                if (!Client.Stat(candidate).Exists)
                 {
                     return candidate;
                 }
@@ -384,18 +298,11 @@ namespace ezExplorer
                 CheckCancel(host);
                 try
                 {
-                    client.CreateDir(RemoteOf(item), item.Created, item.Modified);
+                    Client.CreateDir(RemoteOf(item), item.Created, item.Modified);
                 }
                 catch (Exception ex)
                 {
-                    if (host.Cancelled)
-                    {
-                        throw new Abort(TransferOutcome.Cancelled);
-                    }
-                    if (IsLost())
-                    {
-                        throw new Abort(TransferOutcome.ConnectionLost);
-                    }
+                    ThrowIfEnded(host);
                     Log.Warn("Cannot set the times of '{0}': {1}", item.Name, ex.Message); // cosmetic: not worth a prompt
                 }
             }

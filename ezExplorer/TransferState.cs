@@ -7,7 +7,9 @@ namespace ezExplorer
         Completed,
         Cancelled,
         ConnectionLost,
-        Failed
+        Failed,
+        /// <summary>Preparing took longer than it may (a drag cannot wait for ever).</summary>
+        TimedOut
     }
 
     internal enum ConflictChoice
@@ -29,6 +31,15 @@ namespace ezExplorer
     {
         /// <summary>Why the job failed, when it returned <see cref="TransferOutcome.Failed"/>.</summary>
         public string FailureMessage = string.Empty;
+
+        /// <summary>
+        /// The state this job writes to, if it already has one (a job that started before its dialog opened, or
+        /// one that is driven by someone else). Null: the dialog makes one and passes it to <see cref="Run"/>.
+        /// </summary>
+        public virtual TransferState SharedState
+        {
+            get { return null; }
+        }
 
         /// <summary>Does the work. Runs on a worker thread; must return soon after <see cref="ITransferHost.Cancelled"/>.</summary>
         public abstract TransferOutcome Run(TransferState state, ITransferHost host);

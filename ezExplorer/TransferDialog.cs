@@ -20,7 +20,7 @@ namespace ezExplorer
         }
 
         private readonly TransferJob job;
-        private readonly TransferState state = new TransferState();
+        private readonly TransferState state;
         private readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         private readonly Label headline = new Label();
         private readonly Label nameLabel = new Label();
@@ -41,6 +41,7 @@ namespace ezExplorer
         public TransferDialog(string title, TransferJob job)
         {
             this.job = job;
+            state = job.SharedState != null ? job.SharedState : new TransferState();
 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;

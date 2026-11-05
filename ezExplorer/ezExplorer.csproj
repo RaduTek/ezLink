@@ -34,12 +34,16 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ClientJob.cs" />
     <Compile Include="ConflictDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CopyErrorDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="DownloadPlan.cs" />
+    <Compile Include="DownloadToFolderJob.cs" />
+    <Compile Include="DragSource.cs" />
     <Compile Include="DropEvents.cs" />
     <Compile Include="ExplorerArgs.cs" />
     <Compile Include="ExplorerForm.cs">
@@ -51,8 +55,10 @@
     </Compile>
     <Compile Include="NativeToolStrip\NativeToolStripRenderer.cs" />
     <Compile Include="NavigationController.cs" />
+    <Compile Include="OleInterop.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RemoteBrowser.cs" />
+    <Compile Include="RemoteFileStream.cs" />
     <Compile Include="RemoteItem.cs" />
     <Compile Include="RemoteListView.cs">
       <SubType>Component</SubType>
@@ -69,6 +75,7 @@
     </Compile>
     <Compile Include="TransferState.cs" />
     <Compile Include="UploadJob.cs" />
+    <Compile Include="VirtualFileDataObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\nav-back.png"><LogicalName>ezExplorer.Resources.nav-back.png</LogicalName></EmbeddedResource>

@@ -526,4 +526,27 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="TransferFileBlocked" xml:space="preserve">
     <value>A folder named '{0}' already exists, so a file with that name cannot be copied.</value>
   </data>
+  <data name="DownloadGone" xml:space="preserve">
+    <value>'{0}' no longer exists on the other computer.</value>
+  </data>
+  <data name="DragManyItems" xml:space="preserve">
+    <value>{0} items</value>
+  </data>
+  <data name="TransferNoRead" xml:space="preserve">
+    <value>{0} does not let this computer copy files from it.</value>
+  </data>
+  <data name="TransferPrepSlow" xml:space="preserve">
+    <value>Getting the files ready took too long for a drag. Copy them to a folder instead?</value>
+  </data>
+  <data name="CopyToFolderPrompt" xml:space="preserve">
+    <value>Choose the folder to copy the files from {0} into.</value>
+  </data>
+  <data name="OpenFailed" xml:space="preserve">
+    <value>'{0}' could not be opened.
+
+{1}</value>
+  </data>
+  <data name="ClipboardBusy" xml:space="preserve">
+    <value>The clipboard is in use by another program. Try again in a moment.</value>
+  </data>
 </root>

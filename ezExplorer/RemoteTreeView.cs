@@ -75,11 +75,16 @@ namespace ezExplorer
         /// <summary>Files from Explorer were dropped on a folder.</summary>
         public event EventHandler<FilesDroppedEventArgs> FilesDropped;
 
+        /// <summary>The user started dragging a folder out of the tree.</summary>
+        public event EventHandler<DragRequestEventArgs> DragRequested;
+
         private TreeNode dropNode;
+        private readonly DropTargetHelper targetHelper;
 
         public RemoteTreeView()
         {
             AllowDrop = true;
+            targetHelper = new DropTargetHelper(this);
             HideSelection = false;
             ShowLines = false;
             ShowRootLines = true;
@@ -530,24 +535,52 @@ namespace ezExplorer
         {
             base.OnDragEnter(drgevent);
             UpdateDrag(drgevent);
+            targetHelper.Enter(drgevent);
         }
 
         protected override void OnDragOver(DragEventArgs drgevent)
         {
             base.OnDragOver(drgevent);
             UpdateDrag(drgevent);
+            targetHelper.Over(drgevent);
         }
 
         protected override void OnDragLeave(EventArgs e)
         {
             base.OnDragLeave(e);
             SetDropNode(null);
+            targetHelper.Leave();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                targetHelper.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        protected override void OnItemDrag(ItemDragEventArgs e)
+        {
+            base.OnItemDrag(e);
+            TreeNode node = e.Item as TreeNode;
+            EventHandler<DragRequestEventArgs> handler = DragRequested;
+            if (node != null && handler != null)
+            {
+                NodeInfo info = Info(node);
+                if (!info.IsPlaceholder && !info.IsDrive && !RemotePaths.IsRoot(info.Path))
+                {
+                    handler(this, new DragRequestEventArgs(e.Button, info.Path));
+                }
+            }
         }
 
         protected override void OnDragDrop(DragEventArgs drgevent)
         {
             base.OnDragDrop(drgevent);
             TreeNode target = UpdateDrag(drgevent);
+            targetHelper.Drop(drgevent);
             SetDropNode(null);
             string[] files = DragHelper.GetFiles(drgevent);
             EventHandler<FilesDroppedEventArgs> handler = FilesDropped;

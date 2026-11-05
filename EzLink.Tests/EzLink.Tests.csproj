@@ -51,6 +51,30 @@
     <Compile Include="PayloadTests.cs" />
     <Compile Include="PeerTableTests.cs" />
     <Compile Include="RemotePathsTests.cs" />
+    <Compile Include="..\ezExplorer\ClientJob.cs">
+      <Link>ezExplorer\ClientJob.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\DownloadPlan.cs">
+      <Link>ezExplorer\DownloadPlan.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\DownloadToFolderJob.cs">
+      <Link>ezExplorer\DownloadToFolderJob.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\OleInterop.cs">
+      <Link>ezExplorer\OleInterop.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\RemoteFileStream.cs">
+      <Link>ezExplorer\RemoteFileStream.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\RemoteItem.cs">
+      <Link>ezExplorer\RemoteItem.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\ShellIcons.cs">
+      <Link>ezExplorer\ShellIcons.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\VirtualFileDataObject.cs">
+      <Link>ezExplorer\VirtualFileDataObject.cs</Link>
+    </Compile>
     <Compile Include="..\ezExplorer\RemotePaths.cs">
       <Link>Linked\RemotePaths.cs</Link>
     </Compile>
@@ -63,6 +87,7 @@
     <Compile Include="..\ezExplorer\UploadJob.cs">
       <Link>Linked\UploadJob.cs</Link>
     </Compile>
+    <Compile Include="DownloadTests.cs" />
     <Compile Include="UploadJobTests.cs" />
     <Compile Include="Samples.cs" />
     <Compile Include="SessionTests.cs" />

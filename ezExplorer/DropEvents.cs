@@ -30,6 +30,20 @@ namespace ezExplorer
         }
     }
 
+    /// <summary>The user started dragging the selection out of a pane.</summary>
+    internal sealed class DragRequestEventArgs : EventArgs
+    {
+        public readonly MouseButtons Button;
+        /// <summary>For the tree: the folder dragged. Null for the list, which drags its selection.</summary>
+        public readonly string Path;
+
+        public DragRequestEventArgs(MouseButtons button, string path)
+        {
+            Button = button;
+            Path = path;
+        }
+    }
+
     internal static class DragHelper
     {
         /// <summary>True if the drag carries files from Explorer.</summary>

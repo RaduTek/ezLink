@@ -45,11 +45,16 @@ namespace ezExplorer
         /// <summary>Files from Explorer were dropped.</summary>
         public event EventHandler<FilesDroppedEventArgs> FilesDropped;
 
+        /// <summary>The user started dragging the selected rows out of the list.</summary>
+        public event EventHandler<DragRequestEventArgs> DragRequested;
+
         private int dropHilite = -1;
+        private readonly DropTargetHelper targetHelper;
 
         public RemoteListView()
         {
             AllowDrop = true;
+            targetHelper = new DropTargetHelper(this);
             DoubleBuffered = true;
             View = View.Details;
             VirtualMode = true;
@@ -332,24 +337,37 @@ namespace ezExplorer
         {
             base.OnDragEnter(drgevent);
             UpdateDrag(drgevent);
+            targetHelper.Enter(drgevent);
         }
 
         protected override void OnDragOver(DragEventArgs drgevent)
         {
             base.OnDragOver(drgevent);
             UpdateDrag(drgevent);
+            targetHelper.Over(drgevent);
         }
 
         protected override void OnDragLeave(EventArgs e)
         {
             base.OnDragLeave(e);
             SetDropHilite(-1);
+            targetHelper.Leave();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                targetHelper.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
         protected override void OnDragDrop(DragEventArgs drgevent)
         {
             base.OnDragDrop(drgevent);
             UpdateDrag(drgevent);
+            targetHelper.Drop(drgevent);
             bool allowed = drgevent.Effect != DragDropEffects.None;
             int index = dropHilite;
             SetDropHilite(-1);
@@ -363,6 +381,18 @@ namespace ezExplorer
             if (files != null && files.Length > 0 && handler != null)
             {
                 handler(this, new FilesDroppedEventArgs(files, index >= 0 ? items[index].Path : null));
+            }
+        }
+
+        // ---- drag and drop to Explorer ----
+
+        protected override void OnItemDrag(ItemDragEventArgs e)
+        {
+            base.OnItemDrag(e);
+            EventHandler<DragRequestEventArgs> handler = DragRequested;
+            if (handler != null)
+            {
+                handler(this, new DragRequestEventArgs(e.Button, null));
             }
         }
 
