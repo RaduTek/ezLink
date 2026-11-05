@@ -460,6 +460,16 @@ namespace EzLink
             Simple(new CreateDirRequest(path));
         }
 
+        /// <summary>Creates the folder (if needed) and gives it these times.</summary>
+        public void CreateDir(string path, DateTime created, DateTime modified)
+        {
+            CreateDirRequest request = new CreateDirRequest(path);
+            request.HasTimes = true;
+            request.Created = created;
+            request.Modified = modified;
+            Simple(request);
+        }
+
         public void Delete(string path)
         {
             Simple(new DeleteRequest(path));

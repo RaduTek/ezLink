@@ -153,7 +153,11 @@ namespace EzLink.Tests
             writeEnd.Sha256 = Hash();
             list.Add(writeEnd);
 
-            list.Add(new CreateDirRequest(@"C:\new"));
+            CreateDirRequest createDir = new CreateDirRequest(@"C:\new");
+            createDir.HasTimes = true;
+            createDir.Created = Time;
+            createDir.Modified = Time;
+            list.Add(createDir);
             list.Add(new DeleteRequest(@"C:\old"));
             list.Add(new RenameRequest(@"C:\a", @"C:\b"));
 

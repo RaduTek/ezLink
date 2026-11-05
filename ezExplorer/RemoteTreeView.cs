@@ -70,8 +70,16 @@ namespace ezExplorer
         public event EventHandler<TreeContextEventArgs> FolderContextMenu;
         public event EventHandler<TreeRenameEventArgs> RenameRequested;
 
+        /// <summary>Asks whether files may be dropped on the folder under the cursor.</summary>
+        public event EventHandler<DropQueryEventArgs> DropQuery;
+        /// <summary>Files from Explorer were dropped on a folder.</summary>
+        public event EventHandler<FilesDroppedEventArgs> FilesDropped;
+
+        private TreeNode dropNode;
+
         public RemoteTreeView()
         {
+            AllowDrop = true;
             HideSelection = false;
             ShowLines = false;
             ShowRootLines = true;
@@ -474,6 +482,79 @@ namespace ezExplorer
                 }
                 ReExpand(child, expanded, delegate { ExpandNext(todo, index + 1, expanded, done); });
             });
+        }
+
+        // ---- drag and drop from Explorer ----
+
+        private void SetDropNode(TreeNode node)
+        {
+            if (node == dropNode)
+            {
+                return;
+            }
+            dropNode = node;
+            ShellNative.SendMessage(Handle, ShellNative.TVM_SELECTITEM, new IntPtr(ShellNative.TVGN_DROPHILITE),
+                node == null ? IntPtr.Zero : node.Handle);
+        }
+
+        /// <summary>The folder node under the cursor that accepts the drop, or null.</summary>
+        private TreeNode UpdateDrag(DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            TreeNode target = null;
+            if (DragHelper.HasFiles(e) && (e.AllowedEffect & DragDropEffects.Copy) != 0)
+            {
+                Point client = PointToClient(new Point(e.X, e.Y));
+                DragHelper.AutoScroll(this, client);
+                TreeNode node = GetNodeAt(client);
+                if (node != null && !Info(node).IsPlaceholder)
+                {
+                    DropQueryEventArgs query = new DropQueryEventArgs(Info(node).Path);
+                    EventHandler<DropQueryEventArgs> handler = DropQuery;
+                    if (handler != null)
+                    {
+                        handler(this, query);
+                    }
+                    if (query.Allowed)
+                    {
+                        e.Effect = DragDropEffects.Copy;
+                        target = node;
+                    }
+                }
+            }
+            SetDropNode(target);
+            return target;
+        }
+
+        protected override void OnDragEnter(DragEventArgs drgevent)
+        {
+            base.OnDragEnter(drgevent);
+            UpdateDrag(drgevent);
+        }
+
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            base.OnDragOver(drgevent);
+            UpdateDrag(drgevent);
+        }
+
+        protected override void OnDragLeave(EventArgs e)
+        {
+            base.OnDragLeave(e);
+            SetDropNode(null);
+        }
+
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            base.OnDragDrop(drgevent);
+            TreeNode target = UpdateDrag(drgevent);
+            SetDropNode(null);
+            string[] files = DragHelper.GetFiles(drgevent);
+            EventHandler<FilesDroppedEventArgs> handler = FilesDropped;
+            if (target != null && files != null && files.Length > 0 && handler != null)
+            {
+                handler(this, new FilesDroppedEventArgs(files, Info(target).Path));
+            }
         }
 
         // ---- user input ----

@@ -432,4 +432,98 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="ExplorerRefreshHint" xml:space="preserve">
     <value>Press Refresh to try again.</value>
   </data>
+  <data name="TransferTo" xml:space="preserve">
+    <value>Copying to {0}</value>
+  </data>
+  <data name="TransferFrom" xml:space="preserve">
+    <value>Copying from {0}</value>
+  </data>
+  <data name="TransferPreparing" xml:space="preserve">
+    <value>Counting files…</value>
+  </data>
+  <data name="TransferItemsOf" xml:space="preserve">
+    <value>{0} of {1} items</value>
+  </data>
+  <data name="TransferBytesOf" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="TransferSpeed" xml:space="preserve">
+    <value>{0}/s</value>
+  </data>
+  <data name="TransferRemaining" xml:space="preserve">
+    <value>{0} remaining</value>
+  </data>
+  <data name="TransferCalculating" xml:space="preserve">
+    <value>Calculating time remaining…</value>
+  </data>
+  <data name="TimeSeconds" xml:space="preserve">
+    <value>{0} sec</value>
+  </data>
+  <data name="TimeMinutes" xml:space="preserve">
+    <value>{0} min {1} sec</value>
+  </data>
+  <data name="TimeHours" xml:space="preserve">
+    <value>{0} h {1} min</value>
+  </data>
+  <data name="ConflictTitle" xml:space="preserve">
+    <value>File Already Exists</value>
+  </data>
+  <data name="ConflictMessage" xml:space="preserve">
+    <value>A file named '{0}' already exists in this location.</value>
+  </data>
+  <data name="ConflictExisting" xml:space="preserve">
+    <value>Existing file: {0}, modified {1}</value>
+  </data>
+  <data name="ConflictIncoming" xml:space="preserve">
+    <value>Copying: {0}, modified {1}</value>
+  </data>
+  <data name="ConflictReplace" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="ConflictSkip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="ConflictKeepBoth" xml:space="preserve">
+    <value>Keep both</value>
+  </data>
+  <data name="ConflictApplyAll" xml:space="preserve">
+    <value>Apply to all conflicts</value>
+  </data>
+  <data name="ButtonRetry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="ButtonSkip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="TransferErrorTitle" xml:space="preserve">
+    <value>Copy Error</value>
+  </data>
+  <data name="TransferErrorMessage" xml:space="preserve">
+    <value>Cannot copy '{0}'.
+
+{1}</value>
+  </data>
+  <data name="TransferConnectionLost" xml:space="preserve">
+    <value>Connection lost. The copy was stopped.</value>
+  </data>
+  <data name="TransferFailed" xml:space="preserve">
+    <value>The copy failed.
+
+{0}</value>
+  </data>
+  <data name="TransferFolderBlocked" xml:space="preserve">
+    <value>A file named '{0}' already exists, so a folder with that name cannot be created.</value>
+  </data>
+  <data name="TransferNoWrite" xml:space="preserve">
+    <value>{0} does not let this computer copy files to it.</value>
+  </data>
+  <data name="TransferNothing" xml:space="preserve">
+    <value>There is nothing to copy.</value>
+  </data>
+  <data name="TransferNoTarget" xml:space="preserve">
+    <value>Open a drive or a folder first: files cannot be copied to the computer level.</value>
+  </data>
+  <data name="TransferFileBlocked" xml:space="preserve">
+    <value>A folder named '{0}' already exists, so a file with that name cannot be copied.</value>
+  </data>
 </root>

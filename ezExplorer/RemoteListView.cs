@@ -40,8 +40,16 @@ namespace ezExplorer
         /// <summary>The user finished editing a name (the edit itself is already cancelled; do the rename).</summary>
         public event EventHandler<RenameEventArgs> RenameRequested;
 
+        /// <summary>Asks whether files may be dropped on the folder under the cursor.</summary>
+        public event EventHandler<DropQueryEventArgs> DropQuery;
+        /// <summary>Files from Explorer were dropped.</summary>
+        public event EventHandler<FilesDroppedEventArgs> FilesDropped;
+
+        private int dropHilite = -1;
+
         public RemoteListView()
         {
+            AllowDrop = true;
             DoubleBuffered = true;
             View = View.Details;
             VirtualMode = true;
@@ -251,6 +259,110 @@ namespace ezExplorer
                 {
                     handler(this, new RenameEventArgs(item, newName));
                 }
+            }
+        }
+
+        // ---- drag and drop from Explorer ----
+
+        /// <summary>The index of the folder row under a client point, or -1.</summary>
+        private int FolderIndexAt(Point client)
+        {
+            ListViewItem hit = HitTest(client).Item;
+            if (hit != null && hit.Index >= 0 && hit.Index < items.Count && items[hit.Index].IsFolder)
+            {
+                return hit.Index;
+            }
+            return -1;
+        }
+
+        private void SetDropHilite(int index)
+        {
+            if (index == dropHilite)
+            {
+                return;
+            }
+            if (dropHilite >= 0)
+            {
+                SetItemDropState(dropHilite, 0);
+            }
+            dropHilite = index;
+            if (index >= 0)
+            {
+                SetItemDropState(index, ShellNative.LVIS_DROPHILITED);
+            }
+        }
+
+        private void SetItemDropState(int index, uint state)
+        {
+            ShellNative.LVITEM item = new ShellNative.LVITEM();
+            item.state = state;
+            item.stateMask = ShellNative.LVIS_DROPHILITED;
+            ShellNative.SendMessage(Handle, ShellNative.LVM_SETITEMSTATE, new IntPtr(index), ref item);
+        }
+
+        private void UpdateDrag(DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            int index = -1;
+            if (DragHelper.HasFiles(e) && (e.AllowedEffect & DragDropEffects.Copy) != 0)
+            {
+                Point client = PointToClient(new Point(e.X, e.Y));
+                DragHelper.AutoScroll(this, client);
+                index = FolderIndexAt(client);
+
+                DropQueryEventArgs query = new DropQueryEventArgs(index >= 0 ? items[index].Path : null);
+                EventHandler<DropQueryEventArgs> handler = DropQuery;
+                if (handler != null)
+                {
+                    handler(this, query);
+                }
+                if (query.Allowed)
+                {
+                    e.Effect = DragDropEffects.Copy;
+                }
+                else
+                {
+                    index = -1;
+                }
+            }
+            SetDropHilite(index);
+        }
+
+        protected override void OnDragEnter(DragEventArgs drgevent)
+        {
+            base.OnDragEnter(drgevent);
+            UpdateDrag(drgevent);
+        }
+
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            base.OnDragOver(drgevent);
+            UpdateDrag(drgevent);
+        }
+
+        protected override void OnDragLeave(EventArgs e)
+        {
+            base.OnDragLeave(e);
+            SetDropHilite(-1);
+        }
+
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            base.OnDragDrop(drgevent);
+            UpdateDrag(drgevent);
+            bool allowed = drgevent.Effect != DragDropEffects.None;
+            int index = dropHilite;
+            SetDropHilite(-1);
+            if (!allowed)
+            {
+                return;
+            }
+
+            string[] files = DragHelper.GetFiles(drgevent);
+            EventHandler<FilesDroppedEventArgs> handler = FilesDropped;
+            if (files != null && files.Length > 0 && handler != null)
+            {
+                handler(this, new FilesDroppedEventArgs(files, index >= 0 ? items[index].Path : null));
             }
         }
 

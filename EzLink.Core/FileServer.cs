@@ -923,6 +923,18 @@ namespace EzLink
                 return;
             }
             Directory.CreateDirectory(path); // an existing folder is fine: creating it again is a no-op
+            if (request.HasTimes)
+            {
+                DateTime floor = new DateTime(1601, 1, 3, 0, 0, 0, DateTimeKind.Utc); // 0 means "unknown"
+                if (request.Created > floor)
+                {
+                    Directory.SetCreationTimeUtc(path, request.Created);
+                }
+                if (request.Modified > floor)
+                {
+                    Directory.SetLastWriteTimeUtc(path, request.Modified);
+                }
+            }
             Reply(id, new OkMessage());
         }
 

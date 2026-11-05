@@ -34,6 +34,13 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConflictDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CopyErrorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DropEvents.cs" />
     <Compile Include="ExplorerArgs.cs" />
     <Compile Include="ExplorerForm.cs">
       <SubType>Form</SubType>
@@ -57,6 +64,11 @@
     <Compile Include="ShellIcons.cs" />
     <Compile Include="ShellNative.cs" />
     <Compile Include="ToolImages.cs" />
+    <Compile Include="TransferDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransferState.cs" />
+    <Compile Include="UploadJob.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\nav-back.png"><LogicalName>ezExplorer.Resources.nav-back.png</LogicalName></EmbeddedResource>

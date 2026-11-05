@@ -82,8 +82,10 @@ namespace ezExplorer
             BuildPathBar();
             BuildPanes();
             BuildStatusBar();
-            listMenu = BuildMenu(OnListOpen, OnListRename, OnListDelete, OnListNewFolder, OnRefreshClick);
-            treeMenu = BuildMenu(OnTreeOpen, OnTreeMenuRename, OnTreeDelete, OnTreeNewFolder, OnRefreshClick);
+            listMenu = BuildMenu(OnListOpen, OnListPaste, OnListRename, OnListDelete, OnListNewFolder,
+                OnRefreshClick);
+            treeMenu = BuildMenu(OnTreeOpen, OnTreePaste, OnTreeMenuRename, OnTreeDelete, OnTreeNewFolder,
+                OnRefreshClick);
             list.ContextMenuStrip = listMenu.Strip;
             listMenu.Strip.Opening += OnListMenuOpening;
 
@@ -107,6 +109,10 @@ namespace ezExplorer
             list.ItemActivate += OnListActivate;
             list.RenameRequested += OnListRenameRequested;
             list.SelectionChanged += OnSelectionChanged;
+            list.DropQuery += OnDropQuery;
+            list.FilesDropped += OnFilesDropped;
+            tree.DropQuery += OnDropQuery;
+            tree.FilesDropped += OnFilesDropped;
 
             ipc.MessageReceived += OnIpcMessage;
             SetView(settings.View);
@@ -185,17 +191,16 @@ namespace ezExplorer
             statusStrip.Items.AddRange(new ToolStripItem[] { selectionLabel, connectionLabel });
         }
 
-        private MenuSet BuildMenu(EventHandler open, EventHandler rename, EventHandler delete, EventHandler newFolder,
-            EventHandler refresh)
+        private MenuSet BuildMenu(EventHandler open, EventHandler paste, EventHandler rename, EventHandler delete,
+            EventHandler newFolder, EventHandler refresh)
         {
             MenuSet set = new MenuSet();
             set.Open = new ToolStripMenuItem(Strings.Get("MenuOpenItem"), null, open);
             set.Open.Font = new Font(set.Open.Font, FontStyle.Bold);
-            // Copy and Paste arrive with the transfers (upload and download milestones).
+            // Copy arrives with the download milestone.
             set.Copy = new ToolStripMenuItem(Strings.Get("MenuCopy"));
             set.Copy.Enabled = false;
-            set.Paste = new ToolStripMenuItem(Strings.Get("MenuPaste"));
-            set.Paste.Enabled = false;
+            set.Paste = new ToolStripMenuItem(Strings.Get("MenuPaste"), null, paste);
             set.Rename = new ToolStripMenuItem(Strings.Get("MenuRename"), null, rename);
             set.Delete = new ToolStripMenuItem(Strings.Get("MenuDelete"), null, delete);
             set.NewFolder = new ToolStripMenuItem(Strings.Get("MenuNewFolder"), null, newFolder);
@@ -517,6 +522,7 @@ namespace ezExplorer
             listMenu.Delete.Enabled = selected.Count > 0 && !anyDrive && browser.CanWrite;
             listMenu.NewFolder.Enabled = inFolder && browser.CanWrite;
             listMenu.Refresh.Enabled = true;
+            listMenu.Paste.Enabled = CanPasteInto(ListPasteTarget());
         }
 
         private void OnTreeContextMenu(object sender, TreeContextEventArgs e)
@@ -527,6 +533,7 @@ namespace ezExplorer
             treeMenu.Rename.Enabled = plainFolder && browser.CanWrite;
             treeMenu.Delete.Enabled = plainFolder && browser.CanWrite;
             treeMenu.NewFolder.Enabled = !RemotePaths.IsRoot(e.Path) && browser.CanWrite;
+            treeMenu.Paste.Enabled = CanPasteInto(e.Path);
             treeMenu.Strip.Show(tree, e.Location);
         }
 
@@ -548,6 +555,16 @@ namespace ezExplorer
         private void OnListNewFolder(object sender, EventArgs e)
         {
             NewFolder(nav.Current);
+        }
+
+        private void OnListPaste(object sender, EventArgs e)
+        {
+            PasteInto(ListPasteTarget());
+        }
+
+        private void OnTreePaste(object sender, EventArgs e)
+        {
+            PasteInto(treeContextPath);
         }
 
         private void OnTreeOpen(object sender, EventArgs e)
@@ -624,6 +641,9 @@ namespace ezExplorer
                                 DeletePaths(paths);
                             }
                             return true;
+                        case Keys.Control | Keys.V:
+                            PasteInto(list.Focused ? ListPasteTarget() : tree.SelectedPath);
+                            return true;
                         case Keys.Control | Keys.A:
                             if (list.Focused)
                             {
@@ -635,6 +655,109 @@ namespace ezExplorer
                 }
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        // ---- uploading: files from Explorer ----
+
+        /// <summary>Whether files may be dropped on the folder (null: the current folder of the list).</summary>
+        private void OnDropQuery(object sender, DropQueryEventArgs e)
+        {
+            string target = e.Path != null ? e.Path : nav.Current;
+            e.Allowed = browser.CanWrite && target != null && !RemotePaths.IsRoot(target);
+        }
+
+        private void OnFilesDropped(object sender, FilesDroppedEventArgs e)
+        {
+            string target = e.Path != null ? e.Path : nav.Current;
+            string[] files = e.Files;
+            // Let the drop return to Explorer first: the transfer dialog is modal and would hold its drag loop.
+            BeginInvoke(new MethodInvoker(delegate { StartUpload(files, target); }));
+        }
+
+        /// <summary>Explorer pastes into the selected folder if exactly one is selected, else into the open folder.</summary>
+        private string ListPasteTarget()
+        {
+            List<RemoteItem> selected = list.SelectedRemoteItems;
+            if (selected.Count == 1 && selected[0].IsFolder)
+            {
+                return selected[0].Path;
+            }
+            return nav.Current;
+        }
+
+        private bool CanPasteInto(string folder)
+        {
+            return browser.CanWrite && folder != null && !RemotePaths.IsRoot(folder) && ClipboardFiles().Length > 0;
+        }
+
+        private static string[] ClipboardFiles()
+        {
+            try
+            {
+                if (Clipboard.ContainsFileDropList())
+                {
+                    System.Collections.Specialized.StringCollection files = Clipboard.GetFileDropList();
+                    string[] result = new string[files.Count];
+                    files.CopyTo(result, 0);
+                    return result;
+                }
+            }
+            catch (System.Runtime.InteropServices.ExternalException)
+            {
+                // The clipboard is held by another program right now.
+            }
+            return new string[0];
+        }
+
+        private void PasteInto(string folder)
+        {
+            string[] files = ClipboardFiles();
+            if (files.Length > 0)
+            {
+                StartUpload(files, folder);
+            }
+        }
+
+        /// <summary>Copies local files and folders into a folder on the peer, inside the modal transfer dialog.</summary>
+        private void StartUpload(string[] files, string folder)
+        {
+            if (files == null || files.Length == 0)
+            {
+                MessageBox.Show(this, Strings.Get("TransferNothing"), Strings.Get("ExplorerTitle"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (!browser.Connected)
+            {
+                return;
+            }
+            if (!browser.CanWrite)
+            {
+                MessageBox.Show(this, string.Format(Strings.Get("TransferNoWrite"), args.PeerName),
+                    Strings.Get("ExplorerTitle"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (folder == null || RemotePaths.IsRoot(folder))
+            {
+                MessageBox.Show(this, Strings.Get("TransferNoTarget"), Strings.Get("ExplorerTitle"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            TransferOutcome outcome;
+            UploadJob job = new UploadJob(browser, files, folder);
+            using (TransferDialog dialog = new TransferDialog(string.Format(Strings.Get("TransferTo"), args.PeerName), job))
+            {
+                dialog.ShowDialog(this);
+                outcome = dialog.Outcome;
+            }
+
+            if (outcome == TransferOutcome.ConnectionLost || outcome == TransferOutcome.Failed)
+            {
+                browser.CheckLink();
+            }
+            UpdateEnabled();
+            FinishChange(folder); // show what arrived, even after a cancel
         }
 
         // ---- file operations ----

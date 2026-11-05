@@ -34,12 +34,19 @@ namespace ezExplorer
         public const int LVSIL_NORMAL = 0;
         public const int LVM_SETITEMSTATE = LVM_FIRST + 43;
         public const uint LVIS_SELECTED = 0x2;
+        public const uint LVIS_DROPHILITED = 0x8;
         public const int LVSIL_SMALL = 1;
 
         public const int TV_FIRST = 0x1100;
         public const int TVM_SETIMAGELIST = TV_FIRST + 9;
         public const int TVM_SETITEMW = TV_FIRST + 63;
         public const int TVSIL_NORMAL = 0;
+        public const int TVM_SELECTITEM = TV_FIRST + 11;
+        public const int TVGN_DROPHILITE = 8;
+
+        public const int WM_VSCROLL = 0x115;
+        public const int SB_LINEUP = 0;
+        public const int SB_LINEDOWN = 1;
         public const uint TVIF_IMAGE = 0x2;
         public const uint TVIF_SELECTEDIMAGE = 0x20;
         public const uint TVIF_HANDLE = 0x10;

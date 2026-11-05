@@ -501,8 +501,16 @@ namespace EzLink.Protocol
         }
     }
 
+    /// <summary>
+    /// Creates a folder (creating an existing one is fine). Optional times (flagged by one byte) are applied to
+    /// the folder, so an upload can stamp a folder after its contents are written.
+    /// </summary>
     public sealed class CreateDirRequest : PathRequest
     {
+        public bool HasTimes;
+        public DateTime Created;
+        public DateTime Modified;
+
         public CreateDirRequest()
             : base(FileCommands.CreateDir)
         {
@@ -514,10 +522,27 @@ namespace EzLink.Protocol
             Path = path;
         }
 
+        protected override void WritePayload(PayloadWriter w)
+        {
+            base.WritePayload(w);
+            w.WriteBool(HasTimes);
+            if (HasTimes)
+            {
+                w.WriteFileTime(Created);
+                w.WriteFileTime(Modified);
+            }
+        }
+
         public static CreateDirRequest Read(PayloadReader r)
         {
             CreateDirRequest m = new CreateDirRequest();
             m.Path = r.ReadString();
+            m.HasTimes = r.ReadBool();
+            if (m.HasTimes)
+            {
+                m.Created = r.ReadFileTime();
+                m.Modified = r.ReadFileTime();
+            }
             return m;
         }
     }

@@ -46,6 +46,15 @@ namespace EzLink.Tests
         }
 
         [Test]
+        public void CreateDirWithoutTimesRoundTrips()
+        {
+            Message parsed = MessageFactory.Parse(ThroughTheWire(new CreateDirRequest(@"C:\plain").ToFrame(7)));
+            CreateDirRequest request = (CreateDirRequest)parsed;
+            Assert.AreEqual(@"C:\plain", request.Path);
+            Assert.IsFalse(request.HasTimes);
+        }
+
+        [Test]
         public void EveryMessageTypeHasASample()
         {
             // 9 general + 18 file commands.

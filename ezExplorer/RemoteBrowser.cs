@@ -28,7 +28,7 @@ namespace ezExplorer
     /// worker thread that runs the blocking browse requests one after the other, so the UI never waits on the
     /// cable.
     /// </summary>
-    internal sealed class RemoteBrowser : IDisposable
+    internal sealed class RemoteBrowser : IDisposable, ITransferClientSource
     {
         private readonly ExplorerArgs args;
         private readonly Control ui;
@@ -36,8 +36,10 @@ namespace ezExplorer
         private readonly object queueLock = new object();
         private readonly Thread worker;
         private readonly object clientLock = new object();
+        private readonly object transferLock = new object();
 
         private IPAddress peerAddress;
+        private IPAddress localAddress;
         private FileClient browse;
         private FileClient transfer;
         private Permissions granted = Permissions.None;
@@ -86,6 +88,49 @@ namespace ezExplorer
             get { lock (clientLock) { return transfer; } }
         }
 
+        /// <summary>
+        /// The session for transfers, opened again if it was lost while the browsing session is still up. Runs
+        /// blocking network code: call it from a worker thread.
+        /// </summary>
+        public FileClient GetTransferClient()
+        {
+            lock (transferLock)
+            {
+                FileClient current = TransferClient;
+                if (current != null && !current.Session.IsClosed)
+                {
+                    return current;
+                }
+                if (!Connected || localAddress == null)
+                {
+                    throw new IOException(Strings.Get("ExplorerNotConnected"));
+                }
+
+                string version = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
+                HelloReplyMessage reply;
+                FileClient fresh = FileClient.Connect(localAddress, new IPEndPoint(peerAddress, args.PeerPort),
+                    args.SelfId, args.SelfName, version, out reply);
+                if (fresh == null)
+                {
+                    throw new IOException(string.Format(Strings.Get("ExplorerDenied"), args.PeerName));
+                }
+                lock (clientLock)
+                {
+                    transfer = fresh;
+                }
+                return fresh;
+            }
+        }
+
+        /// <summary>Notices that the link is gone after a transfer failed: the browsing session is closed too.</summary>
+        public void CheckLink()
+        {
+            if (LinkLost())
+            {
+                DropSessions();
+            }
+        }
+
         public bool CanWrite
         {
             get { return Connected && RemotePaths.Allows(Granted, Permissions.Write); }
@@ -123,6 +168,7 @@ namespace ezExplorer
                 throw new IOException(string.Format(Strings.Get("ExplorerNoAdapter"), args.PeerName));
             }
 
+            localAddress = local;
             string version = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
             IPEndPoint endpoint = new IPEndPoint(peerAddress, args.PeerPort);
 

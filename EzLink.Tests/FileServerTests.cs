@@ -304,6 +304,20 @@ namespace EzLink.Tests
         }
 
         [Test]
+        public void CreateDirWithTimesStampsTheFolder()
+        {
+            DateTime created = new DateTime(2020, 3, 4, 5, 6, 7, DateTimeKind.Utc);
+            DateTime modified = new DateTime(2021, 8, 9, 10, 11, 12, DateTimeKind.Utc);
+            client.CreateDir(P("stamped"));
+            MakeFile("stamped\\inside.txt", "x"); // writing a file changes the folder's own time...
+            client.CreateDir(P("stamped"), created, modified); // ...so the times go on last
+            DirectoryInfo dir = new DirectoryInfo(P("stamped"));
+            Assert.AreEqual(created, dir.CreationTimeUtc);
+            Assert.AreEqual(modified, dir.LastWriteTimeUtc);
+            Assert.IsTrue(File.Exists(P("stamped\\inside.txt")));
+        }
+
+        [Test]
         public void ListTreeOfAFolderWithManyEntriesIsComplete()
         {
             for (int i = 0; i < 40; i++)

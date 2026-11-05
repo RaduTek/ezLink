@@ -57,6 +57,13 @@
     <Compile Include="..\ezExplorer\ShellNative.cs">
       <Link>Linked\ShellNative.cs</Link>
     </Compile>
+    <Compile Include="..\ezExplorer\TransferState.cs">
+      <Link>Linked\TransferState.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\UploadJob.cs">
+      <Link>Linked\UploadJob.cs</Link>
+    </Compile>
+    <Compile Include="UploadJobTests.cs" />
     <Compile Include="Samples.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="TrustLinkTests.cs" />
