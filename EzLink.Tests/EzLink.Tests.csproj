@@ -40,6 +40,7 @@
     <Compile Include="BeaconTests.cs" />
     <Compile Include="CommandNumberTests.cs" />
     <Compile Include="DiscoveryServiceTests.cs" />
+    <Compile Include="FileServerTests.cs" />
     <Compile Include="FrameTests.cs" />
     <Compile Include="FakeAdapterSource.cs" />
     <Compile Include="IpcTests.cs" />

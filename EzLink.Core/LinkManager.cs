@@ -47,6 +47,7 @@ namespace EzLink
         private readonly Dictionary<string, SessionListener> listeners = new Dictionary<string, SessionListener>();
         private PeerInfo peer;               // the peer whose beacon we hear
         private PeerSession control;         // the open control session
+        private readonly List<PeerSession> fileSessions = new List<PeerSession>(); // sessions we serve
         private bool connectorRunning;
         private bool started;
         private readonly ManualResetEvent stopEvent = new ManualResetEvent(false);
@@ -165,8 +166,10 @@ namespace EzLink
 
             PeerSession session;
             List<SessionListener> toStop;
+            List<PeerSession> served;
             lock (sync)
             {
+                served = new List<PeerSession>(fileSessions);
                 session = control;
                 control = null;
                 peer = null;
@@ -176,6 +179,10 @@ namespace EzLink
             if (session != null)
             {
                 session.Close("shutting down");
+            }
+            foreach (PeerSession file in served)
+            {
+                file.Close("shutting down");
             }
             foreach (SessionListener listener in toStop)
             {
@@ -226,6 +233,10 @@ namespace EzLink
             else
             {
                 AuthorizeSession(hello, remote, connection, reply);
+                if (reply.Status == HelloStatus.Accepted)
+                {
+                    reply.Capabilities.Add(Capabilities.Files);
+                }
             }
             return reply;
         }
@@ -267,11 +278,66 @@ namespace EzLink
 
         public bool SessionEstablished(PeerSession session)
         {
+            if (session.SessionType == SessionTypes.Files)
+            {
+                return ServeFiles(session);
+            }
             if (session.SessionType != SessionTypes.Control)
             {
                 return false;
             }
             return RegisterControl(session);
+        }
+
+        // ---- serving files ----
+
+        /// <summary>
+        /// Starts the file server on an accepted files session. What the peer may do is looked up for every
+        /// request, so edits in Options and the end of an Allow once grant apply immediately.
+        /// </summary>
+        private bool ServeFiles(PeerSession session)
+        {
+            Guid peerId = session.PeerId;
+            TrustManager manager = trust;
+            lock (sync)
+            {
+                // Like the control session, a files session needs the peer to be on the link right now.
+                if (!started || peer == null || peer.MachineId != peerId)
+                {
+                    Log.Info("Dropping files session {0}: the peer is no longer on the link", session);
+                    return false;
+                }
+                fileSessions.Add(session);
+            }
+            session.Closed += delegate
+            {
+                lock (sync)
+                {
+                    fileSessions.Remove(session);
+                }
+            };
+            new FileServer(session, delegate { return manager.GetEffective(peerId); });
+            Log.Info("Serving files to {0}", session);
+            return true;
+        }
+
+        private void CloseFileSessions(Guid peerId, string reason)
+        {
+            List<PeerSession> toClose = new List<PeerSession>();
+            lock (sync)
+            {
+                foreach (PeerSession session in fileSessions)
+                {
+                    if (session.PeerId == peerId)
+                    {
+                        toClose.Add(session);
+                    }
+                }
+            }
+            foreach (PeerSession session in toClose)
+            {
+                session.Close(reason);
+            }
         }
 
         // ---- discovery events ----
@@ -332,6 +398,7 @@ namespace EzLink
                 }
             }
             state.SetPeer(null);
+            CloseFileSessions(e.Peer.MachineId, "the peer is no longer on the link");
             if (trust != null)
             {
                 trust.ClearOnce(e.Peer.MachineId); // Allow once ends when the cable is unplugged
@@ -667,6 +734,7 @@ namespace EzLink
             discovery.SetSessionOpen(session.PeerId, false);
             state.SetControl(false, null);
             state.SetWeAllow(Permissions.None);
+            CloseFileSessions(session.PeerId, "the control session ended");
             if (trust != null)
             {
                 trust.ClearOnce(session.PeerId); // Allow once lasts for the lifetime of the control session

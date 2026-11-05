@@ -136,6 +136,48 @@ namespace EzLink.Tests
         }
 
         [Test]
+        public void AnApprovedPeerCanBrowseTheServedFolderButOnlyWhatWasGranted()
+        {
+            ScriptedPrompt prompt = new ScriptedPrompt().Then(ApprovalChoice.AllowOnce, ReadAccess);
+            StartPair(prompt);
+            string file = Path.Combine(directory, "shared.txt");
+            File.WriteAllText(file, "hello");
+
+            HelloReplyMessage reply;
+            FileClient files = FileClient.Connect(IPAddress.Loopback, new IPEndPoint(IPAddress.Loopback, TcpB),
+                LowId, "CLIENT", "1.0.0", out reply);
+            Assert.IsNotNull(files);
+            sessions.Add(files.Session);
+
+            Assert.AreEqual(1, prompt.Count);
+            Assert.IsTrue(files.Stat(file).Exists);
+            MemoryStream sink = new MemoryStream();
+            files.ReadFile(file, 0, sink, null);
+            Assert.AreEqual(5, sink.Length);
+
+            RemoteException denied = (RemoteException)Assert.Throws(typeof(RemoteException),
+                delegate { files.CreateDir(Path.Combine(directory, "nope")); });
+            Assert.AreEqual(ErrorCode.PermissionNotGranted, denied.Code, "Write was not granted");
+            Assert.IsFalse(Directory.Exists(Path.Combine(directory, "nope")));
+        }
+
+        [Test]
+        public void ServedFilesSessionsEndWithTheControlSession()
+        {
+            ScriptedPrompt prompt = new ScriptedPrompt().Then(ApprovalChoice.AllowOnce, ReadAccess);
+            StartPair(prompt);
+            HelloReplyMessage reply;
+            FileClient files = FileClient.Connect(IPAddress.Loopback, new IPEndPoint(IPAddress.Loopback, TcpB),
+                LowId, "CLIENT", "1.0.0", out reply);
+            Assert.IsNotNull(files);
+            sessions.Add(files.Session);
+
+            client.Stop(); // the cable goes away
+            Assert.IsTrue(WaitUntil(delegate { return files.Session.IsClosed; }),
+                "the served session must not outlive the link");
+        }
+
+        [Test]
         public void TheControlSessionNeverNeedsApproval()
         {
             ScriptedPrompt prompt = new ScriptedPrompt();

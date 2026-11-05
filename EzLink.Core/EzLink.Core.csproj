@@ -40,6 +40,8 @@
     <Compile Include="BeaconChannel.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DiscoveryService.cs" />
+    <Compile Include="FileClient.cs" />
+    <Compile Include="FileServer.cs" />
     <Compile Include="IAdapterSource.cs" />
     <Compile Include="Ipc.cs" />
     <Compile Include="LinkManager.cs" />
@@ -50,6 +52,7 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="PeerSession.cs" />
     <Compile Include="PeerTable.cs" />
+    <Compile Include="RemotePath.cs" />
     <Compile Include="SessionClient.cs" />
     <Compile Include="SessionConnection.cs" />
     <Compile Include="SessionListener.cs" />

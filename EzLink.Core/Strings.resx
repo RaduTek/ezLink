@@ -231,4 +231,55 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="SetupMissing" xml:space="preserve">
     <value>ezLinkSetup.exe was not found next to ezLink.exe.</value>
   </data>
+  <data name="ErrorPathNotAllowed" xml:space="preserve">
+    <value>This path is not allowed.</value>
+  </data>
+  <data name="ErrorPermissionNotGranted" xml:space="preserve">
+    <value>This computer has not allowed that.</value>
+  </data>
+  <data name="ErrorFolderNotFound" xml:space="preserve">
+    <value>The folder was not found.</value>
+  </data>
+  <data name="ErrorNotFound" xml:space="preserve">
+    <value>The file or folder was not found.</value>
+  </data>
+  <data name="ErrorCancelled" xml:space="preserve">
+    <value>Cancelled.</value>
+  </data>
+  <data name="ErrorIsFolder" xml:space="preserve">
+    <value>This is a folder, not a file.</value>
+  </data>
+  <data name="ErrorOffsetBeyondEnd" xml:space="preserve">
+    <value>The start position is beyond the end of the file.</value>
+  </data>
+  <data name="ErrorTargetIsFolder" xml:space="preserve">
+    <value>A folder with this name already exists.</value>
+  </data>
+  <data name="ErrorAlreadyExists" xml:space="preserve">
+    <value>A file or folder with this name already exists.</value>
+  </data>
+  <data name="ErrorTooMuchData" xml:space="preserve">
+    <value>The file is larger than announced.</value>
+  </data>
+  <data name="ErrorNoUpload" xml:space="preserve">
+    <value>No file transfer is in progress.</value>
+  </data>
+  <data name="ErrorIncompleteUpload" xml:space="preserve">
+    <value>The file was not received completely.</value>
+  </data>
+  <data name="ErrorHashMismatch" xml:space="preserve">
+    <value>The received file does not match its checksum.</value>
+  </data>
+  <data name="ErrorConnectionLost" xml:space="preserve">
+    <value>The connection to the other computer was lost.</value>
+  </data>
+  <data name="ErrorRequestTimeout" xml:space="preserve">
+    <value>The other computer did not answer in time.</value>
+  </data>
+  <data name="ErrorTransferChecksum" xml:space="preserve">
+    <value>The copied file does not match its checksum.</value>
+  </data>
+  <data name="ErrorFilesNotOffered" xml:space="preserve">
+    <value>The other computer does not offer file access.</value>
+  </data>
 </root>

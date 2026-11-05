@@ -30,6 +30,18 @@ namespace EzLink
         }
     }
 
+    public sealed class MessageEventArgs : EventArgs
+    {
+        public readonly Message Message;
+        public readonly uint RequestId;
+
+        public MessageEventArgs(Message message, uint requestId)
+        {
+            Message = message;
+            RequestId = requestId;
+        }
+    }
+
     /// <summary>
     /// An established session with a peer (after Hello): dispatches received frames to the registered
     /// command sets, answers Ping, tracks the peer's TrustChanged announcements and, for the control
@@ -57,6 +69,13 @@ namespace EzLink
         public event EventHandler<SessionClosedEventArgs> Closed;
         /// <summary>The peer announced a new set of permissions it grants us; read <see cref="PeerGrantsUs"/>.</summary>
         public event EventHandler TrustChanged;
+        /// <summary>
+        /// A general reply (Ok, Error, Unsupported) arrived. Command sets that issue requests listen to this
+        /// and match <see cref="MessageEventArgs.RequestId"/> against their pending requests. Raised on the read thread.
+        /// </summary>
+        public event EventHandler<MessageEventArgs> ReplyReceived;
+        /// <summary>The peer asked to stop a request (its id is in the Cancel message). Raised on the read thread.</summary>
+        public event EventHandler<MessageEventArgs> CancelReceived;
 
         public PeerSession(SessionConnection connection, string sessionType, bool initiator, Guid localId,
             Guid peerId, string peerName, string peerAppVersion, List<string> peerCapabilities)
@@ -300,12 +319,27 @@ namespace EzLink
                     handler(this, EventArgs.Empty);
                 }
             }
+            else if (message is OkMessage || message is ErrorMessage || message is UnsupportedMessage)
+            {
+                Raise(ReplyReceived, message, frame.RequestId);
+            }
+            else if (message is CancelMessage)
+            {
+                Raise(CancelReceived, message, ((CancelMessage)message).TargetRequestId);
+            }
             else if (message is HelloMessage || message is HelloReplyMessage)
             {
                 Close("unexpected Hello after the handshake");
             }
-            // Pong needs nothing beyond the timestamp update; Ok, Error, Cancel and Unsupported are consumed by
-            // the command sets that issue requests (later milestones).
+            // Pong needs nothing beyond the timestamp update.
+        }
+
+        private void Raise(EventHandler<MessageEventArgs> handler, Message message, uint requestId)
+        {
+            if (handler != null)
+            {
+                handler(this, new MessageEventArgs(message, requestId));
+            }
         }
 
         private void ReplyUnsupported(Frame frame)
