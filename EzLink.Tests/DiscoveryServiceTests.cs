@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -21,68 +21,6 @@ namespace EzLink.Tests
 
         private static readonly Guid IdA = new Guid("00000000-0000-0000-0000-00000000000a");
         private static readonly Guid IdB = new Guid("00000000-0000-0000-0000-00000000000b");
-
-        /// <summary>A scriptable adapter list; "local" means the loopback endpoint of the given own ports.</summary>
-        private sealed class FakeSource : IAdapterSource
-        {
-            private readonly object sync = new object();
-            private readonly List<int> ownPorts = new List<int>();
-            private AdapterInfo adapter;
-
-            public FakeSource(int ownPort, OperationalStatus status)
-            {
-                ownPorts.Add(ownPort);
-                SetStatus(status);
-            }
-
-            public void SetStatus(OperationalStatus status)
-            {
-                List<AdapterAddress> addresses = new List<AdapterAddress>();
-                addresses.Add(new AdapterAddress(IPAddress.Loopback, IPAddress.Parse("255.255.255.255")));
-                lock (sync)
-                {
-                    adapter = new AdapterInfo("{FAKE-LOOP}", "Fake loopback", "Fake", status, addresses, "usb\\vid_0bda&pid_8152");
-                }
-            }
-
-            public void RemoveAdapter()
-            {
-                lock (sync)
-                {
-                    adapter = null;
-                }
-            }
-
-            /// <summary>Treat beacons from this port as coming from this machine.</summary>
-            public void AddOwnPort(int port)
-            {
-                lock (sync)
-                {
-                    ownPorts.Add(port);
-                }
-            }
-
-            public List<AdapterInfo> GetCandidates()
-            {
-                lock (sync)
-                {
-                    List<AdapterInfo> list = new List<AdapterInfo>();
-                    if (adapter != null)
-                    {
-                        list.Add(adapter);
-                    }
-                    return list;
-                }
-            }
-
-            public bool IsLocalEndpoint(IPEndPoint endpoint)
-            {
-                lock (sync)
-                {
-                    return endpoint.Address.Equals(IPAddress.Loopback) && ownPorts.Contains(endpoint.Port);
-                }
-            }
-        }
 
         private readonly List<DiscoveryService> started = new List<DiscoveryService>();
 
@@ -108,7 +46,7 @@ namespace EzLink.Tests
             return o;
         }
 
-        private DiscoveryService Create(Guid id, string name, int localPort, int remotePort, FakeSource source)
+        private DiscoveryService Create(Guid id, string name, int localPort, int remotePort, FakeAdapterSource source)
         {
             DiscoveryService service = new DiscoveryService(source, id, name, "1.0.0",
                 (ushort)(localPort + 1), Fast(localPort, remotePort));
@@ -149,8 +87,8 @@ namespace EzLink.Tests
         [Test]
         public void TwoComputersFindEachOther()
         {
-            FakeSource sourceA = new FakeSource(PortA, OperationalStatus.Up);
-            FakeSource sourceB = new FakeSource(PortB, OperationalStatus.Up);
+            FakeAdapterSource sourceA = new FakeAdapterSource(PortA, OperationalStatus.Up);
+            FakeAdapterSource sourceB = new FakeAdapterSource(PortB, OperationalStatus.Up);
             DiscoveryService a = Create(IdA, "COMPUTER-A", PortA, PortB, sourceA);
             DiscoveryService b = Create(IdB, "COMPUTER-B", PortB, PortA, sourceB);
             Signal foundByA = new Signal();
@@ -176,8 +114,8 @@ namespace EzLink.Tests
         [Test]
         public void FoundIsRaisedOnceNotOnEveryBeacon()
         {
-            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal foundByA = new Signal();
             a.PeerFound += foundByA.OnPeer;
             a.Start();
@@ -192,7 +130,7 @@ namespace EzLink.Tests
         public void OwnBroadcastIsNotMistakenForAPeerOrADuplicate()
         {
             // Beacons go to our own port, so every beacon we send comes back to us.
-            DiscoveryService alone = Create(IdA, "A", PortA, PortA, new FakeSource(PortA, OperationalStatus.Up));
+            DiscoveryService alone = Create(IdA, "A", PortA, PortA, new FakeAdapterSource(PortA, OperationalStatus.Up));
             Signal found = new Signal();
             Signal duplicate = new Signal();
             alone.PeerFound += found.OnPeer;
@@ -207,10 +145,10 @@ namespace EzLink.Tests
         [Test]
         public void ABeaconFromAnotherAdapterOfTheSameMachineIsIgnored()
         {
-            FakeSource sourceA = new FakeSource(PortA, OperationalStatus.Up);
+            FakeAdapterSource sourceA = new FakeAdapterSource(PortA, OperationalStatus.Up);
             sourceA.AddOwnPort(PortB); // pretend B's socket is this machine's second adapter
             DiscoveryService a = Create(IdA, "A", PortA, PortB, sourceA);
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal found = new Signal();
             a.PeerFound += found.OnPeer;
             a.Start();
@@ -222,8 +160,8 @@ namespace EzLink.Tests
         [Test]
         public void SameUuidOnTwoMachinesIsReportedAsDuplicate()
         {
-            DiscoveryService a = Create(IdA, "CLONE-1", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
-            DiscoveryService b = Create(IdA, "CLONE-2", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService a = Create(IdA, "CLONE-1", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
+            DiscoveryService b = Create(IdA, "CLONE-2", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal duplicate = new Signal();
             Signal found = new Signal();
             a.DuplicateMachineId += delegate(object s, DuplicateMachineIdEventArgs e) { duplicate.OnSignal(s, e); };
@@ -238,8 +176,8 @@ namespace EzLink.Tests
         [Test]
         public void PeerIsLostWhenItStopsBeaconing()
         {
-            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal found = new Signal();
             Signal lost = new Signal();
             a.PeerFound += found.OnPeer;
@@ -258,8 +196,8 @@ namespace EzLink.Tests
         [Test]
         public void PeerWithAnOpenSessionIsNotExpired()
         {
-            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal found = new Signal();
             Signal lost = new Signal();
             a.PeerFound += found.OnPeer;
@@ -280,9 +218,9 @@ namespace EzLink.Tests
         [Test]
         public void UnpluggingTheAdapterDropsThePeerAndReportsTheChange()
         {
-            FakeSource sourceA = new FakeSource(PortA, OperationalStatus.Up);
+            FakeAdapterSource sourceA = new FakeAdapterSource(PortA, OperationalStatus.Up);
             DiscoveryService a = Create(IdA, "A", PortA, PortB, sourceA);
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal found = new Signal();
             Signal lost = new Signal();
             Signal adapters = new Signal();
@@ -305,9 +243,9 @@ namespace EzLink.Tests
         [Test]
         public void ReplugFindsThePeerAgain()
         {
-            FakeSource sourceA = new FakeSource(PortA, OperationalStatus.Up);
+            FakeAdapterSource sourceA = new FakeAdapterSource(PortA, OperationalStatus.Up);
             DiscoveryService a = Create(IdA, "A", PortA, PortB, sourceA);
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal found = new Signal();
             Signal lost = new Signal();
             a.PeerFound += found.OnPeer;
@@ -330,9 +268,9 @@ namespace EzLink.Tests
         [Test]
         public void AnAdapterThatIsDownDoesNotBeaconAndIsStillACandidate()
         {
-            FakeSource sourceA = new FakeSource(PortA, OperationalStatus.Down);
+            FakeAdapterSource sourceA = new FakeAdapterSource(PortA, OperationalStatus.Down);
             DiscoveryService a = Create(IdA, "A", PortA, PortB, sourceA);
-            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeSource(PortB, OperationalStatus.Up));
+            DiscoveryService b = Create(IdB, "B", PortB, PortA, new FakeAdapterSource(PortB, OperationalStatus.Up));
             Signal foundByB = new Signal();
             b.PeerFound += foundByB.OnPeer;
             a.Start();
@@ -356,7 +294,7 @@ namespace EzLink.Tests
                 blocker.ExclusiveAddressUse = true;
                 blocker.Bind(new IPEndPoint(IPAddress.Loopback, PortA));
 
-                DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
+                DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
                 Signal error = new Signal();
                 a.ChannelError += delegate(object s, ChannelErrorEventArgs e) { error.OnSignal(s, e); };
                 a.Start();
@@ -374,7 +312,7 @@ namespace EzLink.Tests
         [Test]
         public void StartAndStopAreIdempotent()
         {
-            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeSource(PortA, OperationalStatus.Up));
+            DiscoveryService a = Create(IdA, "A", PortA, PortB, new FakeAdapterSource(PortA, OperationalStatus.Up));
             a.Stop();
             a.Start();
             a.Start();
@@ -385,3 +323,4 @@ namespace EzLink.Tests
         }
     }
 }
+

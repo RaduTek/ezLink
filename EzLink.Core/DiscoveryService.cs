@@ -100,6 +100,8 @@ namespace EzLink
         public event EventHandler<DuplicateMachineIdEventArgs> DuplicateMachineId;
         /// <summary>A beacon socket could not be opened (for example the port is in use).</summary>
         public event EventHandler<ChannelErrorEventArgs> ChannelError;
+        /// <summary>Every beacon socket that had failed to open is now open (or no longer wanted).</summary>
+        public event EventHandler ChannelErrorsCleared;
 
         public DiscoveryService(IAdapterSource source, Guid machineId, string computerName, string appVersion,
             ushort sessionPort, DiscoveryOptions options)
@@ -260,6 +262,7 @@ namespace EzLink
             List<PeerInfo> lost = new List<PeerInfo>();
             List<ChannelErrorEventArgs> errors = new List<ChannelErrorEventArgs>();
             bool changed;
+            bool errorsCleared = false;
 
             lock (sync)
             {
@@ -282,6 +285,21 @@ namespace EzLink
                         wanted[BeaconChannel.MakeKey(adapter, address)] =
                             new KeyValuePair<AdapterInfo, AdapterAddress>(adapter, address);
                     }
+                }
+
+                // Forget bind errors for pairs that are no longer wanted.
+                bool hadErrors = channelErrors.Count > 0;
+                List<string> staleErrors = new List<string>();
+                foreach (string key in channelErrors.Keys)
+                {
+                    if (!wanted.ContainsKey(key))
+                    {
+                        staleErrors.Add(key);
+                    }
+                }
+                foreach (string key in staleErrors)
+                {
+                    channelErrors.Remove(key);
                 }
 
                 // Close channels that are no longer wanted (or died); their peers are gone with them.
@@ -333,8 +351,29 @@ namespace EzLink
                         }
                     }
                 }
+
+                errorsCleared = hadErrors && channelErrors.Count == 0;
             }
 
+            if (errorsCleared)
+            {
+                EventHandler cleared = ChannelErrorsCleared;
+                if (cleared != null)
+                {
+                    cleared(this, EventArgs.Empty);
+                }
+            }
+
+            // Adapter changes first, so a consumer that loses its peer because the cable went away already
+            // knows why and does not pass through a misleading intermediate state.
+            if (changed)
+            {
+                EventHandler handler = AdaptersChanged;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
+            }
             foreach (PeerInfo peer in lost)
             {
                 Log.Info("Peer lost (adapter gone): {0}", peer);
@@ -346,14 +385,6 @@ namespace EzLink
                 if (handler != null)
                 {
                     handler(this, error);
-                }
-            }
-            if (changed)
-            {
-                EventHandler handler = AdaptersChanged;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
                 }
             }
         }

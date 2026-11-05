@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using EzLink;
 
@@ -7,41 +8,79 @@ namespace ezLink
 {
     internal static class Program
     {
+        private const string MutexName = @"Local\ezLink.Main";
+        private const string MainWindowTitle = "ezLink.Main.Ipc";
+
         [STAThread]
         private static void Main(string[] args)
         {
-            string processName = "ezLink";
+            string suffix = string.Empty; // lets the debug loopback instances run side by side
 #if DEBUG
             int loopback = LoopbackAdapterSource.Parse(args);
             if (loopback != 0)
             {
-                processName = "ezLink-loop" + loopback; // separate log file per instance
+                suffix = "-loop" + loopback;
             }
 #endif
-            AppBootstrap.Start(processName, args);
+            AppBootstrap.Start("ezLink" + suffix, args);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Until the connection state machine arrives (milestone 5) discovery just logs what it finds.
-            DiscoveryService discovery = CreateDiscovery(args);
-            discovery.Start();
-            try
+            bool first;
+            using (Mutex mutex = new Mutex(true, MutexName + suffix, out first))
             {
-                Application.Run(new MainForm());
-            }
-            finally
-            {
-                discovery.Stop();
+                if (!first)
+                {
+                    // One instance per user session: ask the running one to show its window, then leave.
+                    ShowRunningInstance(MainWindowTitle + suffix);
+                    return;
+                }
+
+                bool startHidden = Array.IndexOf(args, "/minimized") >= 0;
+                LinkManager link = CreateLink(args);
+                try
+                {
+                    using (IpcWindow ipc = new IpcWindow(MainWindowTitle + suffix))
+                    using (MainForm form = new MainForm(link, ipc, startHidden))
+                    {
+                        link.Start();
+                        Application.Run(form);
+                    }
+                }
+                finally
+                {
+                    link.Dispose();
+                    Images.DisposeAll();
+                }
+                GC.KeepAlive(mutex);
             }
         }
 
-        private static DiscoveryService CreateDiscovery(string[] args)
+        private static void ShowRunningInstance(string title)
+        {
+            using (IpcWindow self = new IpcWindow("ezLink.Launcher.Ipc"))
+            {
+                // The first instance may still be starting up: give its window a moment to appear.
+                for (int attempt = 0; attempt < 15; attempt++)
+                {
+                    IntPtr target = IpcWindow.Find(title);
+                    if (target != IntPtr.Zero)
+                    {
+                        IpcWindow.Send(target, self, IpcMessages.ShowWindow, string.Empty);
+                        return;
+                    }
+                    Thread.Sleep(200);
+                }
+                Log.Warn("The running ezLink did not answer");
+            }
+        }
+
+        private static LinkManager CreateLink(string[] args)
         {
             IAdapterSource source = new SystemAdapterSource();
             Guid machineId = MachineIdentity.GetOrCreate();
             string computerName = Environment.MachineName;
-            ushort sessionPort = Constants.SessionPort;
-            DiscoveryOptions options = new DiscoveryOptions();
+            LinkOptions options = new LinkOptions();
 
 #if DEBUG
             int loopback = LoopbackAdapterSource.Parse(args);
@@ -50,15 +89,16 @@ namespace ezLink
                 source = new LoopbackAdapterSource(loopback);
                 machineId = LoopbackAdapterSource.IdFor(loopback);
                 computerName = computerName + "-loop" + loopback;
-                sessionPort = (ushort)(Constants.SessionPort + (loopback - 1) * 2);
-                options.LocalPort = LoopbackAdapterSource.PortFor(loopback);
-                options.RemotePort = LoopbackAdapterSource.OtherPortFor(loopback);
-                Log.Warn("DEBUG loopback peer {0} active: UDP {1} -> {2}", loopback, options.LocalPort, options.RemotePort);
+                options.ListenPort = (ushort)(Constants.SessionPort + (loopback - 1) * 2);
+                options.Discovery.LocalPort = LoopbackAdapterSource.PortFor(loopback);
+                options.Discovery.RemotePort = LoopbackAdapterSource.OtherPortFor(loopback);
+                Log.Warn("DEBUG loopback peer {0} active: UDP {1} -> {2}, TCP {3}", loopback,
+                    options.Discovery.LocalPort, options.Discovery.RemotePort, options.ListenPort);
             }
 #endif
 
             string appVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
-            return new DiscoveryService(source, machineId, computerName, appVersion, sessionPort, options);
+            return new LinkManager(source, machineId, computerName, appVersion, options);
         }
     }
 }

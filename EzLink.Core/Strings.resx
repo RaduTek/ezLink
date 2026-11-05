@@ -29,6 +29,108 @@
 Details were written to the log folder:
 {1}</value>
   </data>
+  <data name="StateNoCable" xml:space="preserve">
+    <value>Plug in the ezLink cable</value>
+  </data>
+  <data name="StateWaitingForNetwork" xml:space="preserve">
+    <value>Starting the connection…</value>
+  </data>
+  <data name="StateSearching" xml:space="preserve">
+    <value>Looking for the other computer…</value>
+  </data>
+  <data name="StateConnecting" xml:space="preserve">
+    <value>Connecting to {0}…</value>
+  </data>
+  <data name="StateConnected" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="ErrorDuplicateUuid" xml:space="preserve">
+    <value>Another computer ({0}) has the same ezLink ID as this one. Regenerate this computer's ID.</value>
+  </data>
+  <data name="ErrorPortInUse" xml:space="preserve">
+    <value>ezLink cannot use its network port because another program is using it. ({0})</value>
+  </data>
+  <data name="ErrorListenFailed" xml:space="preserve">
+    <value>ezLink cannot accept connections on the cable: {0}</value>
+  </data>
+  <data name="ErrorVersionMismatch" xml:space="preserve">
+    <value>{0} runs an incompatible version of ezLink. Update both computers to the same version.</value>
+  </data>
+  <data name="TrustWeAllow" xml:space="preserve">
+    <value>You allow {0} to: {1}</value>
+  </data>
+  <data name="TrustPeerAllows" xml:space="preserve">
+    <value>{0} allows you to: {1}</value>
+  </data>
+  <data name="ThisComputer" xml:space="preserve">
+    <value>this computer</value>
+  </data>
+  <data name="PermNone" xml:space="preserve">
+    <value>nothing yet</value>
+  </data>
+  <data name="PermBrowseAndCopy" xml:space="preserve">
+    <value>browse and copy files from {0}</value>
+  </data>
+  <data name="PermBrowseOnly" xml:space="preserve">
+    <value>browse files on {0}</value>
+  </data>
+  <data name="PermCopyFrom" xml:space="preserve">
+    <value>copy files from {0}</value>
+  </data>
+  <data name="PermWrite" xml:space="preserve">
+    <value>copy files to {0}</value>
+  </data>
+  <data name="MenuOpen" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="MenuExplore" xml:space="preserve">
+    <value>Explore {0}</value>
+  </data>
+  <data name="MenuExploreNobody" xml:space="preserve">
+    <value>Explore</value>
+  </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="ToolExplore" xml:space="preserve">
+    <value>Explore</value>
+  </data>
+  <data name="ToolSync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="ToolSyncTip" xml:space="preserve">
+    <value>Coming soon</value>
+  </data>
+  <data name="ToolOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="BalloonConnected" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="BalloonDisconnected" xml:space="preserve">
+    <value>Disconnected from {0}</value>
+  </data>
+  <data name="ExplorerMissing" xml:space="preserve">
+    <value>ezExplorer.exe was not found next to ezLink.exe.</value>
+  </data>
+  <data name="OptionsTitle" xml:space="preserve">
+    <value>ezLink Options</value>
+  </data>
+  <data name="OptionsStartAtLogon" xml:space="preserve">
+    <value>Start ezLink when I log on to Windows</value>
+  </data>
+  <data name="OptionsComputerName" xml:space="preserve">
+    <value>This computer's name</value>
+  </data>
+  <data name="OptionsComputerId" xml:space="preserve">
+    <value>This computer's ID</value>
+  </data>
+  <data name="ButtonOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="MainPlaceholder" xml:space="preserve">
     <value>ezLink is running.
 

@@ -22,6 +22,28 @@ namespace EzLink
             return new IPAddress(result);
         }
 
+        /// <summary>True if both addresses are IPv4 and lie in the same subnet under the mask (null mask: same defaults as above).</summary>
+        public static bool IsInSubnet(IPAddress address, IPAddress network, IPAddress mask)
+        {
+            if (address == null || network == null
+                || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork
+                || network.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                return false;
+            }
+            byte[] a = address.GetAddressBytes();
+            byte[] n = network.GetAddressBytes();
+            byte[] m = mask != null ? mask.GetAddressBytes() : DefaultMask(n);
+            for (int i = 0; i < 4; i++)
+            {
+                if ((a[i] & m[i]) != (n[i] & m[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private static byte[] DefaultMask(byte[] address)
         {
             bool linkLocal = address[0] == 169 && address[1] == 254;

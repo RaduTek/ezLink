@@ -34,15 +34,47 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ExplorerLauncher.cs" />
+    <Compile Include="Images.cs" />
     <Compile Include="LoopbackAdapterSource.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="NativeToolStrip\NativeToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NativeToolStrip\NativeToolStripRenderer.cs" />
+    <Compile Include="OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="StartupRegistration.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Oxygen icons (LGPL-3.0-or-later), see ..\THIRD-PARTY-NOTICES.md -->
+    <EmbeddedResource Include="Resources\status-nocable.png"><LogicalName>ezLink.Resources.status-nocable.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\status-waiting.png"><LogicalName>ezLink.Resources.status-waiting.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\status-searching.png"><LogicalName>ezLink.Resources.status-searching.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\status-connecting.png"><LogicalName>ezLink.Resources.status-connecting.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\status-connected.png"><LogicalName>ezLink.Resources.status-connected.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\status-error.png"><LogicalName>ezLink.Resources.status-error.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-nocable.png"><LogicalName>ezLink.Resources.tray-nocable.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-waiting.png"><LogicalName>ezLink.Resources.tray-waiting.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-searching.png"><LogicalName>ezLink.Resources.tray-searching.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting.png"><LogicalName>ezLink.Resources.tray-connecting.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connected.png"><LogicalName>ezLink.Resources.tray-connected.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-error.png"><LogicalName>ezLink.Resources.tray-error.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tool-explore.png"><LogicalName>ezLink.Resources.tool-explore.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tool-sync.png"><LogicalName>ezLink.Resources.tool-sync.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Resources\tool-options.png"><LogicalName>ezLink.Resources.tool-options.png</LogicalName></EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <None Include="licenses\oxygen-icons-LGPL-3.0-or-later.txt">
+      <Link>licenses\oxygen-icons-LGPL-3.0-or-later.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">

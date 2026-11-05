@@ -29,6 +29,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -40,11 +41,16 @@
     <Compile Include="CommandNumberTests.cs" />
     <Compile Include="DiscoveryServiceTests.cs" />
     <Compile Include="FrameTests.cs" />
+    <Compile Include="FakeAdapterSource.cs" />
+    <Compile Include="IpcTests.cs" />
     <Compile Include="IpMathTests.cs" />
+    <Compile Include="LinkManagerTests.cs" />
+    <Compile Include="LinkStateMachineTests.cs" />
     <Compile Include="MessageTests.cs" />
     <Compile Include="PayloadTests.cs" />
     <Compile Include="PeerTableTests.cs" />
     <Compile Include="Samples.cs" />
+    <Compile Include="SessionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
