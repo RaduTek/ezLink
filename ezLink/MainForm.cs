@@ -10,30 +10,12 @@ namespace ezLink
     /// The ActiveSync-style status window (layout and toolbar rendering follow EasyMusicSync's main window) plus
     /// the tray icon. Minimising hides the window to the tray; closing it exits (after a confirmation while connected).
     /// </summary>
-    internal sealed class MainForm : Form
+    internal sealed partial class MainForm : Form
     {
         private readonly LinkManager link;
         private readonly IpcWindow ipc;
         private readonly ExplorerLauncher explorers;
         private readonly bool startHidden;
-
-        private readonly NativeToolStrip.NativeToolStrip toolStrip = new NativeToolStrip.NativeToolStrip();
-        private readonly ToolStripButton exploreButton;
-        private readonly ToolStripButton syncButton;
-        private readonly ToolStripButton optionsButton;
-        private readonly Panel mainPanel = new Panel();
-        private readonly PictureBox statusIcon = new PictureBox();
-        private readonly Label statusLabel = new Label();
-        private readonly Label peerLabel = new Label();
-        private readonly Label weAllowLabel = new Label();
-        private readonly Label peerAllowsLabel = new Label();
-        private readonly Button fixButton = new Button();
-
-        private readonly NotifyIcon notifyIcon = new NotifyIcon();
-        private readonly ContextMenuStrip trayMenu = new ContextMenuStrip();
-        private readonly ToolStripMenuItem openItem = new ToolStripMenuItem();
-        private readonly ToolStripMenuItem exploreItem = new ToolStripMenuItem();
-        private readonly ToolStripMenuItem exitItem = new ToolStripMenuItem();
 
         private bool allowVisible;
         private bool exiting;
@@ -48,24 +30,9 @@ namespace ezLink
             this.startHidden = startHidden;
             allowVisible = !startHidden;
 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont; // Segoe UI on Vista and later, Tahoma on XP
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = Strings.Get("AppName");
-            ClientSize = new Size(420, 39 + 118);
-
-            exploreButton = new ToolStripButton(Strings.Get("ToolExplore"), Images.Load("tool-explore"));
-            syncButton = new ToolStripButton(Strings.Get("ToolSync"), Images.Load("tool-sync"));
-            optionsButton = new ToolStripButton(Strings.Get("ToolOptions"), Images.Load("tool-options"));
-            BuildToolStrip();
-            BuildStatusArea();
-            BuildTray();
-
-            Controls.Add(mainPanel);
-            Controls.Add(toolStrip);
+            InitializeComponent();
+            ApplyLocalizedContent();
 
             link.State.StateChanged += OnStateChanged;
             ipc.MessageReceived += OnIpcMessage;
@@ -76,97 +43,45 @@ namespace ezLink
 
         // ---- construction ----
 
-        private void BuildToolStrip()
+        /// <summary>Texts, images and fonts that come from resources or the system rather than the designer.</summary>
+        private void ApplyLocalizedContent()
         {
-            toolStrip.AutoSize = false;
-            toolStrip.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip.ImageScalingSize = new Size(32, 32);
-            toolStrip.Location = new Point(0, 0);
-            toolStrip.Padding = new Padding(2, 0, 2, 0);
-            toolStrip.Size = new Size(420, 39);
-            toolStrip.Theme = NativeToolStrip.NativeToolStripTheme.Toolbar;
-            toolStrip.ShowItemToolTips = true;
+            Text = Strings.Get("AppName");
 
-            exploreButton.ImageTransparentColor = Color.Magenta;
-            exploreButton.Click += OnExploreClick;
-
-            syncButton.ImageTransparentColor = Color.Magenta;
-            syncButton.Enabled = false; // placeholder: sync is a later release
-            syncButton.ToolTipText = Strings.Get("ToolSyncTip");
-
-            optionsButton.Alignment = ToolStripItemAlignment.Right;
-            optionsButton.ImageTransparentColor = Color.Magenta;
-            optionsButton.Click += OnOptionsClick;
-
-            toolStrip.Items.AddRange(new ToolStripItem[] { exploreButton, syncButton, optionsButton });
-        }
-
-        private void BuildStatusArea()
-        {
-            mainPanel.BackColor = SystemColors.ControlLightLight;
-            mainPanel.Dock = DockStyle.Fill;
-
-            statusIcon.Location = new Point(8, 8);
-            statusIcon.Size = new Size(64, 64);
-            statusIcon.SizeMode = PictureBoxSizeMode.StretchImage;
-            statusIcon.TabStop = false;
+            exploreButton.Text = Strings.Get("ToolExplore");
+            exploreButton.Image = Images.Load("tool-explore");
+            syncButton.Text = Strings.Get("ToolSync");
+            syncButton.Image = Images.Load("tool-sync");
+            syncButton.ToolTipText = Strings.Get("ToolSyncTip"); // placeholder: sync is a later release
+            optionsButton.Text = Strings.Get("ToolOptions");
+            optionsButton.Image = Images.Load("tool-options");
 
             statusLabel.Font = new Font(Font.FontFamily, 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-            statusLabel.Location = new Point(80, 10);
-            statusLabel.Size = new Size(328, 40);
-            statusLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-            peerLabel.Location = new Point(82, 52);
-            peerLabel.Size = new Size(326, 18);
-            peerLabel.AutoEllipsis = true;
-            peerLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-            weAllowLabel.Location = new Point(82, 76);
-            weAllowLabel.Size = new Size(326, 18);
-            weAllowLabel.AutoEllipsis = true;
-            weAllowLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-            peerAllowsLabel.Location = new Point(82, 96);
-            peerAllowsLabel.Size = new Size(326, 18);
-            peerAllowsLabel.AutoEllipsis = true;
-            peerAllowsLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
             fixButton.Text = Strings.Get("ErrorFixButton");
-            fixButton.Location = new Point(82, 56);
-            fixButton.Size = new Size(90, 26);
-            fixButton.Visible = false;
-            fixButton.Click += OnFixClick;
 
-            mainPanel.Controls.Add(fixButton);
-            mainPanel.Controls.Add(statusIcon);
-            mainPanel.Controls.Add(statusLabel);
-            mainPanel.Controls.Add(peerLabel);
-            mainPanel.Controls.Add(weAllowLabel);
-            mainPanel.Controls.Add(peerAllowsLabel);
-        }
-
-        private void BuildTray()
-        {
             openItem.Text = Strings.Get("MenuOpen");
             openItem.Font = new Font(openItem.Font, FontStyle.Bold);
-            openItem.Click += delegate { ShowMain(); };
-
             exploreItem.Text = Strings.Get("MenuExploreNobody");
-            exploreItem.Click += OnExploreClick;
-
             exitItem.Text = Strings.Get("MenuExit");
-            exitItem.Click += delegate { ExitApplication(); };
 
-            trayMenu.Items.Add(openItem);
-            trayMenu.Items.Add(exploreItem);
-            trayMenu.Items.Add(new ToolStripSeparator());
-            trayMenu.Items.Add(exitItem);
-
-            notifyIcon.ContextMenuStrip = trayMenu;
-            notifyIcon.DoubleClick += delegate { ShowMain(); };
             notifyIcon.Icon = Images.Tray(LinkState.NoCable);
             notifyIcon.Text = Strings.Get("AppName");
             notifyIcon.Visible = true;
+        }
+
+        private void openItem_Click(object sender, EventArgs e)
+        {
+            ShowMain();
+        }
+
+        private void exitItem_Click(object sender, EventArgs e)
+        {
+            ExitApplication();
+        }
+
+        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            ShowMain();
         }
 
         // ---- showing, hiding, exiting ----

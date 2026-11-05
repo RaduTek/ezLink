@@ -38,8 +38,14 @@
     <Compile Include="ConflictDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ConflictDialog.Designer.cs">
+      <DependentUpon>ConflictDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="CopyErrorDialog.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CopyErrorDialog.Designer.cs">
+      <DependentUpon>CopyErrorDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="DownloadPlan.cs" />
     <Compile Include="DownloadToFolderJob.cs" />
@@ -49,6 +55,9 @@
     <Compile Include="ExplorerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ExplorerForm.Designer.cs">
+      <DependentUpon>ExplorerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExplorerSettings.cs" />
     <Compile Include="NativeToolStrip\NativeToolStrip.cs">
       <SubType>Component</SubType>
@@ -57,6 +66,11 @@
     <Compile Include="NavigationController.cs" />
     <Compile Include="OleInterop.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RemoteBrowser.cs" />
     <Compile Include="RemoteFileStream.cs" />
     <Compile Include="RemoteItem.cs" />
@@ -73,16 +87,45 @@
     <Compile Include="TransferDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="TransferDialog.Designer.cs">
+      <DependentUpon>TransferDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="TransferState.cs" />
     <Compile Include="UploadJob.cs" />
     <Compile Include="VirtualFileDataObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\nav-back.png"><LogicalName>ezExplorer.Resources.nav-back.png</LogicalName></EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-forward.png"><LogicalName>ezExplorer.Resources.nav-forward.png</LogicalName></EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-up.png"><LogicalName>ezExplorer.Resources.nav-up.png</LogicalName></EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-refresh.png"><LogicalName>ezExplorer.Resources.nav-refresh.png</LogicalName></EmbeddedResource>
-    <EmbeddedResource Include="Resources\view-details.png"><LogicalName>ezExplorer.Resources.view-details.png</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="ConflictDialog.resx">
+      <DependentUpon>ConflictDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CopyErrorDialog.resx">
+      <DependentUpon>CopyErrorDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExplorerForm.resx">
+      <DependentUpon>ExplorerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-back.png">
+      <LogicalName>ezExplorer.Resources.nav-back.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-forward.png">
+      <LogicalName>ezExplorer.Resources.nav-forward.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-up.png">
+      <LogicalName>ezExplorer.Resources.nav-up.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\nav-refresh.png">
+      <LogicalName>ezExplorer.Resources.nav-refresh.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\view-details.png">
+      <LogicalName>ezExplorer.Resources.view-details.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransferDialog.resx">
+      <DependentUpon>TransferDialog.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -104,4 +147,3 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
-

@@ -12,87 +12,34 @@ namespace ezLink
     /// Allow once / Always allow / Deny. Shown in front of other windows. Closing it with the window's
     /// close button, letting it time out, or the requesting session going away is not a decision.
     /// </summary>
-    internal sealed class ApprovalForm : Form
+    internal sealed partial class ApprovalForm : Form
     {
         /// <summary>Just under the 2 minutes the requesting side waits.</summary>
         private static readonly TimeSpan PromptTimeout = TimeSpan.FromSeconds(110);
 
         private readonly WaitHandle cancel;
         private readonly DateTime deadline = DateTime.UtcNow + PromptTimeout;
-        private readonly CheckBox browseCopy = new CheckBox();
-        private readonly CheckBox write = new CheckBox();
-        private readonly Button allowOnce = new Button();
-        private readonly Button alwaysAllow = new Button();
-        private readonly Button deny = new Button();
-        private readonly System.Windows.Forms.Timer watchdog = new System.Windows.Forms.Timer();
         private ApprovalResult result;
 
         public ApprovalForm(string peerName, WaitHandle cancel)
         {
             this.cancel = cancel;
 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont;
-            Text = Strings.Get("AppName");
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            TopMost = true;
-            StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(440, 196);
+            InitializeComponent();
 
-            Label headline = new Label();
+            Text = Strings.Get("AppName");
             headline.Text = string.Format(Strings.Get("ApprovalHeadline"), peerName);
             headline.Font = new Font(Font, FontStyle.Bold);
-            headline.Location = new Point(14, 14);
-            headline.Size = new Size(412, 38);
-            headline.AutoEllipsis = true;
-            Controls.Add(headline);
-
             browseCopy.Text = Strings.Get("ApprovalBrowseCopy");
-            browseCopy.Checked = true;
-            browseCopy.AutoSize = true;
-            browseCopy.Location = new Point(24, 58);
-            browseCopy.CheckedChanged += OnPermissionsEdited;
-            Controls.Add(browseCopy);
-
             write.Text = Strings.Get("ApprovalWrite");
-            write.AutoSize = true;
-            write.Location = new Point(24, 82);
-            write.CheckedChanged += OnPermissionsEdited;
-            Controls.Add(write);
-
-            Label note = new Label();
             note.Text = Strings.Get("ApprovalNote");
-            note.ForeColor = SystemColors.GrayText;
-            note.Location = new Point(14, 110);
-            note.Size = new Size(412, 34);
-            Controls.Add(note);
-
             allowOnce.Text = Strings.Get("ApprovalAllowOnce");
-            allowOnce.Location = new Point(14, 154);
-            allowOnce.Size = new Size(110, 28);
-            allowOnce.Click += delegate { Finish(ApprovalChoice.AllowOnce); };
-            Controls.Add(allowOnce);
-
             alwaysAllow.Text = Strings.Get("ApprovalAlwaysAllow");
-            alwaysAllow.Location = new Point(132, 154);
-            alwaysAllow.Size = new Size(110, 28);
-            alwaysAllow.Click += delegate { Finish(ApprovalChoice.AlwaysAllow); };
-            Controls.Add(alwaysAllow);
-
             deny.Text = Strings.Get("ApprovalDeny");
-            deny.Location = new Point(316, 154);
-            deny.Size = new Size(110, 28);
-            deny.Click += delegate { Finish(ApprovalChoice.Deny); };
-            Controls.Add(deny);
 
-            // Deny is the safe default for Enter; there is deliberately no Escape binding that decides anything.
-            AcceptButton = deny;
-
-            watchdog.Interval = 250;
-            watchdog.Tick += OnWatchdog;
+            // Deny is the safe default for Enter (AcceptButton); there is deliberately no Escape binding that
+            // decides anything.
             watchdog.Start();
         }
 
@@ -126,6 +73,21 @@ namespace ezLink
             alwaysAllow.Enabled = any;
         }
 
+        private void allowOnce_Click(object sender, EventArgs e)
+        {
+            Finish(ApprovalChoice.AllowOnce);
+        }
+
+        private void alwaysAllow_Click(object sender, EventArgs e)
+        {
+            Finish(ApprovalChoice.AlwaysAllow);
+        }
+
+        private void deny_Click(object sender, EventArgs e)
+        {
+            Finish(ApprovalChoice.Deny);
+        }
+
         private void Finish(ApprovalChoice choice)
         {
             result = new ApprovalResult(choice, choice == ApprovalChoice.Deny ? Permissions.None : Chosen);
@@ -147,15 +109,6 @@ namespace ezLink
         {
             base.OnShown(e);
             Activate();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                watchdog.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 

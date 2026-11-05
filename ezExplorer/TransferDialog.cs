@@ -11,7 +11,7 @@ namespace ezExplorer
     /// The modal window every transfer runs in. Nothing copies in the background and nothing reports through the
     /// status bar. The window is modal to the explorer only; it polls <see cref="TransferState"/> ten times a second.
     /// </summary>
-    internal sealed class TransferDialog : Form, ITransferHost
+    internal sealed partial class TransferDialog : Form, ITransferHost
     {
         private struct Sample
         {
@@ -21,14 +21,6 @@ namespace ezExplorer
 
         private readonly TransferJob job;
         private readonly TransferState state;
-        private readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-        private readonly Label headline = new Label();
-        private readonly Label nameLabel = new Label();
-        private readonly Label pathLabel = new Label();
-        private readonly ProgressBar fileBar = new ProgressBar();
-        private readonly ProgressBar totalBar = new ProgressBar();
-        private readonly Label detail = new Label();
-        private readonly Button cancel = new Button();
         private readonly Queue<Sample> samples = new Queue<Sample>();
 
         private Thread worker;
@@ -43,47 +35,24 @@ namespace ezExplorer
             this.job = job;
             state = job.SharedState != null ? job.SharedState : new TransferState();
 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont;
-            Text = title;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterParent;
-            MinimizeBox = false;
-            MaximizeBox = false;
-            ShowInTaskbar = false;
-            ClientSize = new Size(480, 200);
+            InitializeComponent();
 
+            Text = title;
             headline.Text = title;
             headline.Font = new Font(Font, FontStyle.Bold);
-            headline.SetBounds(12, 12, 456, 20);
-
-            nameLabel.AutoEllipsis = true;
             nameLabel.Text = Strings.Get("TransferPreparing");
-            nameLabel.SetBounds(12, 38, 456, 18);
-            pathLabel.AutoEllipsis = true;
-            pathLabel.ForeColor = SystemColors.GrayText;
-            pathLabel.SetBounds(12, 58, 456, 18);
+            cancelButton.Text = Strings.Get("ButtonCancel");
+        }
 
-            fileBar.SetBounds(12, 84, 456, 18);
-            fileBar.Maximum = 1000;
-            fileBar.Visible = false;
-            totalBar.SetBounds(12, 108, 456, 18);
-            totalBar.Maximum = 1000;
-            totalBar.Style = ProgressBarStyle.Marquee;
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            RequestCancel();
+        }
 
-            detail.AutoEllipsis = true;
-            detail.SetBounds(12, 134, 456, 36);
-
-            cancel.Text = Strings.Get("ButtonCancel");
-            cancel.SetBounds(368, 162, 100, 28);
-            cancel.Click += delegate { RequestCancel(); };
-            CancelButton = cancel;
-
-            Controls.AddRange(new Control[] { headline, nameLabel, pathLabel, fileBar, totalBar, detail, cancel });
-
-            timer.Interval = 100;
-            timer.Tick += delegate { UpdateView(); };
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            UpdateView();
         }
 
         public TransferOutcome Outcome
@@ -163,7 +132,7 @@ namespace ezExplorer
                 return;
             }
             cancelled = true;
-            cancel.Enabled = false;
+            cancelButton.Enabled = false;
             job.Cancel();
         }
 
@@ -177,15 +146,6 @@ namespace ezExplorer
                 RequestCancel();
             }
             base.OnFormClosing(e);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                timer.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         // ---- the view ----

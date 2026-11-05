@@ -13,47 +13,14 @@ namespace ezExplorer
     /// The remote browser window: toolbar, path box, folder tree and file list over one connection to the peer.
     /// All navigation goes through <see cref="NavigationController"/>; this class only renders what it says.
     /// </summary>
-    internal sealed class ExplorerForm : Form, INavigationView
+    internal sealed partial class ExplorerForm : Form, INavigationView
     {
-        private sealed class MenuSet
-        {
-            public readonly ContextMenuStrip Strip = new ContextMenuStrip();
-            public ToolStripMenuItem Open;
-            public ToolStripMenuItem Copy;
-            public ToolStripMenuItem Paste;
-            public ToolStripMenuItem Rename;
-            public ToolStripMenuItem Delete;
-            public ToolStripMenuItem NewFolder;
-            public ToolStripMenuItem Refresh;
-        }
-
         private readonly ExplorerArgs args;
         private readonly IpcWindow ipc;
         private readonly RemoteBrowser browser;
         private readonly NavigationController nav;
         private readonly ExplorerSettings settings;
 
-        private readonly NativeToolStrip.NativeToolStrip toolStrip = new NativeToolStrip.NativeToolStrip();
-        private readonly ToolStripButton backButton;
-        private readonly ToolStripButton forwardButton;
-        private readonly ToolStripButton upButton;
-        private readonly ToolStripButton refreshButton;
-        private readonly ToolStripDropDownButton viewsButton;
-        private readonly ToolStripMenuItem detailsItem = new ToolStripMenuItem();
-        private readonly ToolStripMenuItem iconsItem = new ToolStripMenuItem();
-        private readonly ToolStripMenuItem listItem = new ToolStripMenuItem();
-
-        private readonly Panel pathPanel = new Panel();
-        private readonly TextBox pathBox = new TextBox();
-        private readonly SplitContainer split = new SplitContainer();
-        private readonly RemoteTreeView tree = new RemoteTreeView();
-        private readonly RemoteListView list = new RemoteListView();
-        private readonly StatusStrip statusStrip = new StatusStrip();
-        private readonly ToolStripStatusLabel selectionLabel = new ToolStripStatusLabel();
-        private readonly ToolStripStatusLabel connectionLabel = new ToolStripStatusLabel();
-
-        private MenuSet listMenu;
-        private MenuSet treeMenu;
         private string treeContextPath = string.Empty;
 
         private VirtualFileDataObject clipboardData;       // what we put on the clipboard, to take back on exit
@@ -71,40 +38,10 @@ namespace ezExplorer
             this.ipc = ipc;
             settings = ExplorerSettings.Load();
 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont; // Segoe UI on Vista and later, Tahoma on XP
-            Text = string.Format(Strings.Get("ExplorerWindowTitle"), args.PeerName);
-            StartPosition = FormStartPosition.WindowsDefaultLocation;
+            InitializeComponent();
+            ApplyLocalizedContent();
             ClientSize = settings.WindowSize;
-            MinimumSize = new Size(480, 320);
-
-            backButton = new ToolStripButton(Strings.Get("ToolBack"), ToolImages.Load("nav-back"));
-            forwardButton = new ToolStripButton(Strings.Get("ToolForward"), ToolImages.Load("nav-forward"));
-            upButton = new ToolStripButton(Strings.Get("ToolUp"), ToolImages.Load("nav-up"));
-            refreshButton = new ToolStripButton(Strings.Get("ToolRefresh"), ToolImages.Load("nav-refresh"));
-            viewsButton = new ToolStripDropDownButton(Strings.Get("ToolViews"), ToolImages.Load("view-details"));
-
-            BuildToolStrip();
-            BuildPathBar();
-            BuildPanes();
-            BuildStatusBar();
-            listMenu = BuildMenu(OnListOpen, OnListCopy, OnListPaste, OnListRename, OnListDelete, OnListNewFolder,
-                OnRefreshClick);
-            treeMenu = BuildMenu(OnTreeOpen, OnTreeCopy, OnTreePaste, OnTreeMenuRename, OnTreeDelete,
-                OnTreeNewFolder, OnRefreshClick);
-            list.ContextMenuStrip = listMenu.Strip;
-            listMenu.Strip.Opening += OnListMenuOpening;
-
-            // Dock order: the last control added is laid out first.
-            Controls.Add(split);
-            Controls.Add(pathPanel);
-            Controls.Add(toolStrip);
-            Controls.Add(statusStrip);
-
-            pathBox.TabIndex = 0;
-            tree.TabIndex = 1;
-            list.TabIndex = 2;
 
             browser = new RemoteBrowser(args, this);
             browser.ConnectionChanged += OnConnectionChanged;
@@ -130,94 +67,80 @@ namespace ezExplorer
 
         // ---- construction ----
 
-        private void BuildToolStrip()
+        /// <summary>Texts and images that come from resources rather than the designer.</summary>
+        private void ApplyLocalizedContent()
         {
-            toolStrip.AutoSize = false;
-            toolStrip.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip.ImageScalingSize = new Size(22, 22);
-            toolStrip.Padding = new Padding(2, 0, 2, 0);
-            toolStrip.Size = new Size(ClientSize.Width, 30);
-            toolStrip.Dock = DockStyle.Top;
-            toolStrip.Theme = NativeToolStrip.NativeToolStripTheme.Toolbar;
-            toolStrip.ShowItemToolTips = true;
+            Text = string.Format(Strings.Get("ExplorerWindowTitle"), args.PeerName);
 
+            backButton.Text = Strings.Get("ToolBack");
+            backButton.Image = ToolImages.Load("nav-back");
+            forwardButton.Text = Strings.Get("ToolForward");
+            forwardButton.Image = ToolImages.Load("nav-forward");
+            upButton.Text = Strings.Get("ToolUp");
+            upButton.Image = ToolImages.Load("nav-up");
+            refreshButton.Text = Strings.Get("ToolRefresh");
+            refreshButton.Image = ToolImages.Load("nav-refresh");
             ToolStripButton[] buttons = new ToolStripButton[] { backButton, forwardButton, upButton, refreshButton };
             foreach (ToolStripButton button in buttons)
             {
-                button.DisplayStyle = ToolStripItemDisplayStyle.Image;
                 button.ToolTipText = button.Text;
-                button.ImageTransparentColor = Color.Magenta;
             }
-            backButton.Click += delegate { nav.GoBack(); };
-            forwardButton.Click += delegate { nav.GoForward(); };
-            upButton.Click += delegate { nav.GoUp(); };
-            refreshButton.Click += OnRefreshClick;
 
-            viewsButton.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
-            viewsButton.ImageTransparentColor = Color.Magenta;
+            viewsButton.Text = Strings.Get("ToolViews");
+            viewsButton.Image = ToolImages.Load("view-details");
             detailsItem.Text = Strings.Get("ViewDetails");
             iconsItem.Text = Strings.Get("ViewLargeIcons");
             listItem.Text = Strings.Get("ViewList");
-            detailsItem.Click += delegate { SetView(View.Details); };
-            iconsItem.Click += delegate { SetView(View.LargeIcon); };
-            listItem.Click += delegate { SetView(View.List); };
-            viewsButton.DropDownItems.AddRange(new ToolStripItem[] { detailsItem, iconsItem, listItem });
 
-            toolStrip.Items.AddRange(new ToolStripItem[]
-            {
-                backButton, forwardButton, upButton, new ToolStripSeparator(), refreshButton,
-                new ToolStripSeparator(), viewsButton
-            });
-        }
-
-        private void BuildPathBar()
-        {
-            pathPanel.Dock = DockStyle.Top;
-            pathPanel.Padding = new Padding(4, 4, 4, 4);
             pathPanel.Height = pathBox.PreferredHeight + 10;
-            pathBox.Dock = DockStyle.Fill;
-            pathBox.KeyDown += OnPathKeyDown;
-            pathPanel.Controls.Add(pathBox);
+
+            listOpenItem.Text = Strings.Get("MenuOpenItem");
+            listOpenItem.Font = new Font(listOpenItem.Font, FontStyle.Bold);
+            listCopyItem.Text = Strings.Get("MenuCopy");
+            listPasteItem.Text = Strings.Get("MenuPaste");
+            listRenameItem.Text = Strings.Get("MenuRename");
+            listDeleteItem.Text = Strings.Get("MenuDelete");
+            listNewFolderItem.Text = Strings.Get("MenuNewFolder");
+            listRefreshItem.Text = Strings.Get("MenuRefresh");
+
+            treeOpenItem.Text = Strings.Get("MenuOpenItem");
+            treeOpenItem.Font = new Font(treeOpenItem.Font, FontStyle.Bold);
+            treeCopyItem.Text = Strings.Get("MenuCopy");
+            treePasteItem.Text = Strings.Get("MenuPaste");
+            treeRenameItem.Text = Strings.Get("MenuRename");
+            treeDeleteItem.Text = Strings.Get("MenuDelete");
+            treeNewFolderItem.Text = Strings.Get("MenuNewFolder");
+            treeRefreshItem.Text = Strings.Get("MenuRefresh");
         }
 
-        private void BuildPanes()
+        private void backButton_Click(object sender, EventArgs e)
         {
-            split.Dock = DockStyle.Fill;
-            split.FixedPanel = FixedPanel.Panel1;
-            tree.Dock = DockStyle.Fill;
-            tree.BorderStyle = BorderStyle.None;
-            list.Dock = DockStyle.Fill;
-            list.BorderStyle = BorderStyle.None;
-            split.Panel1.Controls.Add(tree);
-            split.Panel2.Controls.Add(list);
+            nav.GoBack();
         }
 
-        private void BuildStatusBar()
+        private void forwardButton_Click(object sender, EventArgs e)
         {
-            selectionLabel.Spring = true;
-            selectionLabel.TextAlign = ContentAlignment.MiddleLeft;
-            connectionLabel.TextAlign = ContentAlignment.MiddleRight;
-            statusStrip.Items.AddRange(new ToolStripItem[] { selectionLabel, connectionLabel });
+            nav.GoForward();
         }
 
-        private MenuSet BuildMenu(EventHandler open, EventHandler copy, EventHandler paste, EventHandler rename, EventHandler delete,
-            EventHandler newFolder, EventHandler refresh)
+        private void upButton_Click(object sender, EventArgs e)
         {
-            MenuSet set = new MenuSet();
-            set.Open = new ToolStripMenuItem(Strings.Get("MenuOpenItem"), null, open);
-            set.Open.Font = new Font(set.Open.Font, FontStyle.Bold);
-            set.Copy = new ToolStripMenuItem(Strings.Get("MenuCopy"), null, copy);
-            set.Paste = new ToolStripMenuItem(Strings.Get("MenuPaste"), null, paste);
-            set.Rename = new ToolStripMenuItem(Strings.Get("MenuRename"), null, rename);
-            set.Delete = new ToolStripMenuItem(Strings.Get("MenuDelete"), null, delete);
-            set.NewFolder = new ToolStripMenuItem(Strings.Get("MenuNewFolder"), null, newFolder);
-            set.Refresh = new ToolStripMenuItem(Strings.Get("MenuRefresh"), null, refresh);
-            set.Strip.Items.AddRange(new ToolStripItem[]
-            {
-                set.Open, new ToolStripSeparator(), set.Copy, set.Paste, new ToolStripSeparator(),
-                set.Rename, set.Delete, new ToolStripSeparator(), set.NewFolder, set.Refresh
-            });
-            return set;
+            nav.GoUp();
+        }
+
+        private void detailsItem_Click(object sender, EventArgs e)
+        {
+            SetView(View.Details);
+        }
+
+        private void iconsItem_Click(object sender, EventArgs e)
+        {
+            SetView(View.LargeIcon);
+        }
+
+        private void listItem_Click(object sender, EventArgs e)
+        {
+            SetView(View.List);
         }
 
         // ---- window lifetime ----
@@ -549,26 +472,26 @@ namespace ezExplorer
             bool anyDrive = selected.Exists(delegate(RemoteItem item) { return item.IsDrive; });
             bool inFolder = nav.Current != null && !RemotePaths.IsRoot(nav.Current);
 
-            listMenu.Open.Enabled = single && (selected[0].IsFolder || browser.CanRead);
-            listMenu.Copy.Enabled = selected.Count > 0 && !anyDrive && browser.CanRead;
-            listMenu.Rename.Enabled = single && !anyDrive && browser.CanWrite;
-            listMenu.Delete.Enabled = selected.Count > 0 && !anyDrive && browser.CanWrite;
-            listMenu.NewFolder.Enabled = inFolder && browser.CanWrite;
-            listMenu.Refresh.Enabled = true;
-            listMenu.Paste.Enabled = CanPasteInto(ListPasteTarget());
+            listOpenItem.Enabled = single && (selected[0].IsFolder || browser.CanRead);
+            listCopyItem.Enabled = selected.Count > 0 && !anyDrive && browser.CanRead;
+            listRenameItem.Enabled = single && !anyDrive && browser.CanWrite;
+            listDeleteItem.Enabled = selected.Count > 0 && !anyDrive && browser.CanWrite;
+            listNewFolderItem.Enabled = inFolder && browser.CanWrite;
+            listRefreshItem.Enabled = true;
+            listPasteItem.Enabled = CanPasteInto(ListPasteTarget());
         }
 
         private void OnTreeContextMenu(object sender, TreeContextEventArgs e)
         {
             treeContextPath = e.Path;
-            treeMenu.Open.Enabled = true;
+            treeOpenItem.Enabled = true;
             bool plainFolder = !e.IsDrive;
-            treeMenu.Copy.Enabled = plainFolder && browser.CanRead;
-            treeMenu.Rename.Enabled = plainFolder && browser.CanWrite;
-            treeMenu.Delete.Enabled = plainFolder && browser.CanWrite;
-            treeMenu.NewFolder.Enabled = !RemotePaths.IsRoot(e.Path) && browser.CanWrite;
-            treeMenu.Paste.Enabled = CanPasteInto(e.Path);
-            treeMenu.Strip.Show(tree, e.Location);
+            treeCopyItem.Enabled = plainFolder && browser.CanRead;
+            treeRenameItem.Enabled = plainFolder && browser.CanWrite;
+            treeDeleteItem.Enabled = plainFolder && browser.CanWrite;
+            treeNewFolderItem.Enabled = !RemotePaths.IsRoot(e.Path) && browser.CanWrite;
+            treePasteItem.Enabled = CanPasteInto(e.Path);
+            treeMenu.Show(tree, e.Location);
         }
 
         private void OnListOpen(object sender, EventArgs e)
