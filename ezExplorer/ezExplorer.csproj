@@ -61,6 +61,7 @@
     <Compile Include="ExplorerForm.Designer.cs">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DpiInfo.cs" />
     <Compile Include="ExplorerSettings.cs" />
     <Compile Include="NativeToolStrip\NativeContextMenuStrip.cs">
       <SubType>Component</SubType>

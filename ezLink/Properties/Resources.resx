@@ -127,20 +127,20 @@
   <data name="explore_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\explore-32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="explore_48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\explore-48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="explore_40" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\explore-40.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="options_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\options-32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="options_48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\options-48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="options_40" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\options-40.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="sync_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\sync-32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="sync_48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\sync-48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="sync_40" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\sync-40.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="status_active" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\status-active.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -162,6 +162,54 @@
   </data>
   <data name="status_nocable" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\status-nocable.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_active_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-active-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_active_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-active-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connected_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connected-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connected_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connected-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_0_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-0-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_0_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-0-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_1_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-1-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_1_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-1-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_2_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-2-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_connecting_2_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-connecting-2-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_disconnected_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-disconnected-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_disconnected_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-disconnected-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_error_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-error-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_error_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-error-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_nocable_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-nocable-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="status_nocable_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\status-nocable-80.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ezLink" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ezLink.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

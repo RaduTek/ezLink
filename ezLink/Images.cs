@@ -35,10 +35,43 @@ namespace ezLink
 
         private static readonly Dictionary<string, Icon> trayIcons = new Dictionary<string, Icon>();
 
-        /// <summary>True on high-DPI displays, where the 24 px tray icons and 48 px toolbar images are used.</summary>
+        /// <summary>
+        /// True on high-DPI displays (120 DPI / 125% scaling and up), where the 24 px tray icons, 80 px status
+        /// images and 40 px toolbar images are used. Read from the system DPI (needs the app to be DPI aware, see
+        /// app.manifest) because SystemInformation.SmallIconSize does not follow the DPI on Windows XP and 7.
+        /// </summary>
         public static bool HighDpi
         {
-            get { return SystemInformation.SmallIconSize.Width >= 24; }
+            get { return SystemDpi >= 120; }
+        }
+
+        private static int systemDpi;
+
+        private static int SystemDpi
+        {
+            get
+            {
+                if (systemDpi == 0)
+                {
+                    IntPtr dc = NativeMethodsBridge.GetDC(IntPtr.Zero);
+                    try
+                    {
+                        systemDpi = dc != IntPtr.Zero ? NativeMethodsBridge.GetDeviceCaps(dc, 88) : 96; // LOGPIXELSX
+                    }
+                    finally
+                    {
+                        if (dc != IntPtr.Zero)
+                        {
+                            NativeMethodsBridge.ReleaseDC(IntPtr.Zero, dc);
+                        }
+                    }
+                    if (systemDpi <= 0)
+                    {
+                        systemDpi = 96;
+                    }
+                }
+                return systemDpi;
+            }
         }
 
         public static LinkPicture Picture(LinkState state, bool transferActive, int animationFrame)
@@ -87,18 +120,18 @@ namespace ezLink
             }
         }
 
-        /// <summary>The large image for the status area.</summary>
+        /// <summary>The large image for the status area, 64 or 80 px depending on the display.</summary>
         public static Image Status(LinkPicture picture)
         {
             switch (picture)
             {
-                case LinkPicture.Connecting0: return Properties.Resources.status_connecting_0;
-                case LinkPicture.Connecting1: return Properties.Resources.status_connecting_1;
-                case LinkPicture.Connecting2: return Properties.Resources.status_connecting_2;
-                case LinkPicture.Connected: return Properties.Resources.status_connected;
-                case LinkPicture.Active: return Properties.Resources.status_active;
-                case LinkPicture.Error: return Properties.Resources.status_error;
-                default: return Properties.Resources.status_nocable;
+                case LinkPicture.Connecting0: return HighDpi ? Properties.Resources.status_connecting_0_80 : Properties.Resources.status_connecting_0_64;
+                case LinkPicture.Connecting1: return HighDpi ? Properties.Resources.status_connecting_1_80 : Properties.Resources.status_connecting_1_64;
+                case LinkPicture.Connecting2: return HighDpi ? Properties.Resources.status_connecting_2_80 : Properties.Resources.status_connecting_2_64;
+                case LinkPicture.Connected: return HighDpi ? Properties.Resources.status_connected_80 : Properties.Resources.status_connected_64;
+                case LinkPicture.Active: return HighDpi ? Properties.Resources.status_active_80 : Properties.Resources.status_active_64;
+                case LinkPicture.Error: return HighDpi ? Properties.Resources.status_error_80 : Properties.Resources.status_error_64;
+                default: return HighDpi ? Properties.Resources.status_nocable_80 : Properties.Resources.status_nocable_64;
             }
         }
 
@@ -140,5 +173,14 @@ namespace ezLink
     {
         [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
         public static extern bool DestroyIcon(IntPtr hIcon);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern int GetDeviceCaps(IntPtr hdc, int index);
     }
 }

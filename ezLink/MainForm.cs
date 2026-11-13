@@ -56,13 +56,13 @@ namespace ezLink
             Text = Strings.Get("AppName");
 
             exploreButton.Text = Strings.Get("ToolExplore");
-            toolStrip.ImageScalingSize = Images.HighDpi ? new Size(48, 48) : new Size(32, 32);
-            exploreButton.Image = Images.HighDpi ? Properties.Resources.explore_48 : Properties.Resources.explore_32;
+            toolStrip.ImageScalingSize = Images.HighDpi ? new Size(40, 40) : new Size(32, 32);
+            exploreButton.Image = Images.HighDpi ? Properties.Resources.explore_40 : Properties.Resources.explore_32;
             syncButton.Text = Strings.Get("ToolSync");
-            syncButton.Image = Images.HighDpi ? Properties.Resources.sync_48 : Properties.Resources.sync_32;
+            syncButton.Image = Images.HighDpi ? Properties.Resources.sync_40 : Properties.Resources.sync_32;
             syncButton.ToolTipText = Strings.Get("ToolSyncTip"); // placeholder: sync is a later release
             optionsButton.Text = Strings.Get("ToolOptions");
-            optionsButton.Image = Images.HighDpi ? Properties.Resources.options_48 : Properties.Resources.options_32;
+            optionsButton.Image = Images.HighDpi ? Properties.Resources.options_40 : Properties.Resources.options_32;
 
             statusLabel.Font = new Font(Font.FontFamily, 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             fixButton.Text = Strings.Get("ErrorFixButton");

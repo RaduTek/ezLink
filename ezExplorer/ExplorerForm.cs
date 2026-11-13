@@ -72,14 +72,17 @@ namespace ezExplorer
         {
             Text = string.Format(Strings.Get("ExplorerWindowTitle"), args.PeerName);
 
+            bool highDpi = DpiInfo.HighDpi;
+            toolStrip.ImageScalingSize = highDpi ? new Size(32, 32) : new Size(24, 24);
+
             backButton.Text = Strings.Get("ToolBack");
-            backButton.Image = Properties.Resources.nav_back_24;
+            backButton.Image = highDpi ? Properties.Resources.nav_back_32 : Properties.Resources.nav_back_24;
             forwardButton.Text = Strings.Get("ToolForward");
-            forwardButton.Image = Properties.Resources.nav_forward_24;
+            forwardButton.Image = highDpi ? Properties.Resources.nav_forward_32 : Properties.Resources.nav_forward_24;
             upButton.Text = Strings.Get("ToolUp");
-            upButton.Image = Properties.Resources.nav_up_24;
+            upButton.Image = highDpi ? Properties.Resources.nav_up_32 : Properties.Resources.nav_up_24;
             refreshButton.Text = Strings.Get("ToolRefresh");
-            refreshButton.Image = Properties.Resources.refresh_24;
+            refreshButton.Image = highDpi ? Properties.Resources.refresh_32 : Properties.Resources.refresh_24;
             ToolStripButton[] buttons = new ToolStripButton[] { backButton, forwardButton, upButton, refreshButton };
             foreach (ToolStripButton button in buttons)
             {
@@ -87,7 +90,7 @@ namespace ezExplorer
             }
 
             viewsButton.Text = Strings.Get("ToolViews");
-            viewsButton.Image = Properties.Resources.view_details_24;
+            viewsButton.Image = highDpi ? Properties.Resources.view_details_32 : Properties.Resources.view_details_24;
             detailsItem.Text = Strings.Get("ViewDetails");
             iconsItem.Text = Strings.Get("ViewLargeIcons");
             listItem.Text = Strings.Get("ViewList");

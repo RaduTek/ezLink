@@ -93,9 +93,9 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap explore_48 {
+        internal static System.Drawing.Bitmap explore_40 {
             get {
-                object obj = ResourceManager.GetObject("explore_48", resourceCulture);
+                object obj = ResourceManager.GetObject("explore_40", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap options_48 {
+        internal static System.Drawing.Bitmap options_40 {
             get {
-                object obj = ResourceManager.GetObject("options_48", resourceCulture);
+                object obj = ResourceManager.GetObject("options_40", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -203,6 +203,166 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap status_active_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_active_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_active_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_active_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connected_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_connected_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connected_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_connected_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_0_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_0_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_0_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_0_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_1_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_1_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_1_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_1_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_2_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_2_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_connecting_2_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_connecting_2_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_disconnected_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_disconnected_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_disconnected_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_disconnected_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_error_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_error_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_error_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_error_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_nocable_64 {
+            get {
+                object obj = ResourceManager.GetObject("status_nocable_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap status_nocable_80 {
+            get {
+                object obj = ResourceManager.GetObject("status_nocable_80", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap sync_32 {
             get {
                 object obj = ResourceManager.GetObject("sync_32", resourceCulture);
@@ -213,9 +373,9 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap sync_48 {
+        internal static System.Drawing.Bitmap sync_40 {
             get {
-                object obj = ResourceManager.GetObject("sync_48", resourceCulture);
+                object obj = ResourceManager.GetObject("sync_40", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

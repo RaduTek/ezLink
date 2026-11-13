@@ -122,7 +122,7 @@ namespace ezLink
             this.statusIcon.Location = new System.Drawing.Point(8, 8);
             this.statusIcon.Name = "statusIcon";
             this.statusIcon.Size = new System.Drawing.Size(64, 64);
-            this.statusIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.statusIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.statusIcon.TabIndex = 1;
             this.statusIcon.TabStop = false;
             // 
