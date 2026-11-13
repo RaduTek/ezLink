@@ -2,9 +2,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 // Linked into every project; per-project attributes live in Properties\AssemblyInfo.cs.
-[assembly: AssemblyCompany("RaduTek")]
+[assembly: AssemblyCompany("Remotek Corp.")]
 [assembly: AssemblyProduct("ezLink")]
-[assembly: AssemblyCopyright("Copyright © RaduTek")]
+[assembly: AssemblyCopyright("Copyright © Remotek Corp.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyConfiguration("")]

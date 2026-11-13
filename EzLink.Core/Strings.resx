@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -104,7 +104,7 @@ Exit ezLink?</value>
     <value>Sync</value>
   </data>
   <data name="ToolSyncTip" xml:space="preserve">
-    <value>Coming soon</value>
+    <value>Sync files</value>
   </data>
   <data name="ToolOptions" xml:space="preserve">
     <value>Options</value>
@@ -147,9 +147,7 @@ The connection status area arrives in a later milestone.</value>
 The remote file pane arrives in a later milestone.</value>
   </data>
   <data name="SetupPlaceholder" xml:space="preserve">
-    <value>ezLinkSetup is running.
-
-The setup verbs (/install, /uuid, /firewall, /datadir, /uninstall) arrive in a later milestone.</value>
+    <value>Available option: /install, /uuid, /regenerate-uuid, /firewall, /datadir, /uninstall [/purge], /drivers, /remove-drivers.</value>
   </data>
   <data name="AccessBlocked" xml:space="preserve">
     <value>Blocked</value>
@@ -229,7 +227,7 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
     <value>The ID could not be changed (setup helper exit code {0}). Details are in the setup log.</value>
   </data>
   <data name="SetupMissing" xml:space="preserve">
-    <value>ezLinkSetup.exe was not found next to ezLink.exe.</value>
+    <value>setuputil.exe was not found next to ezLink.exe.</value>
   </data>
   <data name="ErrorPathNotAllowed" xml:space="preserve">
     <value>This path is not allowed.</value>

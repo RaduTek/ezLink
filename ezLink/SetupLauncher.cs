@@ -8,7 +8,7 @@ using EzLink;
 namespace ezLink
 {
     /// <summary>
-    /// Runs ezLinkSetup.exe, the only part of ezLink that needs administrator rights, with a UAC prompt on
+    /// Runs setuputil.exe, the only part of ezLink that needs administrator rights, with a UAC prompt on
     /// Vista and later. ezLink itself never runs elevated.
     /// </summary>
     internal static class SetupLauncher
@@ -23,7 +23,7 @@ namespace ezLink
         public static bool Run(string arguments, IWin32Window owner, out int exitCode)
         {
             exitCode = -1;
-            string exe = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ezLinkSetup.exe");
+            string exe = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "setuputil.exe");
             if (!File.Exists(exe))
             {
                 MessageBox.Show(owner, Strings.Get("SetupMissing"), Strings.Get("AppName"),
