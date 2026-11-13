@@ -59,6 +59,9 @@
       <DependentUpon>ExplorerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExplorerSettings.cs" />
+    <Compile Include="NativeToolStrip\NativeContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="NativeToolStrip\NativeToolStrip.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -83,7 +86,6 @@
     </Compile>
     <Compile Include="ShellIcons.cs" />
     <Compile Include="ShellNative.cs" />
-    <Compile Include="ToolImages.cs" />
     <Compile Include="TransferDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -108,21 +110,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-back.png">
-      <LogicalName>ezExplorer.Resources.nav-back.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-forward.png">
-      <LogicalName>ezExplorer.Resources.nav-forward.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-up.png">
-      <LogicalName>ezExplorer.Resources.nav-up.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\nav-refresh.png">
-      <LogicalName>ezExplorer.Resources.nav-refresh.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\view-details.png">
-      <LogicalName>ezExplorer.Resources.view-details.png</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="TransferDialog.resx">
       <DependentUpon>TransferDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -130,10 +117,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="app.manifest" />
-    <None Include="..\ezLink\licenses\oxygen-icons-LGPL-3.0-or-later.txt">
-      <Link>licenses\oxygen-icons-LGPL-3.0-or-later.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">

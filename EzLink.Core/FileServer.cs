@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -59,6 +59,19 @@ namespace EzLink
             public bool Failed;
             public ErrorCode FailCode;
             public string FailText;
+        }
+
+        private static int lastDataTick = Environment.TickCount - 1000000;
+
+        /// <summary>True while file data has moved in the last moment, for the "transfer in progress" indicator.</summary>
+        public static bool TransferActive
+        {
+            get { return unchecked(Environment.TickCount - lastDataTick) < 1500; }
+        }
+
+        private static void NoteData()
+        {
+            lastDataTick = Environment.TickCount;
         }
 
         private readonly PermissionProvider permissions;
@@ -609,6 +622,7 @@ namespace EzLink
                             return;
                         }
 
+                        NoteData();
                         byte[] data = new byte[ChunkSize];
                         int count = ReadFully(stream, data);
                         if (count == 0)
@@ -774,6 +788,7 @@ namespace EzLink
                 return;
             }
 
+            NoteData();
             byte[] data = request.Data;
             if (state.Received + data.Length > state.Expected)
             {

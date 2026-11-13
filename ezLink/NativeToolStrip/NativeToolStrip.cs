@@ -27,7 +27,6 @@ namespace ezLink.NativeToolStrip {
             // 
             // NativeToolStrip
             // 
-            this.AutoSize = false;
             this.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Size = new System.Drawing.Size(100, 26);
             this.ResumeLayout(false);

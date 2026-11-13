@@ -73,13 +73,13 @@ namespace ezExplorer
             Text = string.Format(Strings.Get("ExplorerWindowTitle"), args.PeerName);
 
             backButton.Text = Strings.Get("ToolBack");
-            backButton.Image = ToolImages.Load("nav-back");
+            backButton.Image = Properties.Resources.nav_back_24;
             forwardButton.Text = Strings.Get("ToolForward");
-            forwardButton.Image = ToolImages.Load("nav-forward");
+            forwardButton.Image = Properties.Resources.nav_forward_24;
             upButton.Text = Strings.Get("ToolUp");
-            upButton.Image = ToolImages.Load("nav-up");
+            upButton.Image = Properties.Resources.nav_up_24;
             refreshButton.Text = Strings.Get("ToolRefresh");
-            refreshButton.Image = ToolImages.Load("nav-refresh");
+            refreshButton.Image = Properties.Resources.refresh_24;
             ToolStripButton[] buttons = new ToolStripButton[] { backButton, forwardButton, upButton, refreshButton };
             foreach (ToolStripButton button in buttons)
             {
@@ -87,7 +87,7 @@ namespace ezExplorer
             }
 
             viewsButton.Text = Strings.Get("ToolViews");
-            viewsButton.Image = ToolImages.Load("view-details");
+            viewsButton.Image = Properties.Resources.view_details_24;
             detailsItem.Text = Strings.Get("ViewDetails");
             iconsItem.Text = Strings.Get("ViewLargeIcons");
             listItem.Text = Strings.Get("ViewList");

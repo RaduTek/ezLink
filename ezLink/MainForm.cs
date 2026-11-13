@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 using EzLink;
@@ -21,6 +21,9 @@ namespace ezLink
         private bool exiting;
         private LinkState lastState = LinkState.NoCable;
         private string lastConnectedName = string.Empty;
+        private readonly Timer animationTimer = new Timer();
+        private int animationFrame;
+        private bool transferActive;
 
         public MainForm(LinkManager link, IpcWindow ipc, bool startHidden)
         {
@@ -39,6 +42,10 @@ namespace ezLink
             link.ControlOpened += OnControlOpened;
             link.ControlClosed += OnControlClosed;
             UpdateStatus();
+
+            animationTimer.Interval = 1000; // the connecting animation advances every second
+            animationTimer.Tick += OnAnimationTick;
+            animationTimer.Start();
         }
 
         // ---- construction ----
@@ -49,12 +56,13 @@ namespace ezLink
             Text = Strings.Get("AppName");
 
             exploreButton.Text = Strings.Get("ToolExplore");
-            exploreButton.Image = Images.Load("tool-explore");
+            toolStrip.ImageScalingSize = Images.HighDpi ? new Size(48, 48) : new Size(32, 32);
+            exploreButton.Image = Images.HighDpi ? Properties.Resources.explore_48 : Properties.Resources.explore_32;
             syncButton.Text = Strings.Get("ToolSync");
-            syncButton.Image = Images.Load("tool-sync");
+            syncButton.Image = Images.HighDpi ? Properties.Resources.sync_48 : Properties.Resources.sync_32;
             syncButton.ToolTipText = Strings.Get("ToolSyncTip"); // placeholder: sync is a later release
             optionsButton.Text = Strings.Get("ToolOptions");
-            optionsButton.Image = Images.Load("tool-options");
+            optionsButton.Image = Images.HighDpi ? Properties.Resources.options_48 : Properties.Resources.options_32;
 
             statusLabel.Font = new Font(Font.FontFamily, 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             fixButton.Text = Strings.Get("ErrorFixButton");
@@ -64,7 +72,7 @@ namespace ezLink
             exploreItem.Text = Strings.Get("MenuExploreNobody");
             exitItem.Text = Strings.Get("MenuExit");
 
-            notifyIcon.Icon = Images.Tray(LinkState.NoCable);
+            notifyIcon.Icon = Images.Tray(LinkPicture.Disconnected);
             notifyIcon.Text = Strings.Get("AppName");
             notifyIcon.Visible = true;
         }
@@ -198,6 +206,7 @@ namespace ezLink
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            animationTimer.Dispose();
             notifyIcon.Visible = false;
             notifyIcon.Dispose();
             base.OnFormClosed(e);
@@ -318,7 +327,6 @@ namespace ezLink
             LinkStatus status = link.State.Status;
             bool connected = status.State == LinkState.Connected;
 
-            statusIcon.Image = Images.Status(status.State);
             statusLabel.Text = status.Text;
             fixButton.Visible = status.State == LinkState.Error && status.ErrorKind == LinkErrorKind.DuplicateUuid;
 
@@ -338,9 +346,7 @@ namespace ezLink
                 ? string.Format(Strings.Get("MenuExplore"), status.PeerName)
                 : Strings.Get("MenuExploreNobody");
 
-            Icon icon = Images.Tray(status.State);
-            notifyIcon.Icon = icon;
-            Icon = icon;
+            RefreshPicture(status.State);
             notifyIcon.Text = Truncate(status.Text, 63); // NotifyIcon.Text is limited to 63 characters
 
             if (connected)
@@ -358,6 +364,29 @@ namespace ezLink
                     string.Format(Strings.Get("BalloonDisconnected"), lastConnectedName), ToolTipIcon.Info);
             }
             lastState = status.State;
+        }
+
+        /// <summary>Shows the picture for the state in the status area, the tray and the title bar.</summary>
+        private void RefreshPicture(LinkState state)
+        {
+            LinkPicture picture = Images.Picture(state, transferActive, animationFrame);
+            statusIcon.Image = Images.Status(picture);
+            Icon icon = Images.Tray(picture);
+            notifyIcon.Icon = icon;
+            Icon = icon;
+        }
+
+        private void OnAnimationTick(object sender, EventArgs e)
+        {
+            animationFrame = (animationFrame + 1) % Images.ConnectingFrames;
+            bool active = FileServer.TransferActive;
+            LinkState state = link.State.Status.State;
+            bool animating = state == LinkState.Searching || state == LinkState.Connecting;
+            if (animating || active != transferActive)
+            {
+                transferActive = active;
+                RefreshPicture(state);
+            }
         }
 
         private static string Truncate(string text, int length)

@@ -33,7 +33,7 @@ namespace ezLink
             this.weAllowLabel = new System.Windows.Forms.Label();
             this.peerAllowsLabel = new System.Windows.Forms.Label();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.trayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.trayMenu = new ezLink.NativeToolStrip.NativeContextMenuStrip(this.components);
             this.openItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exploreItem = new System.Windows.Forms.ToolStripMenuItem();
             this.traySeparator = new System.Windows.Forms.ToolStripSeparator();
@@ -46,7 +46,6 @@ namespace ezLink
             // 
             // toolStrip
             // 
-            this.toolStrip.AutoSize = false;
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -56,32 +55,38 @@ namespace ezLink
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.toolStrip.Size = new System.Drawing.Size(420, 39);
+            this.toolStrip.Size = new System.Drawing.Size(420, 43);
             this.toolStrip.TabIndex = 1;
             this.toolStrip.Theme = ezLink.NativeToolStrip.NativeToolStripTheme.Toolbar;
             // 
             // exploreButton
             // 
+            this.exploreButton.Image = global::ezLink.Properties.Resources.explore_32;
             this.exploreButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.exploreButton.Name = "exploreButton";
-            this.exploreButton.Size = new System.Drawing.Size(50, 36);
+            this.exploreButton.Padding = new System.Windows.Forms.Padding(2);
+            this.exploreButton.Size = new System.Drawing.Size(86, 40);
             this.exploreButton.Text = "Explore";
             this.exploreButton.Click += new System.EventHandler(this.OnExploreClick);
             // 
             // syncButton
             // 
             this.syncButton.Enabled = false;
+            this.syncButton.Image = global::ezLink.Properties.Resources.sync_32;
             this.syncButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.syncButton.Name = "syncButton";
-            this.syncButton.Size = new System.Drawing.Size(36, 36);
+            this.syncButton.Padding = new System.Windows.Forms.Padding(2);
+            this.syncButton.Size = new System.Drawing.Size(72, 40);
             this.syncButton.Text = "Sync";
             // 
             // optionsButton
             // 
             this.optionsButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.optionsButton.Image = global::ezLink.Properties.Resources.options_32;
             this.optionsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.optionsButton.Name = "optionsButton";
-            this.optionsButton.Size = new System.Drawing.Size(53, 36);
+            this.optionsButton.Padding = new System.Windows.Forms.Padding(2);
+            this.optionsButton.Size = new System.Drawing.Size(89, 40);
             this.optionsButton.Text = "Options";
             this.optionsButton.Click += new System.EventHandler(this.OnOptionsClick);
             // 
@@ -95,9 +100,9 @@ namespace ezLink
             this.mainPanel.Controls.Add(this.weAllowLabel);
             this.mainPanel.Controls.Add(this.peerAllowsLabel);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainPanel.Location = new System.Drawing.Point(0, 39);
+            this.mainPanel.Location = new System.Drawing.Point(0, 43);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Size = new System.Drawing.Size(420, 118);
+            this.mainPanel.Size = new System.Drawing.Size(420, 114);
             this.mainPanel.TabIndex = 0;
             // 
             // fixButton
@@ -173,6 +178,7 @@ namespace ezLink
             this.exitItem});
             this.trayMenu.Name = "trayMenu";
             this.trayMenu.Size = new System.Drawing.Size(114, 76);
+            this.trayMenu.Theme = ezLink.NativeToolStrip.NativeToolStripTheme.Toolbar;
             // 
             // openItem
             // 
@@ -219,6 +225,7 @@ namespace ezLink
             ((System.ComponentModel.ISupportInitialize)(this.statusIcon)).EndInit();
             this.trayMenu.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -236,7 +243,7 @@ namespace ezLink
         private System.Windows.Forms.Label peerAllowsLabel;
         private System.Windows.Forms.Button fixButton;
         private System.Windows.Forms.NotifyIcon notifyIcon;
-        private System.Windows.Forms.ContextMenuStrip trayMenu;
+        private ezLink.NativeToolStrip.NativeContextMenuStrip trayMenu;
         private System.Windows.Forms.ToolStripMenuItem openItem;
         private System.Windows.Forms.ToolStripMenuItem exploreItem;
         private System.Windows.Forms.ToolStripSeparator traySeparator;

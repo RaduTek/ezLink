@@ -49,6 +49,9 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NativeToolStrip\NativeContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="NativeToolStrip\NativeToolStrip.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -75,7 +78,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <!-- Oxygen icons (LGPL-3.0-or-later), see ..\THIRD-PARTY-NOTICES.md -->
     <EmbeddedResource Include="ApprovalForm.resx">
       <DependentUpon>ApprovalForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -89,50 +91,47 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-nocable.png">
-      <LogicalName>ezLink.Resources.status-nocable.png</LogicalName>
+    <EmbeddedResource Include="Resources\tray-active-24.png">
+      <LogicalName>ezLink.Resources.tray-active-24.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-waiting.png">
-      <LogicalName>ezLink.Resources.status-waiting.png</LogicalName>
+    <EmbeddedResource Include="Resources\tray-active.png">
+      <LogicalName>ezLink.Resources.tray-active.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-searching.png">
-      <LogicalName>ezLink.Resources.status-searching.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-connecting.png">
-      <LogicalName>ezLink.Resources.status-connecting.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-connected.png">
-      <LogicalName>ezLink.Resources.status-connected.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\status-error.png">
-      <LogicalName>ezLink.Resources.status-error.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tray-nocable.png">
-      <LogicalName>ezLink.Resources.tray-nocable.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tray-waiting.png">
-      <LogicalName>ezLink.Resources.tray-waiting.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tray-searching.png">
-      <LogicalName>ezLink.Resources.tray-searching.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tray-connecting.png">
-      <LogicalName>ezLink.Resources.tray-connecting.png</LogicalName>
+    <EmbeddedResource Include="Resources\tray-connected-24.png">
+      <LogicalName>ezLink.Resources.tray-connected-24.png</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\tray-connected.png">
       <LogicalName>ezLink.Resources.tray-connected.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-0-24.png">
+      <LogicalName>ezLink.Resources.tray-connecting-0-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-0.png">
+      <LogicalName>ezLink.Resources.tray-connecting-0.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-1-24.png">
+      <LogicalName>ezLink.Resources.tray-connecting-1-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-1.png">
+      <LogicalName>ezLink.Resources.tray-connecting-1.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-2-24.png">
+      <LogicalName>ezLink.Resources.tray-connecting-2-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-connecting-2.png">
+      <LogicalName>ezLink.Resources.tray-connecting-2.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray-error-24.png">
+      <LogicalName>ezLink.Resources.tray-error-24.png</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\tray-error.png">
       <LogicalName>ezLink.Resources.tray-error.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tool-explore.png">
-      <LogicalName>ezLink.Resources.tool-explore.png</LogicalName>
+    <EmbeddedResource Include="Resources\tray-nocable-24.png">
+      <LogicalName>ezLink.Resources.tray-nocable-24.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tool-sync.png">
-      <LogicalName>ezLink.Resources.tool-sync.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\tool-options.png">
-      <LogicalName>ezLink.Resources.tool-options.png</LogicalName>
+    <EmbeddedResource Include="Resources\tray-nocable.png">
+      <LogicalName>ezLink.Resources.tray-nocable.png</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="TrustEntryForm.resx">
       <DependentUpon>TrustEntryForm.cs</DependentUpon>
@@ -141,10 +140,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="app.manifest" />
-    <None Include="licenses\oxygen-icons-LGPL-3.0-or-later.txt">
-      <Link>licenses\oxygen-icons-LGPL-3.0-or-later.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">
@@ -155,9 +150,6 @@
       <Project>{E08F289C-68CA-4BE3-9875-9557A595B9E0}</Project>
       <Name>EzLink.Protocol</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="licenses\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
