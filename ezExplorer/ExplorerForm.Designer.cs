@@ -21,12 +21,10 @@ namespace ezExplorer
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExplorerForm));
             this.pathPanel = new System.Windows.Forms.Panel();
             this.pathBox = new System.Windows.Forms.TextBox();
             this.split = new System.Windows.Forms.SplitContainer();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.selectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.connectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tree = new ezExplorer.RemoteTreeView();
             this.list = new ezExplorer.RemoteListView();
             this.listMenu = new ezExplorer.NativeToolStrip.NativeContextMenuStrip(this.components);
@@ -40,6 +38,9 @@ namespace ezExplorer
             this.listSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.listNewFolderItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listRefreshItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.selectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.connectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip = new ezExplorer.NativeToolStrip.NativeToolStrip();
             this.backButton = new System.Windows.Forms.ToolStripButton();
             this.forwardButton = new System.Windows.Forms.ToolStripButton();
@@ -66,8 +67,8 @@ namespace ezExplorer
             this.split.Panel1.SuspendLayout();
             this.split.Panel2.SuspendLayout();
             this.split.SuspendLayout();
-            this.statusStrip.SuspendLayout();
             this.listMenu.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.treeMenu.SuspendLayout();
             this.SuspendLayout();
@@ -108,29 +109,6 @@ namespace ezExplorer
             this.split.Size = new System.Drawing.Size(800, 410);
             this.split.SplitterDistance = 200;
             this.split.TabIndex = 0;
-            // 
-            // statusStrip
-            // 
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectionLabel,
-            this.connectionLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 478);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(800, 22);
-            this.statusStrip.TabIndex = 3;
-            // 
-            // selectionLabel
-            // 
-            this.selectionLabel.Name = "selectionLabel";
-            this.selectionLabel.Size = new System.Drawing.Size(785, 17);
-            this.selectionLabel.Spring = true;
-            this.selectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // connectionLabel
-            // 
-            this.connectionLabel.Name = "connectionLabel";
-            this.connectionLabel.Size = new System.Drawing.Size(0, 17);
-            this.connectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tree
             // 
@@ -243,6 +221,29 @@ namespace ezExplorer
             this.listRefreshItem.Size = new System.Drawing.Size(132, 22);
             this.listRefreshItem.Text = "Refresh";
             this.listRefreshItem.Click += new System.EventHandler(this.OnRefreshClick);
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectionLabel,
+            this.connectionLabel});
+            this.statusStrip.Location = new System.Drawing.Point(0, 478);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(800, 22);
+            this.statusStrip.TabIndex = 3;
+            // 
+            // selectionLabel
+            // 
+            this.selectionLabel.Name = "selectionLabel";
+            this.selectionLabel.Size = new System.Drawing.Size(785, 17);
+            this.selectionLabel.Spring = true;
+            this.selectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // connectionLabel
+            // 
+            this.connectionLabel.Name = "connectionLabel";
+            this.connectionLabel.Size = new System.Drawing.Size(0, 17);
+            this.connectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // toolStrip
             // 
@@ -440,6 +441,7 @@ namespace ezExplorer
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.statusStrip);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(480, 320);
             this.Name = "ExplorerForm";
             this.Text = "ExplorerForm";
@@ -448,9 +450,9 @@ namespace ezExplorer
             this.split.Panel1.ResumeLayout(false);
             this.split.Panel2.ResumeLayout(false);
             this.split.ResumeLayout(false);
+            this.listMenu.ResumeLayout(false);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
-            this.listMenu.ResumeLayout(false);
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.treeMenu.ResumeLayout(false);

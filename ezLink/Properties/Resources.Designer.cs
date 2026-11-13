@@ -63,9 +63,9 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cable_48 {
+        internal static System.Drawing.Bitmap cable_256 {
             get {
-                object obj = ResourceManager.GetObject("cable_48", resourceCulture);
+                object obj = ResourceManager.GetObject("cable_256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace ezLink.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cable_256 {
+        internal static System.Drawing.Bitmap cable_48 {
             get {
-                object obj = ResourceManager.GetObject("cable_256", resourceCulture);
+                object obj = ResourceManager.GetObject("cable_48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -101,6 +101,16 @@ namespace ezLink.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon ezLink {
+            get {
+                object obj = ResourceManager.GetObject("ezLink", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap options_32 {
@@ -116,26 +126,6 @@ namespace ezLink.Properties {
         internal static System.Drawing.Bitmap options_48 {
             get {
                 object obj = ResourceManager.GetObject("options_48", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sync_32 {
-            get {
-                object obj = ResourceManager.GetObject("sync_32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sync_48 {
-            get {
-                object obj = ResourceManager.GetObject("sync_48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -206,6 +196,26 @@ namespace ezLink.Properties {
         internal static System.Drawing.Bitmap status_nocable {
             get {
                 object obj = ResourceManager.GetObject("status_nocable", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sync_32 {
+            get {
+                object obj = ResourceManager.GetObject("sync_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sync_48 {
+            get {
+                object obj = ResourceManager.GetObject("sync_48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -373,7 +373,7 @@ namespace ezLink
             statusIcon.Image = Images.Status(picture);
             Icon icon = Images.Tray(picture);
             notifyIcon.Icon = icon;
-            Icon = icon;
+            //Icon = icon;
         }
 
         private void OnAnimationTick(object sender, EventArgs e)

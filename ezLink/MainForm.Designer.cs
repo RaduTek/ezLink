@@ -21,6 +21,7 @@ namespace ezLink
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip = new ezLink.NativeToolStrip.NativeToolStrip();
             this.exploreButton = new System.Windows.Forms.ToolStripButton();
             this.syncButton = new System.Windows.Forms.ToolStripButton();
@@ -215,6 +216,7 @@ namespace ezLink
             this.Controls.Add(this.toolStrip);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
