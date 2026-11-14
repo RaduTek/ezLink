@@ -40,9 +40,9 @@ namespace ezLink
             // startAtLogon
             // 
             this.startAtLogon.AutoSize = true;
-            this.startAtLogon.Location = new System.Drawing.Point(14, 14);
+            this.startAtLogon.Location = new System.Drawing.Point(15, 12);
             this.startAtLogon.Name = "startAtLogon";
-            this.startAtLogon.Size = new System.Drawing.Size(97, 19);
+            this.startAtLogon.Size = new System.Drawing.Size(89, 17);
             this.startAtLogon.TabIndex = 0;
             this.startAtLogon.Text = "Start at logon";
             this.startAtLogon.UseVisualStyleBackColor = true;
@@ -50,51 +50,60 @@ namespace ezLink
             // computerNameLabel
             // 
             this.computerNameLabel.AutoSize = true;
-            this.computerNameLabel.Location = new System.Drawing.Point(14, 51);
+            this.computerNameLabel.Location = new System.Drawing.Point(15, 48);
             this.computerNameLabel.Name = "computerNameLabel";
-            this.computerNameLabel.Size = new System.Drawing.Size(94, 15);
+            this.computerNameLabel.Size = new System.Drawing.Size(81, 13);
             this.computerNameLabel.TabIndex = 1;
             this.computerNameLabel.Text = "Computer name";
             // 
             // computerNameBox
             // 
-            this.computerNameBox.Location = new System.Drawing.Point(160, 48);
+            this.computerNameBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.computerNameBox.Location = new System.Drawing.Point(158, 45);
             this.computerNameBox.Name = "computerNameBox";
             this.computerNameBox.ReadOnly = true;
-            this.computerNameBox.Size = new System.Drawing.Size(246, 23);
+            this.computerNameBox.Size = new System.Drawing.Size(250, 20);
             this.computerNameBox.TabIndex = 2;
             // 
             // computerIdLabel
             // 
             this.computerIdLabel.AutoSize = true;
-            this.computerIdLabel.Location = new System.Drawing.Point(14, 81);
+            this.computerIdLabel.Location = new System.Drawing.Point(15, 78);
             this.computerIdLabel.Name = "computerIdLabel";
-            this.computerIdLabel.Size = new System.Drawing.Size(75, 15);
+            this.computerIdLabel.Size = new System.Drawing.Size(66, 13);
             this.computerIdLabel.TabIndex = 3;
             this.computerIdLabel.Text = "Computer ID";
             // 
             // computerIdBox
             // 
-            this.computerIdBox.Location = new System.Drawing.Point(160, 78);
+            this.computerIdBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.computerIdBox.Location = new System.Drawing.Point(158, 75);
             this.computerIdBox.Name = "computerIdBox";
             this.computerIdBox.ReadOnly = true;
-            this.computerIdBox.Size = new System.Drawing.Size(246, 23);
+            this.computerIdBox.Size = new System.Drawing.Size(250, 20);
             this.computerIdBox.TabIndex = 4;
             // 
             // trustedGroup
             // 
+            this.trustedGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.trustedGroup.Controls.Add(this.trustedList);
             this.trustedGroup.Controls.Add(this.editButton);
             this.trustedGroup.Controls.Add(this.removeButton);
-            this.trustedGroup.Location = new System.Drawing.Point(14, 110);
+            this.trustedGroup.Location = new System.Drawing.Point(12, 113);
             this.trustedGroup.Name = "trustedGroup";
-            this.trustedGroup.Size = new System.Drawing.Size(392, 196);
+            this.trustedGroup.Size = new System.Drawing.Size(396, 173);
             this.trustedGroup.TabIndex = 5;
             this.trustedGroup.TabStop = false;
             this.trustedGroup.Text = "Trusted computers";
             // 
             // trustedList
             // 
+            this.trustedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.trustedList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.nameColumn,
             this.accessColumn,
@@ -104,7 +113,7 @@ namespace ezLink
             this.trustedList.Location = new System.Drawing.Point(10, 22);
             this.trustedList.MultiSelect = false;
             this.trustedList.Name = "trustedList";
-            this.trustedList.Size = new System.Drawing.Size(372, 128);
+            this.trustedList.Size = new System.Drawing.Size(376, 111);
             this.trustedList.TabIndex = 0;
             this.trustedList.UseCompatibleStateImageBehavior = false;
             this.trustedList.View = System.Windows.Forms.View.Details;
@@ -128,9 +137,10 @@ namespace ezLink
             // 
             // editButton
             // 
-            this.editButton.Location = new System.Drawing.Point(226, 158);
+            this.editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.editButton.Location = new System.Drawing.Point(230, 139);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(75, 26);
+            this.editButton.Size = new System.Drawing.Size(75, 23);
             this.editButton.TabIndex = 1;
             this.editButton.Text = "Edit";
             this.editButton.UseVisualStyleBackColor = true;
@@ -138,9 +148,10 @@ namespace ezLink
             // 
             // removeButton
             // 
-            this.removeButton.Location = new System.Drawing.Point(307, 158);
+            this.removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.removeButton.Location = new System.Drawing.Point(311, 139);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(75, 26);
+            this.removeButton.Size = new System.Drawing.Size(75, 23);
             this.removeButton.TabIndex = 2;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -148,10 +159,11 @@ namespace ezLink
             // 
             // okButton
             // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(250, 320);
+            this.okButton.Location = new System.Drawing.Point(252, 300);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 26);
+            this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 6;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
@@ -159,10 +171,11 @@ namespace ezLink
             // 
             // cancelButton
             // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(331, 320);
+            this.cancelButton.Location = new System.Drawing.Point(333, 300);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 26);
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 7;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -173,7 +186,7 @@ namespace ezLink
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(420, 360);
+            this.ClientSize = new System.Drawing.Size(420, 335);
             this.Controls.Add(this.startAtLogon);
             this.Controls.Add(this.computerNameLabel);
             this.Controls.Add(this.computerNameBox);
@@ -182,7 +195,6 @@ namespace ezLink
             this.Controls.Add(this.trustedGroup);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

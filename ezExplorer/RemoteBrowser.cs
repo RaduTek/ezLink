@@ -45,6 +45,20 @@ namespace ezExplorer
         private Permissions granted = Permissions.None;
         private bool connected;
         private bool stopping;
+        private volatile bool showHidden;   // read on the worker thread
+        private volatile bool showSystem;
+
+        public bool ShowHidden
+        {
+            get { return showHidden; }
+            set { showHidden = value; }
+        }
+
+        public bool ShowSystem
+        {
+            get { return showSystem; }
+            set { showSystem = value; }
+        }
 
         /// <summary>Raised on the UI thread when the connection comes up or goes down.</summary>
         public event EventHandler ConnectionChanged;
@@ -309,7 +323,7 @@ namespace ezExplorer
                 {
                     return RemoteItem.FromDrives(Client().GetRoots());
                 }
-                return RemoteItem.FromEntries(path, Client().ListDir(path, false));
+                return RemoteItem.FromEntries(path, Client().ListDir(path, false), ShowHidden, ShowSystem);
             }, done);
         }
 
@@ -322,7 +336,7 @@ namespace ezExplorer
                 {
                     return RemoteItem.FromDrives(Client().GetRoots());
                 }
-                return RemoteItem.FromEntries(path, Client().ListDir(path, true));
+                return RemoteItem.FromEntries(path, Client().ListDir(path, true), ShowHidden, ShowSystem);
             }, done);
         }
 

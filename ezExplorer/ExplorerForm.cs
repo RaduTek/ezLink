@@ -29,7 +29,9 @@ namespace ezExplorer
         private readonly List<string> tempRoots = new List<string>();
 
         private bool firstConnect = true;
-        private string pendingSelectName;       // select (and maybe rename) this item once the next listing shows
+        private readonly Timer detailsTimer = new Timer();
+        private string listingPath;           // the folder the list shows
+        private string pendingSelectName;      // select (and maybe rename) this item once the next listing shows
         private bool pendingRename;
 
         public ExplorerForm(ExplorerArgs args, IpcWindow ipc)
@@ -41,9 +43,13 @@ namespace ezExplorer
             Font = SystemFonts.MessageBoxFont; // Segoe UI on Vista and later, Tahoma on XP
             InitializeComponent();
             ApplyLocalizedContent();
+            detailsTimer.Interval = 30;
+            detailsTimer.Tick += OnDetailsTimer;
             ClientSize = settings.WindowSize;
 
             browser = new RemoteBrowser(args, this);
+            browser.ShowHidden = settings.ShowHidden;
+            browser.ShowSystem = settings.ShowSystem;
             browser.ConnectionChanged += OnConnectionChanged;
             nav = new NavigationController(browser, this);
 
@@ -83,8 +89,8 @@ namespace ezExplorer
             upButton.Image = highDpi ? Properties.Resources.nav_up_32 : Properties.Resources.nav_up_24;
             refreshButton.Text = Strings.Get("ToolRefresh");
             refreshButton.Image = highDpi ? Properties.Resources.refresh_32 : Properties.Resources.refresh_24;
-            ToolStripButton[] buttons = new ToolStripButton[] { backButton, forwardButton, upButton, refreshButton };
-            foreach (ToolStripButton button in buttons)
+            ToolStripItem[] buttons = new ToolStripItem[] { backButton, forwardButton, upButton, refreshButton };
+            foreach (ToolStripItem button in buttons)
             {
                 button.ToolTipText = button.Text;
             }
@@ -95,7 +101,14 @@ namespace ezExplorer
             iconsItem.Text = Strings.Get("ViewLargeIcons");
             listItem.Text = Strings.Get("ViewList");
 
+            optionsButton.Text = Strings.Get("ToolOptions");
+            optionsButton.ToolTipText = optionsButton.Text;
+            optionsButton.Image = highDpi ? Properties.Resources.options_32 : Properties.Resources.options_24;
+
             pathPanel.Height = pathBox.PreferredHeight + 10;
+
+            detailsBar.ModifiedCaption = Strings.Get("DetailsModified");
+            detailsBar.SizeCaption = Strings.Get("DetailsSize");
 
             listOpenItem.Text = Strings.Get("MenuOpenItem");
             listOpenItem.Font = new Font(listOpenItem.Font, FontStyle.Bold);
@@ -169,13 +182,15 @@ namespace ezExplorer
             {
                 IpcWindow.Send(args.MainWindow, ipc, IpcMessages.ExplorerHello, args.PeerId.ToString("D"));
             }
-            selectionLabel.Text = string.Format(Strings.Get("ExplorerConnecting"), args.PeerName);
+            ShowDetailsMessage(string.Format(Strings.Get("ExplorerConnecting"), args.PeerName));
             browser.Connect(OnFirstConnect);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
+            detailsTimer.Stop();
+            detailsTimer.Dispose();
             settings.Maximized = WindowState == FormWindowState.Maximized;
             Rectangle bounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
             settings.WindowSize = ClientSizeFor(bounds);
@@ -282,12 +297,9 @@ namespace ezExplorer
         private void UpdateEnabled()
         {
             bool connected = browser.Connected;
-            connectionLabel.Text = connected || firstConnect
-                ? string.Empty
-                : string.Format(Strings.Get("ExplorerDisconnected"), args.PeerName);
             if (!connected && !firstConnect)
             {
-                selectionLabel.Text = string.Empty;
+                ShowDetailsMessage(string.Format(Strings.Get("ExplorerDisconnected"), args.PeerName));
             }
             else if (connected)
             {
@@ -299,6 +311,7 @@ namespace ezExplorer
 
         void INavigationView.ShowListing(string path, List<RemoteItem> items)
         {
+            listingPath = path;
             list.SetItems(items);
             if (pendingSelectName != null)
             {
@@ -316,6 +329,7 @@ namespace ezExplorer
                     }
                 }
             }
+            UpdateSelectionText();
         }
 
         void INavigationView.ShowPath(string path)
@@ -339,7 +353,7 @@ namespace ezExplorer
         {
             if (!browser.Connected)
             {
-                UpdateEnabled(); // the status bar already says we are disconnected
+                UpdateEnabled(); // the details bar says we are disconnected
                 return;
             }
             string shown = RemotePaths.IsRoot(path) ? args.PeerName : path;
@@ -354,6 +368,26 @@ namespace ezExplorer
             RefreshAll();
         }
 
+        private void optionsButton_Click(object sender, EventArgs e)
+        {
+            using (OptionsForm dialog = new OptionsForm(settings.ShowHidden, settings.ShowSystem))
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                bool changed = dialog.ShowHidden != settings.ShowHidden || dialog.ShowSystem != settings.ShowSystem;
+                settings.ShowHidden = dialog.ShowHidden;
+                settings.ShowSystem = dialog.ShowSystem;
+                browser.ShowHidden = settings.ShowHidden;
+                browser.ShowSystem = settings.ShowSystem;
+                if (changed)
+                {
+                    RefreshAll();
+                }
+            }
+        }
+
         private void RefreshAll()
         {
             if (firstConnect)
@@ -362,7 +396,7 @@ namespace ezExplorer
             }
             if (!browser.Connected)
             {
-                selectionLabel.Text = string.Format(Strings.Get("ExplorerReconnecting"), args.PeerName);
+                ShowDetailsMessage(string.Format(Strings.Get("ExplorerReconnecting"), args.PeerName));
                 browser.Reconnect(null, OnReconnect);
                 return;
             }
@@ -431,8 +465,26 @@ namespace ezExplorer
             UpdateSelectionText();
         }
 
-        /// <summary>The status bar describes the selection only: how many items and, for files, how big.</summary>
+        /// <summary>
+        /// The details bar at the bottom, as in Windows 7: big icon, bold name and type on the left, date modified and
+        /// size on the right. With nothing selected it describes the open folder.
+        /// </summary>
         private void UpdateSelectionText()
+        {
+            // Selecting a range raises an event per change: redraw once after the burst, not for every one.
+            if (!detailsTimer.Enabled)
+            {
+                detailsTimer.Start();
+            }
+        }
+
+        private void OnDetailsTimer(object sender, EventArgs e)
+        {
+            detailsTimer.Stop();
+            RefreshDetails();
+        }
+
+        private void RefreshDetails()
         {
             if (!browser.Connected)
             {
@@ -441,13 +493,15 @@ namespace ezExplorer
             int count = list.SelectedIndices.Count;
             if (count == 0)
             {
-                selectionLabel.Text = string.Empty;
+                ShowFolderDetails();
+                return;
+            }
+            if (count == 1)
+            {
+                ShowItemDetails(list.ItemAt(list.SelectedIndices[0]));
                 return;
             }
 
-            string text = count == 1
-                ? Strings.Get("StatusOneItem")
-                : string.Format(Strings.Get("StatusManyItems"), count);
             long bytes = 0;
             bool anyFile = false;
             foreach (int index in list.SelectedIndices)
@@ -459,11 +513,55 @@ namespace ezExplorer
                     bytes += item.Size;
                 }
             }
-            if (anyFile)
+            SetDetails(list.ItemAt(list.SelectedIndices[0]).IconIndex,
+                string.Format(Strings.Get("StatusManyItems"), count), string.Empty, string.Empty,
+                anyFile ? RemoteListView.FormatSize(bytes) : string.Empty);
+        }
+
+        private void ShowItemDetails(RemoteItem item)
+        {
+            SetDetails(item.IconIndex, item.DisplayName, item.TypeName,
+                item.HasDate ? item.Modified.ToString("g") : string.Empty,
+                item.IsFolder ? string.Empty : RemoteListView.FormatSize(item.Size));
+        }
+
+        private void ShowFolderDetails()
+        {
+            string path = listingPath;
+            if (path == null)
             {
-                text = string.Format(Strings.Get("StatusSize"), text, RemoteListView.FormatSize(bytes));
+                ShowDetailsMessage(string.Empty);
+                return;
             }
-            selectionLabel.Text = text;
+            int icon;
+            string name;
+            if (RemotePaths.IsRoot(path))
+            {
+                icon = ShellIcons.ComputerIndex;
+                name = args.PeerName;
+            }
+            else
+            {
+                string trimmed = path.TrimEnd('\\');
+                bool drive = trimmed.IndexOf('\\') < 0;
+                icon = drive ? ShellIcons.ForDrive((byte)DriveType.Fixed) : ShellIcons.FolderIndex;
+                name = drive ? path : trimmed.Substring(trimmed.LastIndexOf('\\') + 1);
+            }
+            int items = list.ItemCount;
+            SetDetails(icon, name,
+                items == 1 ? Strings.Get("DetailsOneItem") : string.Format(Strings.Get("DetailsManyItems"), items),
+                string.Empty, string.Empty);
+        }
+
+        /// <summary>A line of text (connecting, disconnected...) in place of the item details.</summary>
+        private void ShowDetailsMessage(string text)
+        {
+            SetDetails(-1, text, string.Empty, string.Empty, string.Empty);
+        }
+
+        private void SetDetails(int iconIndex, string name, string type, string modified, string size)
+        {
+            detailsBar.SetDetails(iconIndex >= 0 ? ShellIcons.LargeIcon(iconIndex) : null, name, type, modified, size);
         }
 
         // ---- context menus ----
@@ -1314,7 +1412,7 @@ namespace ezExplorer
             {
                 IPAddress.TryParse(payload.Substring(cut + 1).Trim(), out address);
             }
-            selectionLabel.Text = string.Format(Strings.Get("ExplorerReconnecting"), args.PeerName);
+            ShowDetailsMessage(string.Format(Strings.Get("ExplorerReconnecting"), args.PeerName));
             browser.Reconnect(address, OnReconnect);
         }
 

@@ -33,10 +33,12 @@ namespace ezLink
             // 
             // headline
             // 
+            this.headline.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.headline.AutoEllipsis = true;
-            this.headline.Location = new System.Drawing.Point(14, 14);
+            this.headline.Location = new System.Drawing.Point(9, 9);
             this.headline.Name = "headline";
-            this.headline.Size = new System.Drawing.Size(412, 38);
+            this.headline.Size = new System.Drawing.Size(376, 38);
             this.headline.TabIndex = 0;
             this.headline.Text = "headline";
             // 
@@ -45,9 +47,9 @@ namespace ezLink
             this.browseCopy.AutoSize = true;
             this.browseCopy.Checked = true;
             this.browseCopy.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.browseCopy.Location = new System.Drawing.Point(24, 58);
+            this.browseCopy.Location = new System.Drawing.Point(12, 50);
             this.browseCopy.Name = "browseCopy";
-            this.browseCopy.Size = new System.Drawing.Size(116, 19);
+            this.browseCopy.Size = new System.Drawing.Size(108, 17);
             this.browseCopy.TabIndex = 1;
             this.browseCopy.Text = "Browse and copy";
             this.browseCopy.UseVisualStyleBackColor = true;
@@ -56,9 +58,9 @@ namespace ezLink
             // write
             // 
             this.write.AutoSize = true;
-            this.write.Location = new System.Drawing.Point(24, 82);
+            this.write.Location = new System.Drawing.Point(12, 74);
             this.write.Name = "write";
-            this.write.Size = new System.Drawing.Size(54, 19);
+            this.write.Size = new System.Drawing.Size(51, 17);
             this.write.TabIndex = 2;
             this.write.Text = "Write";
             this.write.UseVisualStyleBackColor = true;
@@ -66,18 +68,21 @@ namespace ezLink
             // 
             // note
             // 
+            this.note.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.note.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.note.Location = new System.Drawing.Point(14, 110);
+            this.note.Location = new System.Drawing.Point(9, 103);
             this.note.Name = "note";
-            this.note.Size = new System.Drawing.Size(412, 34);
+            this.note.Size = new System.Drawing.Size(376, 34);
             this.note.TabIndex = 3;
             this.note.Text = "note";
             // 
             // allowOnce
             // 
-            this.allowOnce.Location = new System.Drawing.Point(14, 154);
+            this.allowOnce.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.allowOnce.Location = new System.Drawing.Point(12, 144);
             this.allowOnce.Name = "allowOnce";
-            this.allowOnce.Size = new System.Drawing.Size(110, 28);
+            this.allowOnce.Size = new System.Drawing.Size(95, 23);
             this.allowOnce.TabIndex = 4;
             this.allowOnce.Text = "Allow once";
             this.allowOnce.UseVisualStyleBackColor = true;
@@ -85,9 +90,10 @@ namespace ezLink
             // 
             // alwaysAllow
             // 
-            this.alwaysAllow.Location = new System.Drawing.Point(132, 154);
+            this.alwaysAllow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.alwaysAllow.Location = new System.Drawing.Point(113, 144);
             this.alwaysAllow.Name = "alwaysAllow";
-            this.alwaysAllow.Size = new System.Drawing.Size(110, 28);
+            this.alwaysAllow.Size = new System.Drawing.Size(95, 23);
             this.alwaysAllow.TabIndex = 5;
             this.alwaysAllow.Text = "Always allow";
             this.alwaysAllow.UseVisualStyleBackColor = true;
@@ -95,9 +101,10 @@ namespace ezLink
             // 
             // deny
             // 
-            this.deny.Location = new System.Drawing.Point(316, 154);
+            this.deny.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.deny.Location = new System.Drawing.Point(290, 144);
             this.deny.Name = "deny";
-            this.deny.Size = new System.Drawing.Size(110, 28);
+            this.deny.Size = new System.Drawing.Size(95, 23);
             this.deny.TabIndex = 6;
             this.deny.Text = "Deny";
             this.deny.UseVisualStyleBackColor = true;
@@ -113,15 +120,14 @@ namespace ezLink
             this.AcceptButton = this.deny;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(440, 196);
+            this.ClientSize = new System.Drawing.Size(397, 179);
+            this.Controls.Add(this.allowOnce);
+            this.Controls.Add(this.alwaysAllow);
+            this.Controls.Add(this.deny);
             this.Controls.Add(this.headline);
             this.Controls.Add(this.browseCopy);
             this.Controls.Add(this.write);
             this.Controls.Add(this.note);
-            this.Controls.Add(this.allowOnce);
-            this.Controls.Add(this.alwaysAllow);
-            this.Controls.Add(this.deny);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

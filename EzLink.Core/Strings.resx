@@ -329,6 +329,18 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="ToolViews" xml:space="preserve">
     <value>Views</value>
   </data>
+  <data name="ToolOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="OptionsTitle" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="OptionsShowHidden" xml:space="preserve">
+    <value>Show hidden files</value>
+  </data>
+  <data name="OptionsShowSystem" xml:space="preserve">
+    <value>Show system files</value>
+  </data>
   <data name="ViewDetails" xml:space="preserve">
     <value>Details</value>
   </data>
@@ -389,8 +401,17 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="StatusManyItems" xml:space="preserve">
     <value>{0} items selected</value>
   </data>
-  <data name="StatusSize" xml:space="preserve">
-    <value>{0}   {1}</value>
+  <data name="DetailsModified" xml:space="preserve">
+    <value>Date modified:</value>
+  </data>
+  <data name="DetailsSize" xml:space="preserve">
+    <value>Size:</value>
+  </data>
+  <data name="DetailsOneItem" xml:space="preserve">
+    <value>1 item</value>
+  </data>
+  <data name="DetailsManyItems" xml:space="preserve">
+    <value>{0} items</value>
   </data>
   <data name="TypeFolder" xml:space="preserve">
     <value>File folder</value>

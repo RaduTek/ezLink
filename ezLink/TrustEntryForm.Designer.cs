@@ -32,7 +32,7 @@ namespace ezLink
             this.browseCopy.AutoSize = true;
             this.browseCopy.Location = new System.Drawing.Point(14, 16);
             this.browseCopy.Name = "browseCopy";
-            this.browseCopy.Size = new System.Drawing.Size(116, 19);
+            this.browseCopy.Size = new System.Drawing.Size(108, 17);
             this.browseCopy.TabIndex = 0;
             this.browseCopy.Text = "Browse and copy";
             this.browseCopy.UseVisualStyleBackColor = true;
@@ -42,7 +42,7 @@ namespace ezLink
             this.write.AutoSize = true;
             this.write.Location = new System.Drawing.Point(14, 42);
             this.write.Name = "write";
-            this.write.Size = new System.Drawing.Size(54, 19);
+            this.write.Size = new System.Drawing.Size(51, 17);
             this.write.TabIndex = 1;
             this.write.Text = "Write";
             this.write.UseVisualStyleBackColor = true;
@@ -50,9 +50,9 @@ namespace ezLink
             // block
             // 
             this.block.AutoSize = true;
-            this.block.Location = new System.Drawing.Point(14, 78);
+            this.block.Location = new System.Drawing.Point(14, 76);
             this.block.Name = "block";
-            this.block.Size = new System.Drawing.Size(55, 19);
+            this.block.Size = new System.Drawing.Size(53, 17);
             this.block.TabIndex = 2;
             this.block.Text = "Block";
             this.block.UseVisualStyleBackColor = true;
@@ -60,10 +60,11 @@ namespace ezLink
             // 
             // okButton
             // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(230, 128);
+            this.okButton.Location = new System.Drawing.Point(134, 104);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 26);
+            this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 3;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
@@ -71,10 +72,11 @@ namespace ezLink
             // 
             // cancelButton
             // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(311, 128);
+            this.cancelButton.Location = new System.Drawing.Point(215, 104);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 26);
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 4;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -85,13 +87,12 @@ namespace ezLink
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(400, 170);
+            this.ClientSize = new System.Drawing.Size(302, 139);
             this.Controls.Add(this.browseCopy);
             this.Controls.Add(this.write);
             this.Controls.Add(this.block);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

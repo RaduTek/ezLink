@@ -68,12 +68,13 @@ namespace ezExplorer
             return items;
         }
 
-        public static List<RemoteItem> FromEntries(string folder, List<FileEntry> entries)
+        public static List<RemoteItem> FromEntries(string folder, List<FileEntry> entries, bool showHidden,
+            bool showSystem)
         {
             List<RemoteItem> items = new List<RemoteItem>(entries.Count);
             foreach (FileEntry entry in entries)
             {
-                if (!RemotePaths.IsProtected(entry.Attributes))
+                if (RemotePaths.IsVisible(entry.Attributes, showHidden, showSystem))
                 {
                     items.Add(FromEntry(folder, entry));
                 }

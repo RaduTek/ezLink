@@ -108,9 +108,9 @@ namespace ezLink
             // 
             // fixButton
             // 
-            this.fixButton.Location = new System.Drawing.Point(82, 56);
+            this.fixButton.Location = new System.Drawing.Point(83, 60);
             this.fixButton.Name = "fixButton";
-            this.fixButton.Size = new System.Drawing.Size(90, 26);
+            this.fixButton.Size = new System.Drawing.Size(75, 23);
             this.fixButton.TabIndex = 0;
             this.fixButton.Text = "Fix";
             this.fixButton.UseVisualStyleBackColor = true;
@@ -132,7 +132,7 @@ namespace ezLink
             | System.Windows.Forms.AnchorStyles.Right)));
             this.statusLabel.Location = new System.Drawing.Point(80, 10);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(328, 40);
+            this.statusLabel.Size = new System.Drawing.Size(328, 32);
             this.statusLabel.TabIndex = 2;
             // 
             // peerLabel
@@ -140,7 +140,7 @@ namespace ezLink
             this.peerLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.peerLabel.AutoEllipsis = true;
-            this.peerLabel.Location = new System.Drawing.Point(82, 52);
+            this.peerLabel.Location = new System.Drawing.Point(82, 42);
             this.peerLabel.Name = "peerLabel";
             this.peerLabel.Size = new System.Drawing.Size(326, 18);
             this.peerLabel.TabIndex = 3;
@@ -150,7 +150,7 @@ namespace ezLink
             this.weAllowLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.weAllowLabel.AutoEllipsis = true;
-            this.weAllowLabel.Location = new System.Drawing.Point(82, 76);
+            this.weAllowLabel.Location = new System.Drawing.Point(82, 66);
             this.weAllowLabel.Name = "weAllowLabel";
             this.weAllowLabel.Size = new System.Drawing.Size(326, 18);
             this.weAllowLabel.TabIndex = 4;
@@ -160,7 +160,7 @@ namespace ezLink
             this.peerAllowsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.peerAllowsLabel.AutoEllipsis = true;
-            this.peerAllowsLabel.Location = new System.Drawing.Point(82, 96);
+            this.peerAllowsLabel.Location = new System.Drawing.Point(82, 86);
             this.peerAllowsLabel.Name = "peerAllowsLabel";
             this.peerAllowsLabel.Size = new System.Drawing.Size(326, 18);
             this.peerAllowsLabel.TabIndex = 5;
@@ -214,7 +214,6 @@ namespace ezLink
             this.ClientSize = new System.Drawing.Size(420, 157);
             this.Controls.Add(this.mainPanel);
             this.Controls.Add(this.toolStrip);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;

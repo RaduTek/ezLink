@@ -134,11 +134,18 @@ namespace ezExplorer
             return (attributes & ShellNative.FILE_ATTRIBUTE_DIRECTORY) != 0;
         }
 
-        /// <summary>Protected operating-system files (hidden and system together) are not listed, as in Explorer.</summary>
-        public static bool IsProtected(uint attributes)
+        /// <summary>Hidden and system items are listed only when the matching option is on.</summary>
+        public static bool IsVisible(uint attributes, bool showHidden, bool showSystem)
         {
-            uint both = ShellNative.FILE_ATTRIBUTE_HIDDEN | ShellNative.FILE_ATTRIBUTE_SYSTEM;
-            return (attributes & both) == both;
+            if (!showHidden && (attributes & ShellNative.FILE_ATTRIBUTE_HIDDEN) != 0)
+            {
+                return false;
+            }
+            if (!showSystem && (attributes & ShellNative.FILE_ATTRIBUTE_SYSTEM) != 0)
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool Allows(Permissions granted, Permissions needed)

@@ -28,17 +28,21 @@ namespace ezExplorer
             // 
             // message
             // 
+            this.message.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.message.Location = new System.Drawing.Point(12, 12);
             this.message.Name = "message";
-            this.message.Size = new System.Drawing.Size(416, 90);
+            this.message.Size = new System.Drawing.Size(370, 76);
             this.message.TabIndex = 0;
             this.message.Text = "message";
             // 
             // retryButton
             // 
-            this.retryButton.Location = new System.Drawing.Point(12, 116);
+            this.retryButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.retryButton.Location = new System.Drawing.Point(130, 91);
             this.retryButton.Name = "retryButton";
-            this.retryButton.Size = new System.Drawing.Size(100, 28);
+            this.retryButton.Size = new System.Drawing.Size(80, 23);
             this.retryButton.TabIndex = 1;
             this.retryButton.Text = "Retry";
             this.retryButton.UseVisualStyleBackColor = true;
@@ -46,9 +50,10 @@ namespace ezExplorer
             // 
             // skipButton
             // 
-            this.skipButton.Location = new System.Drawing.Point(120, 116);
+            this.skipButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.skipButton.Location = new System.Drawing.Point(216, 91);
             this.skipButton.Name = "skipButton";
-            this.skipButton.Size = new System.Drawing.Size(100, 28);
+            this.skipButton.Size = new System.Drawing.Size(80, 23);
             this.skipButton.TabIndex = 2;
             this.skipButton.Text = "Skip";
             this.skipButton.UseVisualStyleBackColor = true;
@@ -56,10 +61,11 @@ namespace ezExplorer
             // 
             // cancelButton
             // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(228, 116);
+            this.cancelButton.Location = new System.Drawing.Point(302, 91);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(100, 28);
+            this.cancelButton.Size = new System.Drawing.Size(80, 23);
             this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -71,12 +77,11 @@ namespace ezExplorer
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(440, 160);
+            this.ClientSize = new System.Drawing.Size(394, 126);
             this.Controls.Add(this.message);
             this.Controls.Add(this.retryButton);
             this.Controls.Add(this.skipButton);
             this.Controls.Add(this.cancelButton);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

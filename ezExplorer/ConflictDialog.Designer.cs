@@ -31,8 +31,10 @@ namespace ezExplorer
             // 
             // message
             // 
+            this.message.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.message.AutoEllipsis = true;
-            this.message.Location = new System.Drawing.Point(12, 12);
+            this.message.Location = new System.Drawing.Point(12, 11);
             this.message.Name = "message";
             this.message.Size = new System.Drawing.Size(416, 36);
             this.message.TabIndex = 0;
@@ -40,7 +42,9 @@ namespace ezExplorer
             // 
             // existing
             // 
-            this.existing.Location = new System.Drawing.Point(12, 52);
+            this.existing.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.existing.Location = new System.Drawing.Point(12, 51);
             this.existing.Name = "existing";
             this.existing.Size = new System.Drawing.Size(416, 20);
             this.existing.TabIndex = 1;
@@ -48,7 +52,9 @@ namespace ezExplorer
             // 
             // incoming
             // 
-            this.incoming.Location = new System.Drawing.Point(12, 74);
+            this.incoming.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.incoming.Location = new System.Drawing.Point(12, 73);
             this.incoming.Name = "incoming";
             this.incoming.Size = new System.Drawing.Size(416, 20);
             this.incoming.TabIndex = 2;
@@ -56,7 +62,9 @@ namespace ezExplorer
             // 
             // applyAll
             // 
-            this.applyAll.Location = new System.Drawing.Point(12, 104);
+            this.applyAll.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.applyAll.Location = new System.Drawing.Point(12, 103);
             this.applyAll.Name = "applyAll";
             this.applyAll.Size = new System.Drawing.Size(416, 22);
             this.applyAll.TabIndex = 3;
@@ -65,9 +73,10 @@ namespace ezExplorer
             // 
             // replaceButton
             // 
-            this.replaceButton.Location = new System.Drawing.Point(12, 142);
+            this.replaceButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.replaceButton.Location = new System.Drawing.Point(12, 134);
             this.replaceButton.Name = "replaceButton";
-            this.replaceButton.Size = new System.Drawing.Size(100, 28);
+            this.replaceButton.Size = new System.Drawing.Size(90, 23);
             this.replaceButton.TabIndex = 4;
             this.replaceButton.Text = "Replace";
             this.replaceButton.UseVisualStyleBackColor = true;
@@ -75,9 +84,10 @@ namespace ezExplorer
             // 
             // keepButton
             // 
-            this.keepButton.Location = new System.Drawing.Point(120, 142);
+            this.keepButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.keepButton.Location = new System.Drawing.Point(108, 134);
             this.keepButton.Name = "keepButton";
-            this.keepButton.Size = new System.Drawing.Size(100, 28);
+            this.keepButton.Size = new System.Drawing.Size(90, 23);
             this.keepButton.TabIndex = 5;
             this.keepButton.Text = "Keep both";
             this.keepButton.UseVisualStyleBackColor = true;
@@ -85,10 +95,11 @@ namespace ezExplorer
             // 
             // skipButton
             // 
+            this.skipButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.skipButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.skipButton.Location = new System.Drawing.Point(228, 142);
+            this.skipButton.Location = new System.Drawing.Point(204, 134);
             this.skipButton.Name = "skipButton";
-            this.skipButton.Size = new System.Drawing.Size(100, 28);
+            this.skipButton.Size = new System.Drawing.Size(90, 23);
             this.skipButton.TabIndex = 6;
             this.skipButton.Text = "Skip";
             this.skipButton.UseVisualStyleBackColor = true;
@@ -100,7 +111,7 @@ namespace ezExplorer
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.skipButton;
-            this.ClientSize = new System.Drawing.Size(440, 190);
+            this.ClientSize = new System.Drawing.Size(440, 169);
             this.Controls.Add(this.message);
             this.Controls.Add(this.existing);
             this.Controls.Add(this.incoming);
@@ -108,7 +119,6 @@ namespace ezExplorer
             this.Controls.Add(this.replaceButton);
             this.Controls.Add(this.keepButton);
             this.Controls.Add(this.skipButton);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

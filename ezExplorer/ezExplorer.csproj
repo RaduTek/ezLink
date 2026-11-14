@@ -61,6 +61,9 @@
     <Compile Include="ExplorerForm.Designer.cs">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DetailsBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DpiInfo.cs" />
     <Compile Include="ExplorerSettings.cs" />
     <Compile Include="NativeToolStrip\NativeContextMenuStrip.cs">
@@ -72,6 +75,12 @@
     <Compile Include="NativeToolStrip\NativeToolStripRenderer.cs" />
     <Compile Include="NavigationController.cs" />
     <Compile Include="OleInterop.cs" />
+    <Compile Include="OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsForm.Designer.cs">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -133,6 +142,51 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ezExplorer.ico" />
+    <Content Include="Resources\delete-16.png" />
+    <Content Include="Resources\delete-24.png" />
+    <Content Include="Resources\delete-32.png" />
+    <Content Include="Resources\move-16.png" />
+    <Content Include="Resources\move-24.png" />
+    <Content Include="Resources\move-32.png" />
+    <Content Include="Resources\nav-back-16.png" />
+    <Content Include="Resources\nav-back-24.png" />
+    <Content Include="Resources\nav-back-32.png" />
+    <Content Include="Resources\nav-forward-16.png" />
+    <Content Include="Resources\nav-forward-24.png" />
+    <Content Include="Resources\nav-forward-32.png" />
+    <Content Include="Resources\nav-up-16.png" />
+    <Content Include="Resources\nav-up-24.png" />
+    <Content Include="Resources\nav-up-32.png" />
+    <None Include="Resources\options-32.png" />
+    <None Include="Resources\options-16.png" />
+    <None Include="Resources\options-24.png" />
+    <Content Include="Resources\refresh-16.png" />
+    <Content Include="Resources\refresh-24.png" />
+    <Content Include="Resources\refresh-32.png" />
+    <Content Include="Resources\rename-16.png" />
+    <Content Include="Resources\rename-24.png" />
+    <Content Include="Resources\rename-32.png" />
+    <Content Include="Resources\tree-16.png" />
+    <Content Include="Resources\tree-24.png" />
+    <Content Include="Resources\tree-32.png" />
+    <Content Include="Resources\view-details-16.png" />
+    <Content Include="Resources\view-details-24.png" />
+    <Content Include="Resources\view-details-32.png" />
+    <Content Include="Resources\view-icons-16.png" />
+    <Content Include="Resources\view-icons-24.png" />
+    <Content Include="Resources\view-icons-32.png" />
+    <Content Include="Resources\view-large-icons-16.png" />
+    <Content Include="Resources\view-large-icons-24.png" />
+    <Content Include="Resources\view-large-icons-32.png" />
+    <Content Include="Resources\view-list-16.png" />
+    <Content Include="Resources\view-list-24.png" />
+    <Content Include="Resources\view-list-32.png" />
+    <Content Include="Resources\view-thumbnail-16.png" />
+    <Content Include="Resources\view-thumbnail-24.png" />
+    <Content Include="Resources\view-thumbnail-32.png" />
+    <Content Include="Resources\view-tiles-16.png" />
+    <Content Include="Resources\view-tiles-24.png" />
+    <Content Include="Resources\view-tiles-32.png" />
     <None Include="Resources\ezExplorer.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -107,6 +107,20 @@ namespace ezExplorer
         public static extern IntPtr SHGetFileInfo(string path, uint fileAttributes, ref SHFILEINFO info,
             uint infoSize, uint flags);
 
+        public const int SHIL_EXTRALARGE = 2;
+        public const uint ILD_TRANSPARENT = 0x1;
+        public static readonly Guid IID_IImageList = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
+
+        /// <summary>Vista and later (XP has it only by ordinal): the system image list of the given size.</summary>
+        [DllImport("shell32.dll")]
+        public static extern int SHGetImageList(int imageList, ref Guid riid, out IntPtr ppv);
+
+        [DllImport("comctl32.dll")]
+        public static extern IntPtr ImageList_GetIcon(IntPtr himl, int index, uint flags);
+
+        [DllImport("user32.dll")]
+        public static extern bool DestroyIcon(IntPtr icon);
+
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         public static extern int SHGetStockIconInfo(uint siid, uint flags, ref SHSTOCKICONINFO info);
 

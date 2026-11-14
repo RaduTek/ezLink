@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using EzLink;
@@ -23,6 +24,8 @@ namespace ezExplorer
         private static readonly Dictionary<string, Info> byExtension =
             new Dictionary<string, Info>(StringComparer.OrdinalIgnoreCase);
 
+        private static readonly Dictionary<int, Bitmap> bigIcons = new Dictionary<int, Bitmap>();
+        private static IntPtr extraLargeList;
         private static bool initialized;
         private static IntPtr smallList;
         private static IntPtr largeList;
@@ -87,6 +90,63 @@ namespace ezExplorer
                 : fi.szTypeName;
             byExtension[extension] = info;
             return info;
+        }
+
+        /// <summary>
+        /// The 48 pixel icon for a system image index, for the details bar (the 32 pixel one where the extra large
+        /// list does not exist). Cached; the caller must not dispose it. Null if the icon cannot be made.
+        /// </summary>
+        public static Bitmap LargeIcon(int index)
+        {
+            Init();
+            Bitmap bitmap;
+            if (bigIcons.TryGetValue(index, out bitmap))
+            {
+                return bitmap;
+            }
+
+            IntPtr handle = IntPtr.Zero;
+            try
+            {
+                if (extraLargeList == IntPtr.Zero)
+                {
+                    Guid iid = ShellNative.IID_IImageList;
+                    IntPtr list;
+                    if (ShellNative.SHGetImageList(ShellNative.SHIL_EXTRALARGE, ref iid, out list) == 0)
+                    {
+                        extraLargeList = list; // kept for the life of the process, like the other system lists
+                    }
+                }
+                if (extraLargeList != IntPtr.Zero)
+                {
+                    handle = ShellNative.ImageList_GetIcon(extraLargeList, index, ShellNative.ILD_TRANSPARENT);
+                }
+            }
+            catch (EntryPointNotFoundException)
+            {
+            }
+            if (handle == IntPtr.Zero)
+            {
+                handle = ShellNative.ImageList_GetIcon(largeList, index, ShellNative.ILD_TRANSPARENT);
+            }
+
+            bitmap = null;
+            if (handle != IntPtr.Zero)
+            {
+                try
+                {
+                    using (Icon icon = Icon.FromHandle(handle))
+                    {
+                        bitmap = icon.ToBitmap();
+                    }
+                }
+                finally
+                {
+                    ShellNative.DestroyIcon(handle);
+                }
+            }
+            bigIcons[index] = bitmap;
+            return bitmap;
         }
 
         /// <param name="driveType">A System.IO.DriveType value as sent by the file server.</param>

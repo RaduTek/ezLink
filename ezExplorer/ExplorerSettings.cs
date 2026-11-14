@@ -15,6 +15,8 @@ namespace ezExplorer
         public bool Maximized;
         public int SplitterDistance = 240;
         public View View = View.Details;
+        public bool ShowHidden;
+        public bool ShowSystem;
 
         public static ExplorerSettings Load()
         {
@@ -44,6 +46,8 @@ namespace ezExplorer
                     {
                         settings.View = (View)view;
                     }
+                    settings.ShowHidden = ReadInt(key, "ShowHidden", 0) != 0;
+                    settings.ShowSystem = ReadInt(key, "ShowSystem", 0) != 0;
                 }
             }
             catch (Exception ex)
@@ -64,6 +68,8 @@ namespace ezExplorer
                     key.SetValue("Maximized", Maximized ? 1 : 0);
                     key.SetValue("SplitterDistance", SplitterDistance);
                     key.SetValue("View", (int)View);
+                    key.SetValue("ShowHidden", ShowHidden ? 1 : 0);
+                    key.SetValue("ShowSystem", ShowSystem ? 1 : 0);
                 }
             }
             catch (Exception ex)

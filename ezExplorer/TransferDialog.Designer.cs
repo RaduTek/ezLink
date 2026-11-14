@@ -33,6 +33,8 @@ namespace ezExplorer
             // 
             // headline
             // 
+            this.headline.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.headline.Location = new System.Drawing.Point(12, 12);
             this.headline.Name = "headline";
             this.headline.Size = new System.Drawing.Size(456, 20);
@@ -41,6 +43,8 @@ namespace ezExplorer
             // 
             // nameLabel
             // 
+            this.nameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nameLabel.AutoEllipsis = true;
             this.nameLabel.Location = new System.Drawing.Point(12, 38);
             this.nameLabel.Name = "nameLabel";
@@ -50,15 +54,20 @@ namespace ezExplorer
             // 
             // pathLabel
             // 
+            this.pathLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pathLabel.AutoEllipsis = true;
             this.pathLabel.ForeColor = System.Drawing.SystemColors.GrayText;
             this.pathLabel.Location = new System.Drawing.Point(12, 58);
             this.pathLabel.Name = "pathLabel";
             this.pathLabel.Size = new System.Drawing.Size(456, 18);
             this.pathLabel.TabIndex = 2;
+            this.pathLabel.Text = "pathLabel";
             // 
             // fileBar
             // 
+            this.fileBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.fileBar.Location = new System.Drawing.Point(12, 84);
             this.fileBar.Maximum = 1000;
             this.fileBar.Name = "fileBar";
@@ -68,6 +77,8 @@ namespace ezExplorer
             // 
             // totalBar
             // 
+            this.totalBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.totalBar.Location = new System.Drawing.Point(12, 108);
             this.totalBar.Maximum = 1000;
             this.totalBar.Name = "totalBar";
@@ -77,18 +88,22 @@ namespace ezExplorer
             // 
             // detail
             // 
+            this.detail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.detail.AutoEllipsis = true;
             this.detail.Location = new System.Drawing.Point(12, 134);
             this.detail.Name = "detail";
-            this.detail.Size = new System.Drawing.Size(456, 36);
+            this.detail.Size = new System.Drawing.Size(456, 28);
             this.detail.TabIndex = 5;
+            this.detail.Text = "detailLabel";
             // 
             // cancelButton
             // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(368, 162);
+            this.cancelButton.Location = new System.Drawing.Point(388, 165);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(100, 28);
+            this.cancelButton.Size = new System.Drawing.Size(80, 23);
             this.cancelButton.TabIndex = 6;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -111,7 +126,6 @@ namespace ezExplorer
             this.Controls.Add(this.totalBar);
             this.Controls.Add(this.detail);
             this.Controls.Add(this.cancelButton);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

@@ -155,6 +155,40 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ezLink.ico" />
+    <Content Include="Resources\cable-256.png" />
+    <Content Include="Resources\cable-48.png" />
+    <Content Include="Resources\explore-32.png" />
+    <Content Include="Resources\explore-40.png" />
+    <Content Include="Resources\options-32.png" />
+    <Content Include="Resources\options-40.png" />
+    <Content Include="Resources\status-active-64.png" />
+    <Content Include="Resources\status-active-80.png" />
+    <Content Include="Resources\status-active.png" />
+    <Content Include="Resources\status-connected-64.png" />
+    <Content Include="Resources\status-connected-80.png" />
+    <Content Include="Resources\status-connected.png" />
+    <Content Include="Resources\status-connecting-0-64.png" />
+    <Content Include="Resources\status-connecting-0-80.png" />
+    <Content Include="Resources\status-connecting-0.png" />
+    <Content Include="Resources\status-connecting-1-64.png" />
+    <Content Include="Resources\status-connecting-1-80.png" />
+    <Content Include="Resources\status-connecting-1.png" />
+    <Content Include="Resources\status-connecting-2-64.png" />
+    <Content Include="Resources\status-connecting-2-80.png" />
+    <Content Include="Resources\status-connecting-2.png" />
+    <Content Include="Resources\status-disconnected-64.png" />
+    <Content Include="Resources\status-disconnected-80.png" />
+    <Content Include="Resources\status-disconnected.png" />
+    <Content Include="Resources\status-error-64.png" />
+    <Content Include="Resources\status-error-80.png" />
+    <Content Include="Resources\status-error.png" />
+    <Content Include="Resources\status-nocable-64.png" />
+    <Content Include="Resources\status-nocable-80.png" />
+    <Content Include="Resources\status-nocable.png" />
+    <Content Include="Resources\sync-32.png" />
+    <Content Include="Resources\sync-40.png" />
+    <Content Include="Resources\tray-disconnected-24.png" />
+    <Content Include="Resources\tray-disconnected.png" />
     <None Include="Resources\ezLink.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

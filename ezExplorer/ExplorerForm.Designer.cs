@@ -38,12 +38,9 @@ namespace ezExplorer
             this.listSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.listNewFolderItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listRefreshItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.selectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.connectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip = new ezExplorer.NativeToolStrip.NativeToolStrip();
-            this.backButton = new System.Windows.Forms.ToolStripButton();
-            this.forwardButton = new System.Windows.Forms.ToolStripButton();
+            this.backButton = new System.Windows.Forms.ToolStripSplitButton();
+            this.forwardButton = new System.Windows.Forms.ToolStripSplitButton();
             this.upButton = new System.Windows.Forms.ToolStripButton();
             this.toolSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.refreshButton = new System.Windows.Forms.ToolStripButton();
@@ -52,6 +49,8 @@ namespace ezExplorer
             this.detailsItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iconsItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsButton = new System.Windows.Forms.ToolStripButton();
+            this.detailsBar = new ezExplorer.DetailsBar();
             this.treeMenu = new ezExplorer.NativeToolStrip.NativeContextMenuStrip(this.components);
             this.treeOpenItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -68,7 +67,6 @@ namespace ezExplorer
             this.split.Panel2.SuspendLayout();
             this.split.SuspendLayout();
             this.listMenu.SuspendLayout();
-            this.statusStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.treeMenu.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +78,7 @@ namespace ezExplorer
             this.pathPanel.Location = new System.Drawing.Point(0, 37);
             this.pathPanel.Name = "pathPanel";
             this.pathPanel.Padding = new System.Windows.Forms.Padding(4);
-            this.pathPanel.Size = new System.Drawing.Size(800, 31);
+            this.pathPanel.Size = new System.Drawing.Size(800, 29);
             this.pathPanel.TabIndex = 1;
             // 
             // pathBox
@@ -88,15 +86,16 @@ namespace ezExplorer
             this.pathBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pathBox.Location = new System.Drawing.Point(4, 4);
             this.pathBox.Name = "pathBox";
-            this.pathBox.Size = new System.Drawing.Size(792, 23);
+            this.pathBox.Size = new System.Drawing.Size(792, 20);
             this.pathBox.TabIndex = 0;
             this.pathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnPathKeyDown);
             // 
             // split
             // 
+            this.split.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(167)))), ((int)(((byte)(186)))), ((int)(((byte)(197)))));
             this.split.Dock = System.Windows.Forms.DockStyle.Fill;
             this.split.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.split.Location = new System.Drawing.Point(0, 68);
+            this.split.Location = new System.Drawing.Point(0, 66);
             this.split.Name = "split";
             // 
             // split.Panel1
@@ -106,8 +105,9 @@ namespace ezExplorer
             // split.Panel2
             // 
             this.split.Panel2.Controls.Add(this.list);
-            this.split.Size = new System.Drawing.Size(800, 410);
+            this.split.Size = new System.Drawing.Size(800, 374);
             this.split.SplitterDistance = 200;
+            this.split.SplitterWidth = 1;
             this.split.TabIndex = 0;
             // 
             // tree
@@ -120,7 +120,7 @@ namespace ezExplorer
             this.tree.Location = new System.Drawing.Point(0, 0);
             this.tree.Name = "tree";
             this.tree.ShowLines = false;
-            this.tree.Size = new System.Drawing.Size(200, 410);
+            this.tree.Size = new System.Drawing.Size(200, 374);
             this.tree.TabIndex = 1;
             // 
             // list
@@ -134,7 +134,7 @@ namespace ezExplorer
             this.list.LabelEdit = true;
             this.list.Location = new System.Drawing.Point(0, 0);
             this.list.Name = "list";
-            this.list.Size = new System.Drawing.Size(596, 410);
+            this.list.Size = new System.Drawing.Size(599, 374);
             this.list.TabIndex = 2;
             this.list.UseCompatibleStateImageBehavior = false;
             this.list.View = System.Windows.Forms.View.Details;
@@ -222,31 +222,9 @@ namespace ezExplorer
             this.listRefreshItem.Text = "Refresh";
             this.listRefreshItem.Click += new System.EventHandler(this.OnRefreshClick);
             // 
-            // statusStrip
-            // 
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectionLabel,
-            this.connectionLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 478);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(800, 22);
-            this.statusStrip.TabIndex = 3;
-            // 
-            // selectionLabel
-            // 
-            this.selectionLabel.Name = "selectionLabel";
-            this.selectionLabel.Size = new System.Drawing.Size(785, 17);
-            this.selectionLabel.Spring = true;
-            this.selectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // connectionLabel
-            // 
-            this.connectionLabel.Name = "connectionLabel";
-            this.connectionLabel.Size = new System.Drawing.Size(0, 17);
-            this.connectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // toolStrip
             // 
+            this.toolStrip.BackColor = System.Drawing.Color.Transparent;
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -256,7 +234,8 @@ namespace ezExplorer
             this.toolSeparator1,
             this.refreshButton,
             this.toolSeparator2,
-            this.viewsButton});
+            this.viewsButton,
+            this.optionsButton});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
@@ -270,7 +249,7 @@ namespace ezExplorer
             this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.backButton.Name = "backButton";
             this.backButton.Padding = new System.Windows.Forms.Padding(3);
-            this.backButton.Size = new System.Drawing.Size(66, 34);
+            this.backButton.Size = new System.Drawing.Size(78, 34);
             this.backButton.Text = "Back";
             this.backButton.Click += new System.EventHandler(this.backButton_Click);
             // 
@@ -281,7 +260,7 @@ namespace ezExplorer
             this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.forwardButton.Name = "forwardButton";
             this.forwardButton.Padding = new System.Windows.Forms.Padding(3);
-            this.forwardButton.Size = new System.Drawing.Size(34, 34);
+            this.forwardButton.Size = new System.Drawing.Size(46, 34);
             this.forwardButton.Text = "Forward";
             this.forwardButton.Click += new System.EventHandler(this.forwardButton_Click);
             // 
@@ -349,6 +328,27 @@ namespace ezExplorer
             this.listItem.Size = new System.Drawing.Size(134, 22);
             this.listItem.Text = "List";
             this.listItem.Click += new System.EventHandler(this.listItem_Click);
+            // 
+            // optionsButton
+            // 
+            this.optionsButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.optionsButton.Image = global::ezExplorer.Properties.Resources.options_24;
+            this.optionsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.optionsButton.Name = "optionsButton";
+            this.optionsButton.Size = new System.Drawing.Size(77, 34);
+            this.optionsButton.Text = "Options";
+            this.optionsButton.Click += new System.EventHandler(this.optionsButton_Click);
+            // 
+            // detailsBar
+            // 
+            this.detailsBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.detailsBar.Location = new System.Drawing.Point(0, 440);
+            this.detailsBar.ModifiedCaption = "";
+            this.detailsBar.Name = "detailsBar";
+            this.detailsBar.Size = new System.Drawing.Size(800, 60);
+            this.detailsBar.SizeCaption = "";
+            this.detailsBar.TabIndex = 3;
+            this.detailsBar.TabStop = false;
             // 
             // treeMenu
             // 
@@ -439,8 +439,8 @@ namespace ezExplorer
             this.Controls.Add(this.split);
             this.Controls.Add(this.pathPanel);
             this.Controls.Add(this.toolStrip);
-            this.Controls.Add(this.statusStrip);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.Controls.Add(this.detailsBar);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(480, 320);
             this.Name = "ExplorerForm";
@@ -451,8 +451,6 @@ namespace ezExplorer
             this.split.Panel2.ResumeLayout(false);
             this.split.ResumeLayout(false);
             this.listMenu.ResumeLayout(false);
-            this.statusStrip.ResumeLayout(false);
-            this.statusStrip.PerformLayout();
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.treeMenu.ResumeLayout(false);
@@ -464,8 +462,6 @@ namespace ezExplorer
         #endregion
 
         private ezExplorer.NativeToolStrip.NativeToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripButton backButton;
-        private System.Windows.Forms.ToolStripButton forwardButton;
         private System.Windows.Forms.ToolStripButton upButton;
         private System.Windows.Forms.ToolStripSeparator toolSeparator1;
         private System.Windows.Forms.ToolStripButton refreshButton;
@@ -479,9 +475,7 @@ namespace ezExplorer
         private System.Windows.Forms.SplitContainer split;
         private ezExplorer.RemoteTreeView tree;
         private ezExplorer.RemoteListView list;
-        private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel selectionLabel;
-        private System.Windows.Forms.ToolStripStatusLabel connectionLabel;
+        private ezExplorer.DetailsBar detailsBar;
         private ezExplorer.NativeToolStrip.NativeContextMenuStrip listMenu;
         private System.Windows.Forms.ToolStripMenuItem listOpenItem;
         private System.Windows.Forms.ToolStripSeparator listSeparator1;
@@ -504,5 +498,8 @@ namespace ezExplorer
         private System.Windows.Forms.ToolStripSeparator treeSeparator3;
         private System.Windows.Forms.ToolStripMenuItem treeNewFolderItem;
         private System.Windows.Forms.ToolStripMenuItem treeRefreshItem;
+        private System.Windows.Forms.ToolStripSplitButton backButton;
+        private System.Windows.Forms.ToolStripSplitButton forwardButton;
+        private System.Windows.Forms.ToolStripButton optionsButton;
     }
 }
