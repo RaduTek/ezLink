@@ -100,7 +100,9 @@ namespace ezLink
 #endif
 
             string appVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
-            TrustManager trust = new TrustManager(new TrustStore(TrustStore.DefaultPath(suffix)), prompt);
+            SharingSettings settings = SharingSettings.Load();
+            prompt.Settings = settings;
+            TrustManager trust = new TrustManager(new TrustStore(TrustStore.DefaultPath(suffix)), prompt, settings);
             return new LinkManager(source, machineId, computerName, appVersion, options, trust);
         }
     }

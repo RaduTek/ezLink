@@ -588,10 +588,9 @@ namespace ezExplorer
             }
             else
             {
-                string trimmed = path.TrimEnd('\\');
-                bool drive = trimmed.IndexOf('\\') < 0;
+                bool drive = RemotePaths.IsDriveRoot(path);
                 icon = drive ? ShellIcons.ForDrive((byte)DriveType.Fixed) : ShellIcons.FolderIndex;
-                name = drive ? path : trimmed.Substring(trimmed.LastIndexOf('\\') + 1);
+                name = drive ? path : RemotePaths.DisplayName(path);
             }
             int items = list.ItemCount;
             SetDetails(icon, name,
@@ -621,9 +620,9 @@ namespace ezExplorer
 
             listOpenItem.Enabled = single && (selected[0].IsFolder || browser.CanRead);
             listCopyItem.Enabled = selected.Count > 0 && !anyDrive && browser.CanRead;
-            listRenameItem.Enabled = single && !anyDrive && browser.CanWrite;
-            listDeleteItem.Enabled = selected.Count > 0 && !anyDrive && browser.CanWrite;
-            listNewFolderItem.Enabled = inFolder && browser.CanWrite;
+            listRenameItem.Enabled = single && !anyDrive && CanWriteTo(nav.Current);
+            listDeleteItem.Enabled = selected.Count > 0 && !anyDrive && CanWriteTo(nav.Current);
+            listNewFolderItem.Enabled = inFolder && CanWriteTo(nav.Current);
             listRefreshItem.Enabled = true;
             listPasteItem.Enabled = CanPasteInto(ListPasteTarget());
         }
@@ -634,9 +633,9 @@ namespace ezExplorer
             treeOpenItem.Enabled = true;
             bool plainFolder = !e.IsDrive;
             treeCopyItem.Enabled = plainFolder && browser.CanRead;
-            treeRenameItem.Enabled = plainFolder && browser.CanWrite;
-            treeDeleteItem.Enabled = plainFolder && browser.CanWrite;
-            treeNewFolderItem.Enabled = !RemotePaths.IsRoot(e.Path) && browser.CanWrite;
+            treeRenameItem.Enabled = plainFolder && CanWriteTo(e.Path);
+            treeDeleteItem.Enabled = plainFolder && CanWriteTo(e.Path);
+            treeNewFolderItem.Enabled = !RemotePaths.IsRoot(e.Path) && CanWriteTo(e.Path);
             treePasteItem.Enabled = CanPasteInto(e.Path);
             treeMenu.Show(tree, e.Location);
         }
@@ -771,7 +770,7 @@ namespace ezExplorer
                             {
                                 RenameSelected();
                             }
-                            else if (tree.SelectedPath != null && browser.CanWrite)
+                            else if (tree.SelectedPath != null && CanWriteTo(tree.SelectedPath))
                             {
                                 tree.BeginRename(tree.SelectedPath);
                             }
@@ -782,7 +781,7 @@ namespace ezExplorer
                                 DeleteSelected();
                             }
                             else if (tree.SelectedPath != null && !RemotePaths.IsRoot(tree.SelectedPath)
-                                && !RemotePaths.IsDriveRoot(tree.SelectedPath) && browser.CanWrite)
+                                && !RemotePaths.IsTopLevel(tree.SelectedPath) && CanWriteTo(tree.SelectedPath))
                             {
                                 List<string> paths = new List<string>();
                                 paths.Add(tree.SelectedPath);
@@ -814,7 +813,7 @@ namespace ezExplorer
         private void OnDropQuery(object sender, DropQueryEventArgs e)
         {
             string target = e.Path != null ? e.Path : nav.Current;
-            e.Allowed = browser.CanWrite && target != null && !RemotePaths.IsRoot(target);
+            e.Allowed = CanWriteTo(target) && target != null && !RemotePaths.IsRoot(target);
         }
 
         private void OnFilesDropped(object sender, FilesDroppedEventArgs e)
@@ -836,9 +835,15 @@ namespace ezExplorer
             return nav.Current;
         }
 
+        /// <summary>Write permission, and the share holding the path is not read-only. The server enforces it too.</summary>
+        private bool CanWriteTo(string path)
+        {
+            return browser.CanWrite && (path == null || !RemotePaths.IsReadOnly(path));
+        }
+
         private bool CanPasteInto(string folder)
         {
-            return browser.CanWrite && folder != null && !RemotePaths.IsRoot(folder) && ClipboardFiles().Length > 0;
+            return CanWriteTo(folder) && folder != null && !RemotePaths.IsRoot(folder) && ClipboardFiles().Length > 0;
         }
 
         private static string[] ClipboardFiles()
@@ -942,7 +947,7 @@ namespace ezExplorer
             else
             {
                 string path = tree.SelectedPath;
-                if (path != null && !RemotePaths.IsRoot(path) && !RemotePaths.IsDriveRoot(path))
+                if (path != null && !RemotePaths.IsRoot(path) && !RemotePaths.IsTopLevel(path))
                 {
                     items.Add(FolderItem(path));
                 }
@@ -1260,7 +1265,7 @@ namespace ezExplorer
 
         private void RenameSelected()
         {
-            if (!browser.CanWrite || list.SelectedIndices.Count != 1)
+            if (!CanWriteTo(nav.Current) || list.SelectedIndices.Count != 1)
             {
                 return;
             }
@@ -1279,7 +1284,7 @@ namespace ezExplorer
 
         private void DoRename(string oldPath, string newName)
         {
-            if (!browser.CanWrite)
+            if (!CanWriteTo(oldPath))
             {
                 return;
             }
@@ -1318,7 +1323,7 @@ namespace ezExplorer
 
         private void DeleteSelected()
         {
-            if (!browser.CanWrite)
+            if (!CanWriteTo(nav.Current))
             {
                 return;
             }
@@ -1336,7 +1341,7 @@ namespace ezExplorer
 
         private void DeletePaths(List<string> paths)
         {
-            if (paths.Count == 0 || !browser.CanWrite)
+            if (paths.Count == 0 || !CanWriteTo(paths[0]))
             {
                 return;
             }
@@ -1387,7 +1392,7 @@ namespace ezExplorer
         /// </summary>
         private void NewFolder(string folder)
         {
-            if (folder == null || RemotePaths.IsRoot(folder) || !browser.CanWrite)
+            if (folder == null || RemotePaths.IsRoot(folder) || !CanWriteTo(folder))
             {
                 return;
             }
@@ -1453,6 +1458,11 @@ namespace ezExplorer
                         Log.Info("ezLink says the peer is gone");
                         browser.MarkDisconnected();
                     }
+                    break;
+
+                case IpcMessages.CloseExplorer:
+                    Log.Info("ezLink is closing; closing the explorer");
+                    Close();
                     break;
 
                 case IpcMessages.PeerBack:

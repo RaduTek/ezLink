@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using EzLink.Protocol;
 using ezExplorer;
 using NUnit.Framework;
 
@@ -71,11 +73,62 @@ namespace EzLink.Tests
         }
 
         [Test]
-        public void HiddenSystemFilesAreProtectedButHiddenAloneAreNot()
+        public void HiddenAndSystemItemsAreListedOnlyWhenTheirOptionIsOn()
         {
-            Assert.IsTrue(RemotePaths.IsProtected(ShellNative.FILE_ATTRIBUTE_HIDDEN | ShellNative.FILE_ATTRIBUTE_SYSTEM));
-            Assert.IsFalse(RemotePaths.IsProtected(ShellNative.FILE_ATTRIBUTE_HIDDEN));
-            Assert.IsFalse(RemotePaths.IsProtected(ShellNative.FILE_ATTRIBUTE_SYSTEM));
+            uint hidden = ShellNative.FILE_ATTRIBUTE_HIDDEN;
+            uint system = ShellNative.FILE_ATTRIBUTE_SYSTEM;
+            Assert.IsFalse(RemotePaths.IsVisible(hidden, false, false));
+            Assert.IsTrue(RemotePaths.IsVisible(hidden, true, false));
+            Assert.IsFalse(RemotePaths.IsVisible(system, true, false));
+            Assert.IsTrue(RemotePaths.IsVisible(system, false, true));
+            Assert.IsTrue(RemotePaths.IsVisible(0, false, false));
+        }
+
+        [Test]
+        public void SharedFoldersAreTopLevelRootsAddressedByName()
+        {
+            Assert.IsTrue(RemotePaths.IsTopLevel("Photos"));
+            Assert.IsTrue(RemotePaths.IsTopLevel(@"C:\"));
+            Assert.IsFalse(RemotePaths.IsTopLevel(@"Photos\2020"));
+            Assert.IsFalse(RemotePaths.IsTopLevel(@"C:\Users"));
+            Assert.IsFalse(RemotePaths.IsTopLevel(""));
+            Assert.AreEqual("", RemotePaths.GetParent("Photos"));
+            Assert.AreEqual("Photos", RemotePaths.GetParent(@"Photos\2020"));
+            Assert.AreEqual(@"Photos\2020", RemotePaths.GetParent(@"Photos\2020\Rock"));
+            Assert.AreEqual(@"C:\", RemotePaths.GetParent(@"C:\Users"));
+            Assert.AreEqual(@"Photos\2020", RemotePaths.Combine("Photos", "2020"));
+            Assert.AreEqual("Rock", RemotePaths.GetName(@"Photos\2020\Rock"));
+            Assert.AreEqual("Photos", RemotePaths.GetName("Photos"));
+            Assert.AreEqual("Photos", RemotePaths.FromUserText(@" Photos\ "));
+            CollectionAssert.AreEqual(new string[] { "Photos", @"Photos\2020" }, RemotePaths.Chain(@"Photos\2020"));
+            Assert.AreEqual("Photos", RemotePaths.RootOf(@"Photos\2020"));
+            Assert.AreEqual(@"C:\", RemotePaths.RootOf(@"C:\Users\Ana"));
+        }
+
+        [Test]
+        public void ReadOnlyAndDisplayNamesComeFromTheRootsList()
+        {
+            List<DriveEntry> entries = new List<DriveEntry>();
+            DriveEntry folder = new DriveEntry();
+            folder.Name = "Photos";
+            folder.Label = "Photos";
+            folder.ReadOnly = true;
+            entries.Add(folder);
+            DriveEntry drive = new DriveEntry();
+            drive.Name = "C:";
+            drive.DriveType = 3;
+            drive.ReadOnly = false;
+            entries.Add(drive);
+            RemotePaths.RememberRoots(entries);
+
+            Assert.IsTrue(RemotePaths.IsReadOnly("Photos"));
+            Assert.IsTrue(RemotePaths.IsReadOnly(@"photos\2020\a.jpg"));
+            Assert.IsFalse(RemotePaths.IsReadOnly(@"C:\Users"));
+            Assert.IsFalse(RemotePaths.IsReadOnly("Unknown"));
+            Assert.IsFalse(RemotePaths.IsReadOnly(""));
+            Assert.AreEqual("C:", RemotePaths.DisplayName(@"C:\"));
+            Assert.AreEqual("Photos", RemotePaths.DisplayName("Photos"));
+            RemotePaths.RememberRoots(new List<DriveEntry>());
         }
     }
 }

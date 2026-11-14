@@ -56,23 +56,30 @@ namespace EzLink.Protocol
         }
     }
 
-    /// <summary>One drive in a Roots reply.</summary>
+    /// <summary>
+    /// One shared root in a Roots reply: a whole drive ("C:") or a shared folder ("Photos"). The name is the
+    /// first part of every path below it ("Photos\2020\a.jpg"); a drive's paths keep the "C:\" form.
+    /// </summary>
     public sealed class DriveEntry
     {
-        /// <summary>Smallest encoded size: letter (2) + type (1) + empty label (2) + free (8) + total (8).</summary>
-        public const int MinWireSize = 21;
+        /// <summary>Smallest encoded size: empty name (2) + type (1) + read-only (1) + empty label (2) + free (8) + total (8).</summary>
+        public const int MinWireSize = 22;
 
-        public char Letter = 'C';
-        /// <summary>A System.IO.DriveType value (Fixed = 3, Removable = 2).</summary>
+        /// <summary>"C:" for a drive, otherwise the shared folder's name. Unique within one reply.</summary>
+        public string Name = "C:";
+        /// <summary>A System.IO.DriveType value (Fixed = 3, Removable = 2); 0 for a shared folder.</summary>
         public byte DriveType;
+        /// <summary>The owner allows no writes, deletes or renames below this root.</summary>
+        public bool ReadOnly;
         public string Label = string.Empty;
         public long FreeBytes;
         public long TotalBytes;
 
         public void Write(PayloadWriter w)
         {
-            w.WriteUInt16(Letter);
+            w.WriteString(Name);
             w.WriteByte(DriveType);
+            w.WriteByte(ReadOnly ? (byte)1 : (byte)0);
             w.WriteString(Label);
             w.WriteInt64(FreeBytes);
             w.WriteInt64(TotalBytes);
@@ -81,8 +88,9 @@ namespace EzLink.Protocol
         public static DriveEntry Read(PayloadReader r)
         {
             DriveEntry d = new DriveEntry();
-            d.Letter = (char)r.ReadUInt16();
+            d.Name = r.ReadString();
             d.DriveType = r.ReadByte();
+            d.ReadOnly = r.ReadByte() != 0;
             d.Label = r.ReadString();
             d.FreeBytes = r.ReadNonNegativeInt64();
             d.TotalBytes = r.ReadNonNegativeInt64();

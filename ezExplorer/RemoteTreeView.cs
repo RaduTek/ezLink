@@ -255,7 +255,7 @@ namespace ezExplorer
                     info.IsDrive = folder.IsDrive;
                     child.Tag = info;
                     node.Nodes.Add(child);
-                    if (folder.IsDrive)
+                    if (folder.IsDrive && !folder.IsFolderShare)
                     {
                         SetIcons(child, folder.IconIndex, folder.IconIndex);
                     }

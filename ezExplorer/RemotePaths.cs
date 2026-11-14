@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using EzLink;
 using EzLink.Protocol;
 
 namespace ezExplorer
 {
     /// <summary>
-    /// Path helpers for the peer's file system. The empty string is the "computer" level that lists the drives;
-    /// everything else is a full Windows path ("C:\", "C:\Users\Ana"). Drive roots keep their trailing backslash.
+    /// Path helpers for the peer's file system. The empty string is the "computer" level that lists the roots.
+    /// A drive path is a full Windows path ("C:\", "C:\Users\Ana"; drive roots keep their trailing backslash) and a
+    /// shared folder is addressed by its name ("Photos", "Photos\2020\a.jpg").
     /// </summary>
     internal static class RemotePaths
     {
@@ -20,6 +22,79 @@ namespace ezExplorer
         public static bool IsRoot(string path)
         {
             return path.Length == 0;
+        }
+
+        // The peer's roots (learned from its root list): "C:\" for a drive, the share's name for a shared folder.
+        private static readonly object rootsLock = new object();
+        private static readonly Dictionary<string, DriveEntry> roots =
+            new Dictionary<string, DriveEntry>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>The path of a root as used in paths: "C:\" for a drive, otherwise the share's name.</summary>
+        public static string RootPath(DriveEntry entry)
+        {
+            return entry.DriveType != 0 ? entry.Name + "\\" : entry.Name;
+        }
+
+        /// <summary>Remembers the peer's roots, for display names and read-only shares.</summary>
+        public static void RememberRoots(List<DriveEntry> entries)
+        {
+            lock (rootsLock)
+            {
+                roots.Clear();
+                foreach (DriveEntry entry in entries)
+                {
+                    roots[RootPath(entry)] = entry;
+                }
+            }
+        }
+
+        /// <summary>The root a path lies in: "C:\" for "C:\Users\Ana", "Photos" for "Photos\2020".</summary>
+        public static string RootOf(string path)
+        {
+            if (path.Length == 0)
+            {
+                return string.Empty;
+            }
+            if (path.Length >= 2 && path[1] == ':')
+            {
+                return path.Substring(0, 2) + "\\";
+            }
+            int cut = path.IndexOf('\\');
+            return cut < 0 ? path : path.Substring(0, cut);
+        }
+
+        /// <summary>True if the owner shares the root of this path read-only.</summary>
+        public static bool IsReadOnly(string path)
+        {
+            lock (rootsLock)
+            {
+                DriveEntry entry;
+                return path.Length > 0 && roots.TryGetValue(RootOf(path), out entry) && entry.ReadOnly;
+            }
+        }
+
+        /// <summary>A root listed at the computer level: a drive ("C:\") or a shared folder ("Photos").</summary>
+        public static bool IsTopLevel(string path)
+        {
+            return path.Length > 0 && (IsDriveRoot(path) || path.IndexOf('\\') < 0);
+        }
+
+        /// <summary>The name to show for a path segment: a root's label, a drive without its backslash, or the folder name.</summary>
+        public static string DisplayName(string path)
+        {
+            if (IsTopLevel(path))
+            {
+                lock (rootsLock)
+                {
+                    DriveEntry entry;
+                    if (roots.TryGetValue(path, out entry) && entry.DriveType == 0 && entry.Label.Length > 0)
+                    {
+                        return entry.Label;
+                    }
+                }
+                return IsDriveRoot(path) ? path.TrimEnd('\\') : path;
+            }
+            return GetName(path);
         }
 
         public static bool IsDriveRoot(string path)
@@ -43,16 +118,16 @@ namespace ezExplorer
             {
                 return null;
             }
-            if (IsDriveRoot(path))
+            if (IsTopLevel(path))
             {
                 return Root;
             }
             int cut = path.LastIndexOf('\\');
-            if (cut <= 2)
+            if (path[1] == ':' && cut <= 2)
             {
-                return path.Substring(0, 3);
+                return path.Substring(0, 3); // "C:\Users" -> "C:\"
             }
-            return path.Substring(0, cut);
+            return path.Substring(0, cut); // "Photos\2020" -> "Photos"
         }
 
         public static string GetName(string path)

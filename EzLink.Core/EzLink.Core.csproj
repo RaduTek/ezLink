@@ -50,12 +50,16 @@
     <Compile Include="Log.cs" />
     <Compile Include="MachineIdentity.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="PathPolicy.cs" />
     <Compile Include="PeerSession.cs" />
     <Compile Include="PeerTable.cs" />
     <Compile Include="RemotePath.cs" />
     <Compile Include="SessionClient.cs" />
     <Compile Include="SessionConnection.cs" />
     <Compile Include="SessionListener.cs" />
+    <Compile Include="SharedFolder.cs" />
+    <Compile Include="ShareTable.cs" />
+    <Compile Include="SharingSettings.cs" />
     <Compile Include="Strings.cs" />
     <Compile Include="SystemAdapterSource.cs" />
     <Compile Include="TrustManager.cs" />

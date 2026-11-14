@@ -29,6 +29,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +50,8 @@
     <Compile Include="LinkStateMachineTests.cs" />
     <Compile Include="MessageTests.cs" />
     <Compile Include="PayloadTests.cs" />
+    <Compile Include="PathPolicyTests.cs" />
+    <Compile Include="ShareTableTests.cs" />
     <Compile Include="PeerTableTests.cs" />
     <Compile Include="RemotePathsTests.cs" />
     <Compile Include="..\ezExplorer\ClientJob.cs">
@@ -59,6 +62,9 @@
     </Compile>
     <Compile Include="..\ezExplorer\DownloadToFolderJob.cs">
       <Link>ezExplorer\DownloadToFolderJob.cs</Link>
+    </Compile>
+    <Compile Include="..\ezExplorer\DpiInfo.cs">
+      <Link>ezExplorer\DpiInfo.cs</Link>
     </Compile>
     <Compile Include="..\ezExplorer\OleInterop.cs">
       <Link>ezExplorer\OleInterop.cs</Link>

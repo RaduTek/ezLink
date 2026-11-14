@@ -104,6 +104,12 @@ namespace EzLink
             get { return machineId; }
         }
 
+        /// <summary>What is shared and allowed; the settings of the trust manager, or the permissive defaults without one.</summary>
+        public SharingSettings Settings
+        {
+            get { return trust != null ? trust.Settings : null; }
+        }
+
         /// <summary>The trust manager, or null if this link has none.</summary>
         public TrustManager Trust
         {
@@ -316,7 +322,7 @@ namespace EzLink
                     fileSessions.Remove(session);
                 }
             };
-            new FileServer(session, delegate { return manager.GetEffective(peerId); });
+            new FileServer(session, delegate { return manager.GetEffective(peerId); }, manager.Settings);
             Log.Info("Serving files to {0}", session);
             return true;
         }
@@ -693,7 +699,7 @@ namespace EzLink
             {
                 session = control;
             }
-            if (session != null && session.PeerId == e.PeerId && !session.IsClosed)
+            if (session != null && (e.PeerId == Guid.Empty || session.PeerId == e.PeerId) && !session.IsClosed)
             {
                 AnnounceWhatWeAllow(session);
             }

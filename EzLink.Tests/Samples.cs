@@ -99,13 +99,16 @@ namespace EzLink.Tests
             list.Add(new GetRootsRequest());
             RootsReply roots = new RootsReply();
             DriveEntry drive = new DriveEntry();
-            drive.Letter = 'D';
+            drive.Name = "D:";
             drive.DriveType = 3;
             drive.Label = "Data";
             drive.FreeBytes = 123456789012;
             drive.TotalBytes = 999999999999;
             roots.Drives.Add(drive);
-            roots.Drives.Add(new DriveEntry());
+            DriveEntry folder = new DriveEntry();
+            folder.Name = "Photos";
+            folder.ReadOnly = true;
+            roots.Drives.Add(folder);
             list.Add(roots);
 
             list.Add(new ListDirRequest(@"C:\Users\Ana", true));

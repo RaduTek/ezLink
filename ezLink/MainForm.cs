@@ -206,6 +206,7 @@ namespace ezLink
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            explorers.CloseAll(link);
             animationTimer.Dispose();
             notifyIcon.Visible = false;
             notifyIcon.Dispose();

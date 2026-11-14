@@ -21,6 +21,8 @@ namespace EzLink
         public const int ExplorerClosed = 5;
         /// <summary>ezExplorer.exe to ezLink.exe right after start; payload: peer UUID.</summary>
         public const int ExplorerHello = 6;
+        /// <summary>ezLink.exe to ezExplorer.exe when ezLink exits: close the explorer window.</summary>
+        public const int CloseExplorer = 7;
 
         /// <summary>The title of an explorer's message window; ezLink.exe finds it by the peer it browses.</summary>
         public static string ExplorerWindowTitle(Guid peerId)

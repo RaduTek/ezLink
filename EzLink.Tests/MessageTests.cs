@@ -267,11 +267,15 @@ namespace EzLink.Tests
             RootsReply roots = (RootsReply)MessageFactory.Parse(
                 ThroughTheWire(Samples.Get<RootsReply>().ToFrame(5)));
             Assert.AreEqual(2, roots.Drives.Count);
-            Assert.AreEqual('D', roots.Drives[0].Letter);
+            Assert.AreEqual("D:", roots.Drives[0].Name);
+            Assert.IsFalse(roots.Drives[0].ReadOnly);
             Assert.AreEqual(3, roots.Drives[0].DriveType);
             Assert.AreEqual("Data", roots.Drives[0].Label);
             Assert.AreEqual(123456789012, roots.Drives[0].FreeBytes);
             Assert.AreEqual(999999999999, roots.Drives[0].TotalBytes);
+            Assert.AreEqual("Photos", roots.Drives[1].Name);
+            Assert.AreEqual(0, roots.Drives[1].DriveType);
+            Assert.IsTrue(roots.Drives[1].ReadOnly);
         }
 
         [Test]

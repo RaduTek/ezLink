@@ -92,6 +92,81 @@ namespace EzLink.Tests
             return manager.Authorize(Peer, "ANA-LAPTOP", SessionTypes.Files, null, never, out granted);
         }
 
+        // ---- allow all connections ----
+
+        private TrustManager ManagerWith(ScriptedPrompt prompt, SharingSettings settings)
+        {
+            return new TrustManager(new TrustStore(path), prompt, settings);
+        }
+
+        [Test]
+        public void AllowAllAcceptsWithoutAskingAndGrantsTheChosenFileAccess()
+        {
+            ScriptedPrompt prompt = new ScriptedPrompt();
+            SharingSettings settings = new SharingSettings();
+            settings.AllowAllConnections = true;
+            settings.AllowBrowseCopy = true;
+            settings.AllowWrite = false;
+            TrustManager manager = ManagerWith(prompt, settings);
+            Permissions granted;
+
+            Assert.AreEqual(HelloStatus.Accepted, Authorize(manager, out granted));
+            Assert.AreEqual(ReadAccess, granted);
+            Assert.AreEqual(0, prompt.Count);
+            Assert.AreEqual(0, manager.Store.GetAll().Count, "nothing is remembered");
+
+            settings.AllowWrite = true;
+            Assert.AreEqual(ReadAccess | Permissions.Write, manager.GetEffective(Peer));
+        }
+
+        [Test]
+        public void AllowAllBypassesABlockedPeer()
+        {
+            TrustEntry blocked = new TrustEntry();
+            blocked.PeerId = Peer;
+            blocked.Decision = TrustDecision.Deny;
+            new TrustStore(path).Set(blocked);
+
+            SharingSettings settings = new SharingSettings();
+            settings.AllowAllConnections = true;
+            TrustManager manager = ManagerWith(new ScriptedPrompt(), settings);
+            Permissions granted;
+
+            Assert.AreEqual(HelloStatus.Accepted, Authorize(manager, out granted));
+            settings.AllowAllConnections = false;
+            Assert.AreEqual(Permissions.None, manager.GetEffective(Peer), "the block applies again");
+        }
+
+        [Test]
+        public void AllowAllWithNoFileAccessChosenFallsBackToTheNormalFlow()
+        {
+            ScriptedPrompt prompt = new ScriptedPrompt().Then(ApprovalChoice.Deny, Permissions.None);
+            SharingSettings settings = new SharingSettings();
+            settings.AllowAllConnections = true;
+            settings.AllowBrowseCopy = false;
+            settings.AllowWrite = false;
+            TrustManager manager = ManagerWith(prompt, settings);
+            Permissions granted;
+
+            Assert.AreEqual(HelloStatus.Denied, Authorize(manager, out granted));
+            Assert.AreEqual(1, prompt.Count);
+        }
+
+        [Test]
+        public void ChangingTheSettingsRaisesPermissionsChangedForOpenSessions()
+        {
+            SharingSettings settings = new SharingSettings();
+            TrustManager manager = ManagerWith(new ScriptedPrompt(), settings);
+            int raised = 0;
+            Guid seen = Peer;
+            manager.PermissionsChanged += delegate(object s, TrustEventArgs e) { raised++; seen = e.PeerId; };
+
+            settings.Save();
+
+            Assert.AreEqual(1, raised);
+            Assert.AreEqual(Guid.Empty, seen, "Guid.Empty means every peer");
+        }
+
         [Test]
         public void AnUnknownPeerIsAskedAndTheAnswerGrantsWhatWasChosen()
         {

@@ -206,6 +206,108 @@ The remote file pane arrives in a later milestone.</value>
   <data name="OptionsUnblock" xml:space="preserve">
     <value>Unblock</value>
   </data>
+  <data name="OptionsTabGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="OptionsTabSecurity" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="OptionsTabTrustedDevices" xml:space="preserve">
+    <value>Trusted Devices</value>
+  </data>
+  <data name="OptionsTabFileSharing" xml:space="preserve">
+    <value>File Sharing</value>
+  </data>
+  <data name="OptionsTabInformation" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="OptionsAllowAll" xml:space="preserve">
+    <value>Allow all connections</value>
+  </data>
+  <data name="OptionsAllowAllNote" xml:space="preserve">
+    <value>Skips Trusted Devices. Any computer on the link gets the file access chosen below.</value>
+  </data>
+  <data name="OptionsGroupFileTransfer" xml:space="preserve">
+    <value>File Transfer</value>
+  </data>
+  <data name="OptionsSeeHiddenSystem" xml:space="preserve">
+    <value>See hidden and system files</value>
+  </data>
+  <data name="OptionsProtectSystem" xml:space="preserve">
+    <value>Protect system files (recommended)</value>
+  </data>
+  <data name="OptionsTrustedHint" xml:space="preserve">
+    <value>View or edit the permissions of computers you have trusted in the past</value>
+  </data>
+  <data name="OptionsGroupConnectionActions" xml:space="preserve">
+    <value>Connection actions</value>
+  </data>
+  <data name="OptionsShowWindowOnConnect" xml:space="preserve">
+    <value>Show window when connected</value>
+  </data>
+  <data name="OptionsOpenExplorerOnConnect" xml:space="preserve">
+    <value>Open file explorer when connected</value>
+  </data>
+  <data name="OptionsStartSyncOnConnect" xml:space="preserve">
+    <value>Start sync when connected</value>
+  </data>
+  <data name="OptionsGroupShared" xml:space="preserve">
+    <value>Folders and drives the other computer can access</value>
+  </data>
+  <data name="OptionsShareProfile" xml:space="preserve">
+    <value>Share my user profile folder (documents, music, pictures)</value>
+  </data>
+  <data name="OptionsShareFixed" xml:space="preserve">
+    <value>Share all fixed drives</value>
+  </data>
+  <data name="OptionsShareRemovable" xml:space="preserve">
+    <value>Share all removable drives</value>
+  </data>
+  <data name="ErrorShareReadOnly" xml:space="preserve">
+    <value>This shared folder is read-only.</value>
+  </data>
+  <data name="OptionsReadOnly" xml:space="preserve">
+    <value>Read-only</value>
+  </data>
+  <data name="OptionsSharedFolders" xml:space="preserve">
+    <value>Other shared folders and drives</value>
+  </data>
+  <data name="OptionsToggleReadOnly" xml:space="preserve">
+    <value>Read-only on/off</value>
+  </data>
+  <data name="OptionsAddFolder" xml:space="preserve">
+    <value>Add folder...</value>
+  </data>
+  <data name="OptionsAddDrive" xml:space="preserve">
+    <value>Add drive...</value>
+  </data>
+  <data name="OptionsShareFolderPrompt" xml:space="preserve">
+    <value>Choose a folder to share with the other computer</value>
+  </data>
+  <data name="OptionsColShareName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="OptionsColSharePath" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="OptionsColShareReadOnly" xml:space="preserve">
+    <value>Read-only</value>
+  </data>
+  <data name="OptionsShareNameClash" xml:space="preserve">
+    <value>Another shared folder or drive is already named "{0}". Every shared folder needs a different name, because the name is how the other computer finds it.</value>
+  </data>
+  <data name="OptionsShareAlreadyShared" xml:space="preserve">
+    <value>That folder is already shared.</value>
+  </data>
+  <data name="OptionsShareNoDrives" xml:space="preserve">
+    <value>There are no more drives to add.</value>
+  </data>
+  <data name="ErrorSystemProtected" xml:space="preserve">
+    <value>This is a protected system location and cannot be changed.</value>
+  </data>
+  <data name="ErrorNotShared" xml:space="preserve">
+    <value>This computer does not share that location.</value>
+  </data>
   <data name="TrustEditTitle" xml:space="preserve">
     <value>Access for {0}</value>
   </data>

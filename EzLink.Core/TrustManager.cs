@@ -44,6 +44,7 @@ namespace EzLink
     {
         private readonly TrustStore store;
         private readonly IApprovalPrompt prompt;
+        private readonly SharingSettings settings;
         private readonly object decisionLock = new object(); // one prompt at a time, later sessions see its outcome
         private readonly object onceLock = new object();
         private readonly Dictionary<Guid, Permissions> once = new Dictionary<Guid, Permissions>();
@@ -55,9 +56,16 @@ namespace EzLink
         public event EventHandler<TrustEventArgs> PermissionsChanged;
 
         public TrustManager(TrustStore store, IApprovalPrompt prompt)
+            : this(store, prompt, null)
+        {
+        }
+
+        public TrustManager(TrustStore store, IApprovalPrompt prompt, SharingSettings settings)
         {
             this.store = store;
             this.prompt = prompt;
+            this.settings = settings != null ? settings : SharingSettings.Permissive(); // no Options: nothing restricted
+            this.settings.Changed += delegate { RaisePermissionsChanged(Guid.Empty); };
         }
 
         public TrustStore Store
@@ -65,9 +73,24 @@ namespace EzLink
             get { return store; }
         }
 
+        /// <summary>What is shared, hidden and allowed on this computer (Options).</summary>
+        public SharingSettings Settings
+        {
+            get { return settings; }
+        }
+
         /// <summary>What the peer may do right now.</summary>
         public Permissions GetEffective(Guid peerId)
         {
+            if (settings.AllowAllConnections)
+            {
+                // The bypass: the two file boxes in Options decide, stored entries (even blocks) are ignored.
+                Permissions everyone = settings.AllowedPermissions;
+                if (everyone != Permissions.None)
+                {
+                    return everyone;
+                }
+            }
             TrustEntry entry = store.Get(peerId);
             if (entry != null && entry.Decision == TrustDecision.Deny)
             {
@@ -96,6 +119,13 @@ namespace EzLink
             granted = Permissions.None;
             lock (decisionLock)
             {
+                if (settings.AllowAllConnections && settings.AllowedPermissions != Permissions.None)
+                {
+                    Log.Info("Allowing {0}'s {1} session: all connections are allowed", peerName, sessionType);
+                    granted = settings.AllowedPermissions;
+                    return HelloStatus.Accepted;
+                }
+
                 TrustEntry entry = store.Get(peerId);
                 if (entry != null && entry.Decision == TrustDecision.Deny)
                 {

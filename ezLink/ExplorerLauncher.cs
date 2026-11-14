@@ -81,6 +81,25 @@ namespace ezLink
             }
         }
 
+        /// <summary>ezLink is exiting: every open explorer is closed with it.</summary>
+        public void CloseAll(LinkManager link)
+        {
+            List<IntPtr> windows = new List<IntPtr>(explorers.Values);
+            PeerInfo peer = link.CurrentPeer;
+            if (peer != null)
+            {
+                IntPtr found = FindExplorer(peer.MachineId); // one that never announced itself
+                if (found != IntPtr.Zero && !windows.Contains(found))
+                {
+                    windows.Add(found);
+                }
+            }
+            foreach (IntPtr window in windows)
+            {
+                IpcWindow.Send(window, ipc, IpcMessages.CloseExplorer, string.Empty);
+            }
+        }
+
         /// <summary>The control session to a peer ended: its explorer shows "Disconnected".</summary>
         public void PeerLost(Guid peerId)
         {

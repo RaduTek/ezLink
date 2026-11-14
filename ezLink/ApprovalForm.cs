@@ -21,7 +21,7 @@ namespace ezLink
         private readonly DateTime deadline = DateTime.UtcNow + PromptTimeout;
         private ApprovalResult result;
 
-        public ApprovalForm(string peerName, WaitHandle cancel)
+        public ApprovalForm(string peerName, WaitHandle cancel, SharingSettings defaults)
         {
             this.cancel = cancel;
 
@@ -40,6 +40,12 @@ namespace ezLink
 
             // Deny is the safe default for Enter (AcceptButton); there is deliberately no Escape binding that
             // decides anything.
+            if (defaults != null)
+            {
+                // The File Transfer boxes in Options are the starting choice of this prompt.
+                browseCopy.Checked = defaults.AllowBrowseCopy;
+                write.Checked = defaults.AllowWrite;
+            }
             watchdog.Start();
         }
 
@@ -116,6 +122,14 @@ namespace ezLink
     internal sealed class WinFormsApprovalPrompt : IApprovalPrompt
     {
         private volatile Control owner;
+        private volatile SharingSettings settings;
+
+        /// <summary>Supplies the default choices of the prompt (from Options).</summary>
+        public SharingSettings Settings
+        {
+            get { return settings; }
+            set { settings = value; }
+        }
 
         /// <summary>The main window, whose message loop shows the prompts. Until set, every request is dismissed.</summary>
         public void Attach(Control mainWindow)
@@ -140,7 +154,7 @@ namespace ezLink
                     {
                         try
                         {
-                            using (ApprovalForm form = new ApprovalForm(peerName, cancel))
+                            using (ApprovalForm form = new ApprovalForm(peerName, cancel, settings))
                             {
                                 form.ShowDialog();
                                 answer = form.Result;

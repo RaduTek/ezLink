@@ -27,6 +27,7 @@ namespace EzLink.Tests
         private sealed class Host : ISessionHost
         {
             public volatile Permissions Granted = All;
+            public readonly SharingSettings Settings = SharingSettings.Permissive();
 
             public HelloReplyMessage HandleHello(HelloMessage hello, IPEndPoint remote, SessionConnection connection)
             {
@@ -41,7 +42,7 @@ namespace EzLink.Tests
 
             public bool SessionEstablished(PeerSession session)
             {
-                new FileServer(session, delegate { return Granted; });
+                new FileServer(session, delegate { return Granted; }, Settings);
                 return true;
             }
         }
@@ -140,6 +141,7 @@ namespace EzLink.Tests
             {
                 raw.Session.Close("test over");
             }
+            PathPolicy.SetProfileFolder(null);
             listener.Stop();
             Thread.Sleep(50);
             RemoveTree(new DirectoryInfo(root));
@@ -211,6 +213,186 @@ namespace EzLink.Tests
             client.WriteFile(path, new MemoryStream(data), data.Length, DateTime.UtcNow, DateTime.UtcNow, 0, mode, null);
         }
 
+        // ---- sharing policy ----
+
+        /// <summary>The name the profile folder is shared under: its folder name.</summary>
+        private string ProfileShare
+        {
+            get { return Path.GetFileName(root); }
+        }
+
+        private void ShareOnly(params SharedFolder[] folders)
+        {
+            host.Settings.ShareUserProfile = false;
+            host.Settings.ShareFixedDrives = false;
+            host.Settings.ShareRemovableDrives = false;
+            host.Settings.SetFolders(new List<SharedFolder>(folders));
+        }
+
+        [Test]
+        public void TheProfileIsListedByItsFolderNameAndBrowsedRelativeToIt()
+        {
+            PathPolicy.SetProfileFolder(root);
+            MakeFile(@"Music\song.txt", "la");
+            List<DriveEntry> roots = client.GetRoots();
+            Assert.AreEqual(ProfileShare, roots[0].Name);
+            Assert.AreEqual(0, roots[0].DriveType, "a folder share");
+
+            List<FileEntry> top = client.ListDir(ProfileShare, false);
+            Assert.IsNotNull(top.Find(delegate(FileEntry e) { return e.Name == "Music"; }));
+            List<FileEntry> music = client.ListDir(ProfileShare + @"\Music", false);
+            Assert.AreEqual("song.txt", music[0].Name);
+            Assert.AreEqual("la", Encoding.ASCII.GetString(Download(ProfileShare + @"\Music\song.txt", 0)));
+        }
+
+        [Test]
+        public void PathsCannotClimbOutOfAShare()
+        {
+            PathPolicy.SetProfileFolder(P("home"));
+            Directory.CreateDirectory(P("home"));
+            MakeFile("secret.txt", "x");
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.ListDir(@"home\..", false); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { Download(@"home\..\secret.txt", 0); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.ListDir("nothere", false); });
+        }
+
+        [Test]
+        public void OnlyTheEnabledShareTypesAreListedAndReachable()
+        {
+            PathPolicy.SetProfileFolder(P("home"));
+            Directory.CreateDirectory(P("home"));
+            MakeFile("outside.txt", "x");
+            host.Settings.ShareFixedDrives = false;
+            host.Settings.ShareRemovableDrives = false;
+            host.Settings.ShareUserProfile = true;
+
+            List<DriveEntry> roots = client.GetRoots();
+            Assert.AreEqual(1, roots.Count, "only the profile");
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.ListDir(root, false); });
+            client.ListDir("home", false); // allowed
+
+            host.Settings.ShareUserProfile = false;
+            Assert.AreEqual(0, client.GetRoots().Count);
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.ListDir("home", false); });
+        }
+
+        [Test]
+        public void AnExtraFolderIsSharedUnderItsOwnNameAndReadOnlyIsEnforced()
+        {
+            string photos = MakeFile(@"Photos\a.txt", "pic");
+            Directory.CreateDirectory(P("Work"));
+            ShareOnly(new SharedFolder(P("Photos"), true), new SharedFolder(P("Work"), false));
+
+            List<DriveEntry> roots = client.GetRoots();
+            Assert.AreEqual(2, roots.Count);
+            Assert.AreEqual("Photos", roots[0].Name);
+            Assert.IsTrue(roots[0].ReadOnly);
+            Assert.AreEqual("Work", roots[1].Name);
+            Assert.IsFalse(roots[1].ReadOnly);
+
+            Assert.AreEqual("pic", Encoding.ASCII.GetString(Download(@"Photos\a.txt", 0)));
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Delete(@"Photos\a.txt"); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.CreateDir(@"Photos\new"); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { Upload(@"Photos\b.txt", new byte[] { 1 }, WriteMode.Overwrite); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Rename(@"Photos\a.txt", @"Photos\c.txt"); });
+            Assert.IsTrue(File.Exists(photos));
+            Assert.IsFalse(File.Exists(P(@"Photos\b.txt")));
+
+            Upload(@"Work\b.txt", new byte[] { 1, 2 }, WriteMode.Overwrite);
+            Assert.IsTrue(File.Exists(P(@"Work\b.txt")));
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Rename(@"Work\b.txt", @"Photos\b.txt"); });
+        }
+
+        [Test]
+        public void FoldersWithTheSameNameCannotBothBeShared()
+        {
+            Directory.CreateDirectory(P(@"a\Docs"));
+            Directory.CreateDirectory(P(@"b\Docs"));
+            MakeFile(@"a\Docs\first.txt", "1");
+            MakeFile(@"b\Docs\second.txt", "2");
+            ShareOnly(new SharedFolder(P(@"a\Docs"), false), new SharedFolder(P(@"b\Docs"), false));
+
+            Assert.AreEqual(1, client.GetRoots().Count, "the second 'Docs' is not shared");
+            Assert.AreEqual("first.txt", client.ListDir("Docs", false)[0].Name);
+        }
+
+        [Test]
+        public void AWholeDriveCanBeSharedReadOnlyAndKeepsItsLetterForm()
+        {
+            string drive = Path.GetPathRoot(root);
+            ShareOnly(new SharedFolder(drive, true));
+            List<DriveEntry> roots = client.GetRoots();
+            Assert.AreEqual(1, roots.Count);
+            Assert.AreEqual(drive.Substring(0, 2).ToUpperInvariant(), roots[0].Name);
+            Assert.AreEqual((byte)DriveType.Fixed, roots[0].DriveType);
+            Assert.IsTrue(roots[0].ReadOnly);
+
+            MakeFile("on-drive.txt", "x");
+            Assert.AreEqual(1, client.ListDir(root, false).FindAll(delegate(FileEntry e) { return e.Name == "on-drive.txt"; }).Count);
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Delete(P("on-drive.txt")); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Rename(drive, P("x")); });
+        }
+
+        [Test]
+        public void HiddenSystemAndProtectedItemsAreHiddenUnlessAllowed()
+        {
+            PathPolicy.SetProfileFolder(root);
+            MakeFile("plain.txt", "x");
+            File.SetAttributes(MakeFile("hidden.txt", "x"), FileAttributes.Hidden);
+            File.SetAttributes(MakeFile("sys.txt", "x"), FileAttributes.System);
+            MakeFile(@"AppData\a.txt", "x");
+
+            host.Settings.ShowHiddenAndSystem = false;
+            List<FileEntry> visible = client.ListDir(ProfileShare, false);
+            Assert.AreEqual(1, visible.Count, "only plain.txt");
+            Assert.AreEqual("plain.txt", visible[0].Name);
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.ListDir(ProfileShare + @"\AppData", false); });
+
+            host.Settings.ShowHiddenAndSystem = true;
+            Assert.AreEqual(4, client.ListDir(ProfileShare, false).Count);
+        }
+
+        [Test]
+        public void ProtectedLocationsCannotBeChangedWhileProtectionIsOn()
+        {
+            PathPolicy.SetProfileFolder(root);
+            string file = MakeFile(@"AppData\a.txt", "x");
+            string inside = ProfileShare + @"\AppData\";
+            host.Settings.ShowHiddenAndSystem = true;
+            host.Settings.ProtectSystemFiles = true;
+
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Delete(inside + "a.txt"); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { Upload(inside + "b.txt", new byte[] { 1 }, WriteMode.Overwrite); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Rename(inside + "a.txt", inside + "c.txt"); });
+            Assert.IsTrue(File.Exists(file));
+
+            host.Settings.ProtectSystemFiles = false;
+            client.Delete(inside + "a.txt");
+            Assert.IsFalse(File.Exists(file));
+        }
+
+        [Test]
+        public void SystemAttributedFilesCannotBeDeletedWhileProtectionIsOn()
+        {
+            PathPolicy.SetProfileFolder(root);
+            string file = MakeFile("sys.dat", "x");
+            File.SetAttributes(file, FileAttributes.System);
+            host.Settings.ShowHiddenAndSystem = true;
+            host.Settings.ProtectSystemFiles = true;
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Delete(ProfileShare + @"\sys.dat"); });
+            Assert.IsTrue(File.Exists(file));
+        }
+
+        [Test]
+        public void TheRootFolderOfAShareCannotBeDeletedOrRenamed()
+        {
+            PathPolicy.SetProfileFolder(P("home"));
+            Directory.CreateDirectory(P("home"));
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Delete("home"); });
+            AssertRemoteError(ErrorCode.AccessDenied, delegate { client.Rename("home", @"home\x"); });
+            Assert.IsTrue(Directory.Exists(P("home")));
+        }
+
         // ---- browsing ----
 
         [Test]
@@ -219,14 +401,14 @@ namespace EzLink.Tests
             List<DriveEntry> drives = client.GetRoots();
             Assert.Greater(drives.Count, 0);
             string systemDrive = Path.GetPathRoot(Environment.SystemDirectory).Substring(0, 1);
-            DriveEntry system = drives.Find(delegate(DriveEntry d) { return d.Letter.ToString() == systemDrive.ToUpperInvariant(); });
+            DriveEntry system = drives.Find(delegate(DriveEntry d) { return d.Name == systemDrive.ToUpperInvariant() + ":"; });
             Assert.IsNotNull(system, "the system drive is listed");
             Assert.AreEqual((byte)DriveType.Fixed, system.DriveType);
             Assert.Greater(system.TotalBytes, 0);
-            foreach (DriveEntry d in drives)
+            foreach (DriveEntry d in drives.FindAll(delegate(DriveEntry e) { return e.DriveType != 0; }))
             {
                 Assert.IsTrue(d.DriveType == (byte)DriveType.Fixed || d.DriveType == (byte)DriveType.Removable,
-                    "only fixed and removable drives, got " + d.Letter + " " + d.DriveType);
+                    "only fixed and removable drives, got " + d.Name + " " + d.DriveType);
             }
         }
 

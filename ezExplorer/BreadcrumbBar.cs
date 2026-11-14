@@ -216,11 +216,7 @@ namespace ezExplorer
             {
                 foreach (string segment in RemotePaths.Chain(path))
                 {
-                    string name = RemotePaths.GetName(segment);
-                    if (RemotePaths.IsDriveRoot(segment))
-                    {
-                        name = name.TrimEnd('\\');
-                    }
+                    string name = RemotePaths.DisplayName(segment);
                     crumbs.Add(new Crumb(segment, name));
                 }
             }

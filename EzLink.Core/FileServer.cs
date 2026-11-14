@@ -75,6 +75,7 @@ namespace EzLink
         }
 
         private readonly PermissionProvider permissions;
+        private readonly SharingSettings settings;
         private readonly PeerSession session;
         private readonly object sync = new object();
         private readonly Queue<Job> queue = new Queue<Job>();
@@ -85,9 +86,18 @@ namespace EzLink
         private WriteState write; // only the worker thread touches the contents; 'write' itself is guarded by sync
 
         public FileServer(PeerSession session, PermissionProvider permissions)
+            : this(session, permissions, null)
+        {
+        }
+
+        /// <summary>
+        /// <paramref name="settings"/> says what is shared and protected; null shares everything unprotected.
+        /// </summary>
+        public FileServer(PeerSession session, PermissionProvider permissions, SharingSettings settings)
         {
             this.session = session;
             this.permissions = permissions;
+            this.settings = settings != null ? settings : SharingSettings.Permissive();
             session.Register(this);
             session.CancelReceived += OnCancel;
             session.Closed += OnSessionClosed;
@@ -349,6 +359,89 @@ namespace EzLink
             return false;
         }
 
+        // ---- what is shared and protected ----
+
+        /// <summary>
+        /// Normalizes a path from the peer and applies the sharing rules: it must be inside what is shared, and
+        /// protected system locations are invisible when hidden files are off. With <paramref name="forWrite"/>
+        /// the protected locations and system files are also refused when "protect system files" is on.
+        /// Throws <see cref="PathRejectedException"/> (reported as access denied).
+        /// </summary>
+        private string Resolve(string wirePath, bool forWrite)
+        {
+            Share share;
+            return Resolve(wirePath, forWrite, out share);
+        }
+
+        private string Resolve(string wirePath, bool forWrite, out Share share)
+        {
+            string path = ShareTable.Build(settings).Resolve(wirePath, out share);
+            if (!settings.ShowHiddenAndSystem && PathPolicy.IsProtected(path))
+            {
+                throw new PathRejectedException(Strings.Get("ErrorNotShared"));
+            }
+            if (forWrite && share.ReadOnly)
+            {
+                throw new PathRejectedException(Strings.Get("ErrorShareReadOnly"));
+            }
+            if (forWrite && settings.ProtectSystemFiles && IsSystemLocation(path))
+            {
+                throw new PathRejectedException(Strings.Get("ErrorSystemProtected"));
+            }
+            return path;
+        }
+
+        /// <summary>The root folder of a share (or a drive root) cannot be deleted, renamed or replaced by a file.</summary>
+        private bool IsShareRoot(string fullPath)
+        {
+            return RemotePath.IsDriveRoot(fullPath) || ShareTable.Build(settings).IsShareRoot(fullPath);
+        }
+
+        /// <summary>Deleting or renaming a folder that holds a protected one (such as C:\Users) is refused too.</summary>
+        private void RefuseIfHoldsProtected(string path)
+        {
+            if (settings.ProtectSystemFiles && PathPolicy.ContainsProtected(path))
+            {
+                throw new PathRejectedException(Strings.Get("ErrorSystemProtected"));
+            }
+        }
+
+        private static bool IsSystemLocation(string path)
+        {
+            if (PathPolicy.IsProtected(path))
+            {
+                return true;
+            }
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return (File.GetAttributes(path) & FileAttributes.System) != 0;
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            return false;
+        }
+
+        /// <summary>False for entries the peer must not see: hidden, system and protected ones when those are off.</summary>
+        private bool IsVisible(FileSystemInfo info)
+        {
+            if (settings.ShowHiddenAndSystem)
+            {
+                return true;
+            }
+            if ((info.Attributes & (FileAttributes.Hidden | FileAttributes.System)) != 0)
+            {
+                return false;
+            }
+            return !PathPolicy.IsProtected(info.FullName);
+        }
+
         // ---- browsing ----
 
         private void GetRoots(uint id)
@@ -358,20 +451,33 @@ namespace EzLink
                 return;
             }
             RootsReply reply = new RootsReply();
-            foreach (DriveInfo drive in DriveInfo.GetDrives())
+            foreach (Share share in ShareTable.Build(settings).Shares)
             {
                 try
                 {
-                    if ((drive.DriveType != DriveType.Fixed && drive.DriveType != DriveType.Removable) || !drive.IsReady)
-                    {
-                        continue;
-                    }
                     DriveEntry entry = new DriveEntry();
-                    entry.Letter = char.ToUpperInvariant(drive.Name[0]);
-                    entry.DriveType = (byte)drive.DriveType;
-                    entry.Label = drive.VolumeLabel;
-                    entry.FreeBytes = drive.AvailableFreeSpace;
-                    entry.TotalBytes = drive.TotalSize;
+                    entry.Name = share.Name;
+                    entry.DriveType = share.DriveType;
+                    entry.ReadOnly = share.ReadOnly;
+                    if (share.IsDrive)
+                    {
+                        DriveInfo drive = new DriveInfo(share.FullPath);
+                        if (!drive.IsReady)
+                        {
+                            continue;
+                        }
+                        entry.Label = drive.VolumeLabel;
+                        entry.FreeBytes = drive.AvailableFreeSpace;
+                        entry.TotalBytes = drive.TotalSize;
+                    }
+                    else
+                    {
+                        if (!Directory.Exists(share.FullPath))
+                        {
+                            continue;
+                        }
+                        entry.Label = share.Name;
+                    }
                     reply.Drives.Add(entry);
                 }
                 catch (IOException)
@@ -379,6 +485,9 @@ namespace EzLink
                     // Went away while we looked (media removed): leave it out.
                 }
                 catch (UnauthorizedAccessException)
+                {
+                }
+                catch (ArgumentException)
                 {
                 }
             }
@@ -408,7 +517,7 @@ namespace EzLink
             {
                 return;
             }
-            string path = RemotePath.Normalize(request.Path);
+            string path = Resolve(request.Path, false);
             DirectoryInfo dir = new DirectoryInfo(path);
             if (!dir.Exists)
             {
@@ -425,6 +534,10 @@ namespace EzLink
                 try
                 {
                     if (request.FoldersOnly && (info.Attributes & FileAttributes.Directory) == 0)
+                    {
+                        continue;
+                    }
+                    if (!IsVisible(info))
                     {
                         continue;
                     }
@@ -467,7 +580,7 @@ namespace EzLink
             {
                 return;
             }
-            string root = RemotePath.Normalize(request.Path);
+            string root = Resolve(request.Path, false);
             if (!Directory.Exists(root))
             {
                 SendError(id, ErrorCode.NotFound, Strings.Get("ErrorFolderNotFound"));
@@ -511,6 +624,10 @@ namespace EzLink
                     bool descend;
                     try
                     {
+                        if (!IsVisible(info))
+                        {
+                            continue;
+                        }
                         string name = relative.Length == 0 ? info.Name : relative + "\\" + info.Name;
                         entry = ToEntry(info, name);
                         // Links to other folders are listed but not followed, so loops cannot happen.
@@ -562,7 +679,7 @@ namespace EzLink
             {
                 return;
             }
-            string path = RemotePath.Normalize(request.Path);
+            string path = Resolve(request.Path, false);
             StatResultReply reply = new StatResultReply();
             FileSystemInfo info;
             if (Directory.Exists(path))
@@ -595,7 +712,7 @@ namespace EzLink
             {
                 return;
             }
-            string path = RemotePath.Normalize(request.Path);
+            string path = Resolve(request.Path, false);
             if (Directory.Exists(path))
             {
                 SendError(id, ErrorCode.IoError, Strings.Get("ErrorIsFolder"));
@@ -689,8 +806,8 @@ namespace EzLink
                 return;
             }
 
-            string target = RemotePath.Normalize(request.Path);
-            if (RemotePath.IsDriveRoot(target) || Directory.Exists(target))
+            string target = Resolve(request.Path, true);
+            if (IsShareRoot(target) || Directory.Exists(target))
             {
                 SendError(id, ErrorCode.Exists, Strings.Get("ErrorTargetIsFolder"));
                 return;
@@ -931,7 +1048,7 @@ namespace EzLink
             {
                 return;
             }
-            string path = RemotePath.Normalize(request.Path);
+            string path = Resolve(request.Path, true);
             if (File.Exists(path))
             {
                 SendError(id, ErrorCode.Exists, Strings.Get("ErrorAlreadyExists"));
@@ -959,8 +1076,9 @@ namespace EzLink
             {
                 return;
             }
-            string path = RemotePath.Normalize(request.Path);
-            if (RemotePath.IsDriveRoot(path))
+            string path = Resolve(request.Path, true);
+            RefuseIfHoldsProtected(path);
+            if (IsShareRoot(path))
             {
                 SendError(id, ErrorCode.AccessDenied, Strings.Get("ErrorPathNotAllowed"));
                 return;
@@ -1015,14 +1133,17 @@ namespace EzLink
             {
                 return;
             }
-            string from = RemotePath.Normalize(request.Path);
-            string to = RemotePath.Normalize(request.NewPath);
-            if (RemotePath.IsDriveRoot(from) || RemotePath.IsDriveRoot(to))
+            Share fromShare;
+            Share toShare;
+            string from = Resolve(request.Path, true, out fromShare);
+            string to = Resolve(request.NewPath, true, out toShare);
+            if (IsShareRoot(from) || IsShareRoot(to) || !string.Equals(fromShare.Name, toShare.Name, StringComparison.OrdinalIgnoreCase))
             {
                 SendError(id, ErrorCode.AccessDenied, Strings.Get("ErrorPathNotAllowed"));
                 return;
             }
 
+            RefuseIfHoldsProtected(from);
             bool isFolder = Directory.Exists(from);
             if (!isFolder && !File.Exists(from))
             {
