@@ -50,6 +50,9 @@
     <Compile Include="CopyErrorDialog.Designer.cs">
       <DependentUpon>CopyErrorDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="DialogHeadline.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DownloadPlan.cs" />
     <Compile Include="DownloadToFolderJob.cs" />
     <Compile Include="DragSource.cs" />

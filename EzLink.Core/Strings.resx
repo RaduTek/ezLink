@@ -460,6 +460,12 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="TransferFrom" xml:space="preserve">
     <value>Copying from {0}</value>
   </data>
+  <data name="TransferCopyingName" xml:space="preserve">
+    <value>Copying {0}</value>
+  </data>
+  <data name="TransferToPath" xml:space="preserve">
+    <value>To {0}</value>
+  </data>
   <data name="TransferPreparing" xml:space="preserve">
     <value>Counting files…</value>
   </data>

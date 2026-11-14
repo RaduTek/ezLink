@@ -40,7 +40,6 @@ namespace ezExplorer
 
             Text = title;
             headline.Text = title;
-            headline.Font = new Font(Font, FontStyle.Bold);
             nameLabel.Text = Strings.Get("TransferPreparing");
             cancelButton.Text = Strings.Get("ButtonCancel");
         }
@@ -167,8 +166,12 @@ namespace ezExplorer
                 fileBar.Visible = true;
             }
 
-            nameLabel.Text = v.CurrentName;
-            pathLabel.Text = v.CurrentPath;
+            nameLabel.Text = string.IsNullOrEmpty(v.CurrentName)
+                ? string.Empty
+                : string.Format(Strings.Get("TransferCopyingName"), v.CurrentName);
+            pathLabel.Text = string.IsNullOrEmpty(v.CurrentPath)
+                ? string.Empty
+                : string.Format(Strings.Get("TransferToPath"), v.CurrentPath);
             fileBar.Value = Scale(v.FileDone, v.FileSize);
             totalBar.Value = Scale(v.TotalDone, v.TotalSize);
 
