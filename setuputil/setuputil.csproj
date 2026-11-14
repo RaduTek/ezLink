@@ -38,7 +38,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataDirSetup.cs" />
-    <Compile Include="DriverSetup.cs" />
     <Compile Include="FirewallSetup.cs" />
     <Compile Include="MachineIdSetup.cs" />
     <Compile Include="Program.cs" />
@@ -46,18 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.manifest" />
-    <None Include="drivers\x64\rtux64lh.cat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x64\rtux64lh.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x86\rtux86lh.cat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x86\rtux86lh.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EzLink.Core\EzLink.Core.csproj">
@@ -70,24 +57,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="drivers\dpinstx64.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\dpinstx86.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x64\RTNicProp64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x64\rtux64lh.INF">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x86\RTNicProp32.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="drivers\x86\rtux86lh.INF">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="Setup.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

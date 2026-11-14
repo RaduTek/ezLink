@@ -10,15 +10,9 @@ namespace ezLinkSetup
     /// Admin-only helper (requireAdministrator manifest). Verbs (each idempotent): /install (= /uuid,
     /// /firewall, /datadir), /uuid, /regenerate-uuid, /firewall, /datadir, /uninstall [/purge]. Exit code 0
     /// on success; otherwise non-zero with the reason in %ALLUSERSPROFILE%\ezLink\setup.log.
-    /// /drivers and /remove-drivers are run by the MSI (Setup project) on Windows
-    /// versions before Windows 10; they wrap DPInst, whose exit code is a status
-    /// bit field that Windows Installer would otherwise treat as a failure.
     /// </summary>
     internal static class Program
     {
-        private const string DriverInf32 = "rtux86lh.INF";
-        private const string DriverInf64 = "rtux64lh.INF";
-
         [STAThread]
         private static int Main(string[] args)
         {
@@ -94,10 +88,6 @@ namespace ezLinkSetup
                             DataDirSetup.Purge();
                         }
                         return 0;
-                    case "/drivers":
-                        return DriverSetup.Run(true);
-                    case "/remove-drivers":
-                        return DriverSetup.Run(false);
                 }
 
                 if (verb.StartsWith("/static-ip"))
