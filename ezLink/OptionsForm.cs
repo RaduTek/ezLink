@@ -78,6 +78,8 @@ namespace ezLink
             shareProfile.Checked = settings.ShareUserProfile;
             shareFixed.Checked = settings.ShareFixedDrives;
             shareRemovable.Checked = settings.ShareRemovableDrives;
+            showWindowOnConnect.Checked = settings.ShowWindowOnConnect;
+            openExplorerOnConnect.Checked = settings.OpenExplorerOnConnect;
             fixedReadOnly.Checked = settings.FixedDrivesReadOnly;
             removableReadOnly.Checked = settings.RemovableDrivesReadOnly;
             sharedStaged = settings.GetFolders();
@@ -220,6 +222,8 @@ namespace ezLink
             settings.ShareUserProfile = shareProfile.Checked;
             settings.ShareFixedDrives = shareFixed.Checked;
             settings.ShareRemovableDrives = shareRemovable.Checked;
+            settings.ShowWindowOnConnect = showWindowOnConnect.Checked;
+            settings.OpenExplorerOnConnect = openExplorerOnConnect.Checked;
             settings.FixedDrivesReadOnly = fixedReadOnly.Checked;
             settings.RemovableDrivesReadOnly = removableReadOnly.Checked;
             settings.SetFolders(sharedStaged);

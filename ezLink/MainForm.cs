@@ -253,7 +253,32 @@ namespace ezLink
         // The control session events come from session threads; the explorers are told on the UI thread.
         private void OnControlOpened(object sender, PeerEventArgs e)
         {
-            RunOnUi(delegate { explorers.PeerBack(e.Peer); });
+            RunOnUi(delegate
+            {
+                explorers.PeerBack(e.Peer);
+                RunConnectionActions(e.Peer);
+            });
+        }
+
+        /// <summary>
+        /// The "connection actions" of Options, run every time the control session to a peer opens (so a replugged
+        /// cable raises the window again). UI thread.
+        /// </summary>
+        private void RunConnectionActions(PeerInfo peer)
+        {
+            SharingSettings settings = link.Settings;
+            if (settings == null)
+            {
+                return;
+            }
+            if (settings.ShowWindowOnConnect)
+            {
+                ShowMain();
+            }
+            if (settings.OpenExplorerOnConnect)
+            {
+                explorers.Launch(link, Visible ? (IWin32Window)this : null);
+            }
         }
 
         private void OnControlClosed(object sender, PeerEventArgs e)

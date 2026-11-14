@@ -28,6 +28,10 @@ namespace EzLink
         public volatile bool ShareUserProfile = true;
         public volatile bool ShareFixedDrives;
         public volatile bool ShareRemovableDrives;
+        /// <summary>Bring the ezLink window forward when a computer connects (every time it connects).</summary>
+        public volatile bool ShowWindowOnConnect;
+        /// <summary>Open an explorer for the computer that connects (every time it connects).</summary>
+        public volatile bool OpenExplorerOnConnect;
         public volatile bool FixedDrivesReadOnly;
         public volatile bool RemovableDrivesReadOnly;
 
@@ -113,6 +117,8 @@ namespace EzLink
                     s.ShareUserProfile = Read(key, "ShareUserProfile", s.ShareUserProfile);
                     s.ShareFixedDrives = Read(key, "ShareFixedDrives", s.ShareFixedDrives);
                     s.ShareRemovableDrives = Read(key, "ShareRemovableDrives", s.ShareRemovableDrives);
+                    s.ShowWindowOnConnect = Read(key, "ShowWindowOnConnect", s.ShowWindowOnConnect);
+                    s.OpenExplorerOnConnect = Read(key, "OpenExplorerOnConnect", s.OpenExplorerOnConnect);
                     s.FixedDrivesReadOnly = Read(key, "FixedDrivesReadOnly", s.FixedDrivesReadOnly);
                     s.RemovableDrivesReadOnly = Read(key, "RemovableDrivesReadOnly", s.RemovableDrivesReadOnly);
                     s.SetFolders(SharedFolder.ParseAll(key.GetValue("Folders") as string[]));
@@ -139,6 +145,8 @@ namespace EzLink
                     Write(key, "ShareUserProfile", ShareUserProfile);
                     Write(key, "ShareFixedDrives", ShareFixedDrives);
                     Write(key, "ShareRemovableDrives", ShareRemovableDrives);
+                    Write(key, "ShowWindowOnConnect", ShowWindowOnConnect);
+                    Write(key, "OpenExplorerOnConnect", OpenExplorerOnConnect);
                     Write(key, "FixedDrivesReadOnly", FixedDrivesReadOnly);
                     Write(key, "RemovableDrivesReadOnly", RemovableDrivesReadOnly);
                     key.SetValue("Folders", SharedFolder.FormatAll(GetFolders()), RegistryValueKind.MultiString);
