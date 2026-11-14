@@ -22,8 +22,6 @@ namespace ezExplorer
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExplorerForm));
-            this.pathPanel = new System.Windows.Forms.Panel();
-            this.pathBox = new System.Windows.Forms.TextBox();
             this.split = new System.Windows.Forms.SplitContainer();
             this.tree = new ezExplorer.RemoteTreeView();
             this.list = new ezExplorer.RemoteListView();
@@ -38,6 +36,10 @@ namespace ezExplorer
             this.listSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.listNewFolderItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listRefreshItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolbarPanel = new ezExplorer.ToolbarPanel();
+            this.pathPanel = new System.Windows.Forms.Panel();
+            this.pathBar = new ezExplorer.BreadcrumbBar();
+            this.toolbarDivider = new ezExplorer.ToolbarDivider();
             this.toolStrip = new ezExplorer.NativeToolStrip.NativeToolStrip();
             this.backButton = new System.Windows.Forms.ToolStripSplitButton();
             this.forwardButton = new System.Windows.Forms.ToolStripSplitButton();
@@ -62,40 +64,22 @@ namespace ezExplorer
             this.treeSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.treeNewFolderItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeRefreshItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pathPanel.SuspendLayout();
             this.split.Panel1.SuspendLayout();
             this.split.Panel2.SuspendLayout();
             this.split.SuspendLayout();
             this.listMenu.SuspendLayout();
+            this.toolbarPanel.SuspendLayout();
+            this.pathPanel.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.treeMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // pathPanel
-            // 
-            this.pathPanel.Controls.Add(this.pathBox);
-            this.pathPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pathPanel.Location = new System.Drawing.Point(0, 37);
-            this.pathPanel.Name = "pathPanel";
-            this.pathPanel.Padding = new System.Windows.Forms.Padding(4);
-            this.pathPanel.Size = new System.Drawing.Size(800, 29);
-            this.pathPanel.TabIndex = 1;
-            // 
-            // pathBox
-            // 
-            this.pathBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pathBox.Location = new System.Drawing.Point(4, 4);
-            this.pathBox.Name = "pathBox";
-            this.pathBox.Size = new System.Drawing.Size(792, 20);
-            this.pathBox.TabIndex = 0;
-            this.pathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnPathKeyDown);
             // 
             // split
             // 
             this.split.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(167)))), ((int)(((byte)(186)))), ((int)(((byte)(197)))));
             this.split.Dock = System.Windows.Forms.DockStyle.Fill;
             this.split.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.split.Location = new System.Drawing.Point(0, 66);
+            this.split.Location = new System.Drawing.Point(0, 68);
             this.split.Name = "split";
             // 
             // split.Panel1
@@ -105,7 +89,7 @@ namespace ezExplorer
             // split.Panel2
             // 
             this.split.Panel2.Controls.Add(this.list);
-            this.split.Size = new System.Drawing.Size(800, 374);
+            this.split.Size = new System.Drawing.Size(800, 372);
             this.split.SplitterDistance = 200;
             this.split.SplitterWidth = 1;
             this.split.TabIndex = 0;
@@ -120,7 +104,7 @@ namespace ezExplorer
             this.tree.Location = new System.Drawing.Point(0, 0);
             this.tree.Name = "tree";
             this.tree.ShowLines = false;
-            this.tree.Size = new System.Drawing.Size(200, 374);
+            this.tree.Size = new System.Drawing.Size(200, 372);
             this.tree.TabIndex = 1;
             // 
             // list
@@ -134,7 +118,7 @@ namespace ezExplorer
             this.list.LabelEdit = true;
             this.list.Location = new System.Drawing.Point(0, 0);
             this.list.Name = "list";
-            this.list.Size = new System.Drawing.Size(599, 374);
+            this.list.Size = new System.Drawing.Size(599, 372);
             this.list.TabIndex = 2;
             this.list.UseCompatibleStateImageBehavior = false;
             this.list.View = System.Windows.Forms.View.Details;
@@ -222,6 +206,50 @@ namespace ezExplorer
             this.listRefreshItem.Text = "Refresh";
             this.listRefreshItem.Click += new System.EventHandler(this.OnRefreshClick);
             // 
+            // toolbarPanel
+            // 
+            this.toolbarPanel.Controls.Add(this.pathPanel);
+            this.toolbarPanel.Controls.Add(this.toolbarDivider);
+            this.toolbarPanel.Controls.Add(this.toolStrip);
+            this.toolbarPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.toolbarPanel.Location = new System.Drawing.Point(0, 0);
+            this.toolbarPanel.Name = "toolbarPanel";
+            this.toolbarPanel.Size = new System.Drawing.Size(800, 68);
+            this.toolbarPanel.TabIndex = 1;
+            // 
+            // pathPanel
+            // 
+            this.pathPanel.BackColor = System.Drawing.Color.Transparent;
+            this.pathPanel.Controls.Add(this.pathBar);
+            this.pathPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pathPanel.Location = new System.Drawing.Point(0, 38);
+            this.pathPanel.Name = "pathPanel";
+            this.pathPanel.Padding = new System.Windows.Forms.Padding(7, 4, 7, 5);
+            this.pathPanel.Size = new System.Drawing.Size(800, 30);
+            this.pathPanel.TabIndex = 3;
+            // 
+            // pathBar
+            // 
+            this.pathBar.Browser = null;
+            this.pathBar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pathBar.Location = new System.Drawing.Point(7, 4);
+            this.pathBar.Name = "pathBar";
+            this.pathBar.RootText = "";
+            this.pathBar.Size = new System.Drawing.Size(786, 21);
+            this.pathBar.TabIndex = 0;
+            this.pathBar.TabStop = false;
+            this.pathBar.NavigateRequested += new ezExplorer.PathHandler(this.OnPathNavigateRequested);
+            this.pathBar.PathSubmitted += new ezExplorer.PathHandler(this.OnPathSubmitted);
+            this.pathBar.EditCancelled += new System.EventHandler(this.OnPathEditCancelled);
+            // 
+            // toolbarDivider
+            // 
+            this.toolbarDivider.Dock = System.Windows.Forms.DockStyle.Top;
+            this.toolbarDivider.Location = new System.Drawing.Point(0, 37);
+            this.toolbarDivider.Name = "toolbarDivider";
+            this.toolbarDivider.Size = new System.Drawing.Size(800, 1);
+            this.toolbarDivider.TabIndex = 4;
+            // 
             // toolStrip
             // 
             this.toolStrip.BackColor = System.Drawing.Color.Transparent;
@@ -241,7 +269,7 @@ namespace ezExplorer
             this.toolStrip.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.toolStrip.Size = new System.Drawing.Size(800, 37);
             this.toolStrip.TabIndex = 2;
-            this.toolStrip.Theme = ezExplorer.NativeToolStrip.NativeToolStripTheme.Toolbar;
+            this.toolStrip.Theme = ezExplorer.NativeToolStrip.NativeToolStripTheme.Transparent;
             // 
             // backButton
             // 
@@ -437,25 +465,24 @@ namespace ezExplorer
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(800, 500);
             this.Controls.Add(this.split);
-            this.Controls.Add(this.pathPanel);
-            this.Controls.Add(this.toolStrip);
+            this.Controls.Add(this.toolbarPanel);
             this.Controls.Add(this.detailsBar);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(480, 320);
             this.Name = "ExplorerForm";
             this.Text = "ExplorerForm";
-            this.pathPanel.ResumeLayout(false);
-            this.pathPanel.PerformLayout();
             this.split.Panel1.ResumeLayout(false);
             this.split.Panel2.ResumeLayout(false);
             this.split.ResumeLayout(false);
             this.listMenu.ResumeLayout(false);
+            this.toolbarPanel.ResumeLayout(false);
+            this.toolbarPanel.PerformLayout();
+            this.pathPanel.ResumeLayout(false);
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.treeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -470,8 +497,8 @@ namespace ezExplorer
         private System.Windows.Forms.ToolStripMenuItem detailsItem;
         private System.Windows.Forms.ToolStripMenuItem iconsItem;
         private System.Windows.Forms.ToolStripMenuItem listItem;
-        private System.Windows.Forms.Panel pathPanel;
-        private System.Windows.Forms.TextBox pathBox;
+        private ezExplorer.ToolbarPanel toolbarPanel;
+        private ezExplorer.BreadcrumbBar pathBar;
         private System.Windows.Forms.SplitContainer split;
         private ezExplorer.RemoteTreeView tree;
         private ezExplorer.RemoteListView list;
@@ -501,5 +528,7 @@ namespace ezExplorer
         private System.Windows.Forms.ToolStripSplitButton backButton;
         private System.Windows.Forms.ToolStripSplitButton forwardButton;
         private System.Windows.Forms.ToolStripButton optionsButton;
+        private System.Windows.Forms.Panel pathPanel;
+        private ezExplorer.ToolbarDivider toolbarDivider;
     }
 }

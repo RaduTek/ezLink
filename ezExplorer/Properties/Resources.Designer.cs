@@ -220,6 +220,48 @@ namespace ezExplorer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap breadcrumb_aero_normal {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_aero_normal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap breadcrumb_aero_hover {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_aero_hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap breadcrumb_aero_pressed {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_aero_pressed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap breadcrumb_aero_disabled {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_aero_disabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap breadcrumb_arrow {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_arrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap breadcrumb_arrow_large {
+            get {
+                object obj = ResourceManager.GetObject("breadcrumb_arrow_large", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>

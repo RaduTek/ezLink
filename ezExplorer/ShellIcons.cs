@@ -25,6 +25,7 @@ namespace ezExplorer
             new Dictionary<string, Info>(StringComparer.OrdinalIgnoreCase);
 
         private static readonly Dictionary<int, Bitmap> bigIcons = new Dictionary<int, Bitmap>();
+        private static readonly Dictionary<int, Bitmap> smallIcons = new Dictionary<int, Bitmap>();
         private static IntPtr extraLargeList;
         private static bool initialized;
         private static IntPtr smallList;
@@ -147,6 +148,87 @@ namespace ezExplorer
             }
             bigIcons[index] = bitmap;
             return bitmap;
+        }
+
+        /// <summary>
+        /// The size of the icons in the system small image list. Read from the list itself, as
+        /// SystemInformation.SmallIconSize is not reliable when the DPI is not 96.
+        /// </summary>
+        public static Size SmallIconSize
+        {
+            get
+            {
+                Init();
+                int cx, cy;
+                if (smallList != IntPtr.Zero && ShellNative.ImageList_GetIconSize(smallList, out cx, out cy)
+                    && cx > 0 && cy > 0)
+                {
+                    return new Size(cx, cy);
+                }
+                int size = (int)Math.Round(16 * DpiInfo.SystemDpi / 96f);
+                return new Size(size, size);
+            }
+        }
+
+        /// <summary>
+        /// The small icon for a system image index as a bitmap (for menu items). Cached; the caller must not dispose
+        /// it. Null if the icon cannot be made.
+        /// </summary>
+        public static Bitmap SmallIcon(int index)
+        {
+            Init();
+            Bitmap bitmap;
+            if (smallIcons.TryGetValue(index, out bitmap))
+            {
+                return bitmap;
+            }
+            bitmap = null;
+            IntPtr handle = ShellNative.ImageList_GetIcon(smallList, index, ShellNative.ILD_TRANSPARENT);
+            if (handle != IntPtr.Zero)
+            {
+                try
+                {
+                    using (Icon icon = Icon.FromHandle(handle))
+                    {
+                        bitmap = icon.ToBitmap();
+                    }
+                }
+                finally
+                {
+                    ShellNative.DestroyIcon(handle);
+                }
+            }
+            smallIcons[index] = bitmap;
+            return bitmap;
+        }
+
+        /// <summary>Draws a small system icon with its top left corner at (x, y).</summary>
+        public static void DrawSmall(Graphics g, int index, int x, int y)
+        {
+            Init();
+            IntPtr hdc = g.GetHdc();
+            try
+            {
+                Ole.ImageList_Draw(smallList, index, hdc, x, y, Ole.ILD_TRANSPARENT);
+            }
+            finally
+            {
+                g.ReleaseHdc(hdc);
+            }
+        }
+
+        /// <summary>The icon index for a remote folder path: the computer, a drive or a plain folder.</summary>
+        public static int ForPath(string path)
+        {
+            if (path == null || RemotePaths.IsRoot(path))
+            {
+                return ComputerIndex;
+            }
+            if (RemotePaths.IsDriveRoot(path))
+            {
+                return ForDrive((byte)DriveType.Fixed);
+            }
+            return FolderIndex;
         }
 
         /// <param name="driveType">A System.IO.DriveType value as sent by the file server.</param>

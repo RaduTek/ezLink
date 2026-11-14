@@ -64,6 +64,16 @@
     <Compile Include="DetailsBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="BreadcrumbBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NinePatchImage.cs" />
+    <Compile Include="ToolbarDivider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolbarPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DpiInfo.cs" />
     <Compile Include="ExplorerSettings.cs" />
     <Compile Include="NativeToolStrip\NativeContextMenuStrip.cs">
@@ -158,6 +168,12 @@
     <Content Include="Resources\nav-up-24.png" />
     <Content Include="Resources\nav-up-32.png" />
     <None Include="Resources\options-32.png" />
+    <None Include="Resources\breadcrumb_aero_normal.png" />
+    <None Include="Resources\breadcrumb_aero_hover.png" />
+    <None Include="Resources\breadcrumb_aero_pressed.png" />
+    <None Include="Resources\breadcrumb_aero_disabled.png" />
+    <None Include="Resources\breadcrumb_arrow.png" />
+    <None Include="Resources\breadcrumb_arrow_large.png" />
     <None Include="Resources\options-16.png" />
     <None Include="Resources\options-24.png" />
     <Content Include="Resources\refresh-16.png" />

@@ -52,6 +52,11 @@ namespace ezExplorer
             browser.ShowSystem = settings.ShowSystem;
             browser.ConnectionChanged += OnConnectionChanged;
             nav = new NavigationController(browser, this);
+            pathBar.Browser = browser;
+            backButton.DropDown = backMenu;
+            forwardButton.DropDown = forwardMenu;
+            backButton.DropDownOpening += backButton_DropDownOpening;
+            forwardButton.DropDownOpening += forwardButton_DropDownOpening;
 
             tree.FolderPicked += OnTreeFolderPicked;
             tree.FolderContextMenu += OnTreeContextMenu;
@@ -105,7 +110,8 @@ namespace ezExplorer
             optionsButton.ToolTipText = optionsButton.Text;
             optionsButton.Image = highDpi ? Properties.Resources.options_32 : Properties.Resources.options_24;
 
-            pathPanel.Height = pathBox.PreferredHeight + 10;
+            pathBar.RootText = args.PeerName;
+            //pathPanel.Height = pathBar.PreferredHeight + 10;
 
             detailsBar.ModifiedCaption = Strings.Get("DetailsModified");
             detailsBar.SizeCaption = Strings.Get("DetailsSize");
@@ -137,6 +143,48 @@ namespace ezExplorer
         private void forwardButton_Click(object sender, EventArgs e)
         {
             nav.GoForward();
+        }
+
+        private const int HistoryMenuLength = 10;
+        private readonly NativeToolStrip.NativeContextMenuStrip backMenu = new NativeToolStrip.NativeContextMenuStrip();
+        private readonly NativeToolStrip.NativeContextMenuStrip forwardMenu = new NativeToolStrip.NativeContextMenuStrip();
+
+        private void backButton_DropDownOpening(object sender, EventArgs e)
+        {
+            FillHistoryMenu(backMenu, nav.BackHistory(HistoryMenuLength), OnBackHistoryClick);
+        }
+
+        private void forwardButton_DropDownOpening(object sender, EventArgs e)
+        {
+            FillHistoryMenu(forwardMenu, nav.ForwardHistory(HistoryMenuLength), OnForwardHistoryClick);
+        }
+
+        /// <summary>One item per remembered folder, nearest first; the item's Tag is the number of steps to it.</summary>
+        private void FillHistoryMenu(NativeToolStrip.NativeContextMenuStrip menu, List<string> folders, EventHandler click)
+        {
+            menu.Items.Clear();
+            menu.ImageScalingSize = ShellIcons.SmallIconSize;
+            for (int i = 0; i < folders.Count; i++)
+            {
+                string folder = folders[i];
+                string text = RemotePaths.IsRoot(folder) ? args.PeerName : RemotePaths.GetName(folder);
+                ToolStripMenuItem item = new ToolStripMenuItem(text.Replace("&", "&&"));
+                item.ToolTipText = RemotePaths.IsRoot(folder) ? args.PeerName : folder;
+                item.Image = ShellIcons.SmallIcon(ShellIcons.ForPath(folder));
+                item.Tag = i + 1;
+                item.Click += click;
+                menu.Items.Add(item);
+            }
+        }
+
+        private void OnBackHistoryClick(object sender, EventArgs e)
+        {
+            nav.GoBack((int)((ToolStripItem)sender).Tag);
+        }
+
+        private void OnForwardHistoryClick(object sender, EventArgs e)
+        {
+            nav.GoForward((int)((ToolStripItem)sender).Tag);
         }
 
         private void upButton_Click(object sender, EventArgs e)
@@ -334,7 +382,7 @@ namespace ezExplorer
 
         void INavigationView.ShowPath(string path)
         {
-            pathBox.Text = RemotePaths.IsRoot(path) ? args.PeerName : path;
+            pathBar.ShowPath(path);
         }
 
         void INavigationView.UpdateNavigation(bool canBack, bool canForward, bool canUp)
@@ -404,26 +452,24 @@ namespace ezExplorer
             nav.Refresh();
         }
 
-        private void OnPathKeyDown(object sender, KeyEventArgs e)
+        private void OnPathNavigateRequested(string path)
         {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                string text = pathBox.Text.Trim();
-                string path = text.Length == 0 || string.Equals(text, args.PeerName, StringComparison.OrdinalIgnoreCase)
-                    ? RemotePaths.Root
-                    : RemotePaths.FromUserText(text);
-                nav.NavigateTo(path);
-            }
-            else if (e.KeyCode == Keys.Escape)
-            {
-                e.SuppressKeyPress = true;
-                if (nav.Current != null)
-                {
-                    ((INavigationView)this).ShowPath(nav.Current);
-                }
-                list.Focus();
-            }
+            nav.NavigateTo(path);
+        }
+
+        private void OnPathSubmitted(string typed)
+        {
+            string text = typed.Trim();
+            string path = text.Length == 0 || string.Equals(text, args.PeerName, StringComparison.OrdinalIgnoreCase)
+                ? RemotePaths.Root
+                : RemotePaths.FromUserText(text);
+            list.Focus();
+            nav.NavigateTo(path);
+        }
+
+        private void OnPathEditCancelled(object sender, EventArgs e)
+        {
+            list.Focus();
         }
 
         private void SetView(View view)
@@ -659,6 +705,35 @@ namespace ezExplorer
 
         // ---- keys ----
 
+        /// <summary>
+        /// The keyboard's Browser Back / Forward keys (and mouse side buttons) arrive as WM_APPCOMMAND, which
+        /// child controls pass up to the form.
+        /// </summary>
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_APPCOMMAND = 0x0319;
+            const int APPCOMMAND_BROWSER_BACKWARD = 1;
+            const int APPCOMMAND_BROWSER_FORWARD = 2;
+
+            if (m.Msg == WM_APPCOMMAND && !list.IsEditing && !tree.IsEditing)
+            {
+                int command = (int)(((long)m.LParam >> 16) & 0x0FFF);
+                if (command == APPCOMMAND_BROWSER_BACKWARD)
+                {
+                    nav.GoBack();
+                    m.Result = new IntPtr(1);
+                    return;
+                }
+                if (command == APPCOMMAND_BROWSER_FORWARD)
+                {
+                    nav.GoForward();
+                    m.Result = new IntPtr(1);
+                    return;
+                }
+            }
+            base.WndProc(ref m);
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (!list.IsEditing && !tree.IsEditing)
@@ -676,6 +751,11 @@ namespace ezExplorer
                         return true;
                     case Keys.F5:
                         RefreshAll();
+                        return true;
+                    case Keys.Control | Keys.L:
+                    case Keys.Alt | Keys.D:
+                    case Keys.F4:
+                        pathBar.BeginEdit();
                         return true;
                 }
 

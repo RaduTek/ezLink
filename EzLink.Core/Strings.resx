@@ -300,6 +300,9 @@ Give this computer a new ID now? Windows will ask for administrator permission, 
   <data name="ExplorerNoArguments" xml:space="preserve">
     <value>ezExplorer is started by ezLink. Open ezLink and click Explore.</value>
   </data>
+  <data name="BreadcrumbEmpty" xml:space="preserve">
+    <value>(Empty)</value>
+  </data>
   <data name="ExplorerDisconnected" xml:space="preserve">
     <value>Disconnected from {0}</value>
   </data>

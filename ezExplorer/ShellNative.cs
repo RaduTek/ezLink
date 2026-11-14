@@ -118,6 +118,9 @@ namespace ezExplorer
         [DllImport("comctl32.dll")]
         public static extern IntPtr ImageList_GetIcon(IntPtr himl, int index, uint flags);
 
+        [DllImport("comctl32.dll")]
+        public static extern bool ImageList_GetIconSize(IntPtr himl, out int cx, out int cy);
+
         [DllImport("user32.dll")]
         public static extern bool DestroyIcon(IntPtr icon);
 

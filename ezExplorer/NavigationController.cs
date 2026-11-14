@@ -72,23 +72,57 @@ namespace ezExplorer
 
         public void NavigateTo(string path)
         {
-            Load(path, Mode.Push);
+            Load(path, Mode.Push, 1);
         }
 
         public void GoBack()
         {
-            if (CanGoBack)
-            {
-                Load(back[back.Count - 1], Mode.Back);
-            }
+            GoBack(1);
         }
 
         public void GoForward()
         {
-            if (CanGoForward)
+            GoForward(1);
+        }
+
+        /// <summary>Goes back this many steps in one go (1 is the previous folder).</summary>
+        public void GoBack(int steps)
+        {
+            if (steps >= 1 && steps <= back.Count)
             {
-                Load(forward[forward.Count - 1], Mode.Forward);
+                Load(back[back.Count - steps], Mode.Back, steps);
             }
+        }
+
+        /// <summary>Goes forward this many steps in one go (1 is the next folder).</summary>
+        public void GoForward(int steps)
+        {
+            if (steps >= 1 && steps <= forward.Count)
+            {
+                Load(forward[forward.Count - steps], Mode.Forward, steps);
+            }
+        }
+
+        /// <summary>The folders Back leads to, nearest first, at most max of them.</summary>
+        public List<string> BackHistory(int max)
+        {
+            return Recent(back, max);
+        }
+
+        /// <summary>The folders Forward leads to, nearest first, at most max of them.</summary>
+        public List<string> ForwardHistory(int max)
+        {
+            return Recent(forward, max);
+        }
+
+        private static List<string> Recent(List<string> stack, int max)
+        {
+            List<string> result = new List<string>();
+            for (int i = stack.Count - 1; i >= 0 && result.Count < max; i--)
+            {
+                result.Add(stack[i]);
+            }
+            return result;
         }
 
         public void GoUp()
@@ -104,10 +138,10 @@ namespace ezExplorer
         /// </summary>
         public void Refresh()
         {
-            Load(current == null ? RemotePaths.Root : current, Mode.Refresh);
+            Load(current == null ? RemotePaths.Root : current, Mode.Refresh, 1);
         }
 
-        private void Load(string path, Mode mode)
+        private void Load(string path, Mode mode, int steps)
         {
             int ticket = ++generation;
             browser.ListDir(path, delegate(List<RemoteItem> items, Exception error)
@@ -118,7 +152,7 @@ namespace ezExplorer
                 }
                 if (error == null)
                 {
-                    Commit(path, items, mode);
+                    Commit(path, items, mode, steps);
                     return;
                 }
 
@@ -126,7 +160,7 @@ namespace ezExplorer
                 if (mode == Mode.Refresh && remote != null && remote.Code == ErrorCode.NotFound
                     && RemotePaths.GetParent(path) != null)
                 {
-                    Load(RemotePaths.GetParent(path), Mode.Refresh); // the folder was deleted: climb up
+                    Load(RemotePaths.GetParent(path), Mode.Refresh, 1); // the folder was deleted: climb up
                     return;
                 }
 
@@ -139,7 +173,7 @@ namespace ezExplorer
             });
         }
 
-        private void Commit(string path, List<RemoteItem> items, Mode mode)
+        private void Commit(string path, List<RemoteItem> items, Mode mode, int steps)
         {
             switch (mode)
             {
@@ -151,12 +185,23 @@ namespace ezExplorer
                     }
                     break;
                 case Mode.Back:
-                    back.RemoveAt(back.Count - 1);
+                    // The skipped folders and the current one move to Forward, the nearest ending up on top.
+                    steps = Math.Min(steps, back.Count);
                     forward.Add(current);
+                    for (int i = back.Count - 1; i > back.Count - steps; i--)
+                    {
+                        forward.Add(back[i]);
+                    }
+                    back.RemoveRange(back.Count - steps, steps);
                     break;
                 case Mode.Forward:
-                    forward.RemoveAt(forward.Count - 1);
+                    steps = Math.Min(steps, forward.Count);
                     back.Add(current);
+                    for (int i = forward.Count - 1; i > forward.Count - steps; i--)
+                    {
+                        back.Add(forward[i]);
+                    }
+                    forward.RemoveRange(forward.Count - steps, steps);
                     break;
             }
             current = path;
